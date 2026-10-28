@@ -1,0 +1,31 @@
+product_id,sku,product_name,category_id,supplier_id,unit_measure,unit_cost_usd,unit_price_usd,current_stock,min_stock,aisle_location
+1,HM-001,Martillo de uña curva 16 oz mango fibra de vidrio Truper,1,1,Unidad,5.20,8.50,28,10,Pasillo A-01
+2,HM-002,Cinta métrica profesional 5 metros contra impacto,1,1,Unidad,2.80,4.75,8,12,Pasillo A-01
+3,HM-003,Juego de destornilladores precisión y fuerza (6 piezas),1,1,Juego,6.50,10.90,19,8,Pasillo A-02
+4,HM-004,Alicate universal de electricista 8 pulgadas aislado,1,1,Unidad,4.40,7.25,5,10,Pasillo A-02
+5,HM-005,Llave ajustable cromada (Perica) de 10 pulgadas,1,1,Unidad,5.80,9.50,15,6,Pasillo A-03
+6,HE-001,Taladro percutor industrial 1/2 pulg 750W velocidad variable,2,2,Unidad,38.00,56.50,11,5,Pasillo B-01
+7,HE-002,Esmeriladora angular (Pulidora) 4-1/2 pulg 850W,2,2,Unidad,34.50,49.90,3,5,Pasillo B-01
+8,HE-003,Disco de corte fino para metal 4-1/2 x 1/16 pulg,2,2,Unidad,0.75,1.50,145,50,Pasillo B-02
+9,HE-004,Disco diamantado segmentado para concreto 4-1/2 pulg,2,2,Unidad,3.90,6.80,18,15,Pasillo B-02
+10,HE-005,Juego de brocas de alta velocidad HSS para metal (13 pzas),2,2,Juego,7.20,12.50,0,6,Pasillo B-03
+11,TF-001,Tornillo goloso para lámina 2 pulg con arandela neopreno (Ciento),3,6,Caja x100,4.10,7.80,42,15,Pasillo C-01
+12,TF-002,Tornillo para tabla roca (Drywall) 6x1 pulg punta fina (Ciento),3,6,Caja x100,1.65,3.25,65,20,Pasillo C-01
+13,TF-003,Perno hexagonal grado 5 de 3/8 x 2 pulg con tuerca (Docena),3,6,Docena,2.40,4.50,9,12,Pasillo C-02
+14,TF-004,Anclaje expansivo para concreto (Chazo metálico) 3/8 x 3 pulg,3,6,Unidad,0.45,0.95,110,40,Pasillo C-02
+15,TF-005,Clavo de acero con cabeza para madera 2-1/2 pulg (Libra),3,6,Libra,0.85,1.60,18,25,Pasillo C-03
+16,FP-001,Tubo PVC agua potable 1/2 pulg SDR-26 de 6 metros (315 PSI),4,3,Lance 6m,3.80,6.25,54,25,Bodega Tubos T-01
+17,FP-002,Tubo PVC drenaje sanitario 4 pulg de 6 metros,4,3,Lance 6m,14.20,21.50,16,10,Bodega Tubos T-02
+18,FP-003,Pegamento solvente para PVC pesado 1/4 de pinta con aplicador,4,3,Lata,2.60,4.40,7,15,Pasillo D-01
+19,FP-004,Válvula de bola (Llave de paso) PVC roscable 1/2 pulg,4,3,Unidad,1.40,2.65,32,15,Pasillo D-02
+20,FP-005,Cinta teflón de alta densidad 3/4 pulg x 10 metros,4,3,Rollo,0.30,0.75,190,50,Pasillo D-02
+21,MC-001,Cemento gris uso general tipo UGC bolsa de 42.5 kg,5,4,Bolsa 42.5kg,7.85,9.75,85,40,Bodega Pesados P-01
+22,MC-002,Hierro corrugado de 3/8 pulg grado 40 (Varilla de 6 metros),5,4,Varilla,4.15,5.60,120,50,Bodega Pesados P-02
+23,MC-003,Alambre de amarre recocido calibre 18 (Libra),5,4,Libra,0.90,1.55,14,30,Bodega Pesados P-02
+24,MC-004,Lámina galvanizada acanalada calibre 26 de 3 metros,5,4,Lámina,13.50,17.90,22,15,Bodega Pesados P-03
+25,MC-005,Mortero premezclado para repello fino bolsa de 40 kg,5,4,Bolsa 40kg,5.40,7.25,0,20,Bodega Pesados P-01
+26,PQ-001,Pintura látex acrílica blanco mate interior/exterior (Galón),6,5,Galón,11.50,16.90,24,10,Pasillo E-01
+27,PQ-002,Pintura anticorrosiva alquídica rojo óxido para metal (Galón),6,5,Galón,14.80,21.50,6,8,Pasillo E-01
+28,PQ-003,Solvente mineral / Thinner acrílico estándar (Botella 750 ml),6,5,Botella,1.35,2.40,48,20,Pasillo E-02
+29,PQ-004,Silicona acética transparente multiusos tubo 280 ml,6,5,Cartucho,2.20,3.85,29,12,Pasillo E-03
+30,PQ-005,Brocha profesional de cerda natural 4 pulgadas,6,5,Unidad,2.10,3.60,35,15,Pasillo E-03

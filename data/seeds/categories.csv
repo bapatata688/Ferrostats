@@ -1,0 +1,7 @@
+category_id,category_code,category_name,target_margin_pct
+1,HER-MAN,"Herramientas Manuales",35.0
+2,HER-ELE,"Herramientas Eléctricas y Accesorios",28.0
+3,TOR-FIJ,"Tornillería, Pernos y Fijaciones",48.0
+4,FON-PVC,"Fontanería, Tubería PVC y Grifería",38.0
+5,MAT-CON,"Materiales Pesados de Construcción",22.0
+6,PIN-QUI,"Pinturas, Solventes y Químicos",32.0
