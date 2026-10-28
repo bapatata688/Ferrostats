@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal de Facturación — Punto de Venta (POS)</title>
+  <meta name="description" content="Terminal transaccional ACID de mostrador para cajeros de ferretería.">
+  
+  <!-- Google Fonts: Outfit (Display) & Inter (Data & Body) & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Sistema de Diseño UI/UX Pro Max (Slate/Dark Industrial) -->
+  <link rel="stylesheet" href="/static/styles.css?v=2.1">
+</head>
+<body class="theme-slate-industrial pos-standalone-body">
+
+  <!-- ============================================================ -->
+  <!-- TOPBAR MINIMALISTA: SOLO LOGO Y ENLACE GERENCIAL              -->
+  <!-- ============================================================ -->
+  <header class="navbar-minimal">
+    <div class="nav-brand-clean">
+      <div class="brand-logo-container">
+        <img src="/static/img/logo.jpg" alt="Logo" class="brand-logo" width="42" height="42">
+      </div>
+      <div class="brand-app-title">
+        <span class="system-title">Sistema Caja</span>
+        <span class="system-sub">Terminal de Facturación • Caja 1</span>
+      </div>
+    </div>
+
+    <div class="nav-actions-clean">
+      <span class="badge-role-cashier">
+        <span class="pulse-dot"></span> Mostrador Activo
+      </span>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- CONTENEDOR PRINCIPAL POS TRANSACCIONAL                       -->
+  <!-- ============================================================ -->
+  <main class="pos-main-container">
+    
+    <div class="pos-fluid-layout">
+      <!-- Columna Catálogo de Artículos -->
+      <section class="pos-catalog-column">
+        
+        <!-- Barra de Búsqueda Rápida de SKU / Nombre -->
+        <div class="pos-search-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input 
+            type="text" 
+            id="posSearchInput" 
+            class="pos-search-field" 
+            placeholder="Buscar SKU o nombre (ej. MC-001, Taladro, PVC, Cemento, Broca)..."
+            autocomplete="off"
+            autofocus
+          >
+          <button class="btn-clear-search" id="btnClearSearch" aria-label="Limpiar búsqueda">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <!-- Filtros de Categoría Ferretera -->
+        <div class="pos-category-scroller" id="posCategoryFilters">
+          <button class="cat-pill active" data-cat="">Todos (30)</button>
+          <button class="cat-pill" data-cat="1">Herramientas Manuales</button>
+          <button class="cat-pill" data-cat="2">Herramientas Eléctricas</button>
+          <button class="cat-pill" data-cat="3">Tornillería</button>
+          <button class="cat-pill" data-cat="4">Fontanería PVC</button>
+          <button class="cat-pill" data-cat="5">Materiales Pesados</button>
+          <button class="cat-pill" data-cat="6">Pinturas</button>
+        </div>
+
+        <!-- Grid de Tarjetas de Artículos -->
+        <div class="pos-cards-grid" id="posProductsGrid">
+          <!-- Se puebla dinámicamente con JavaScript -->
+        </div>
+      </section>
+
+      <!-- Columna Carrito y Checkout Transaccional -->
+      <aside class="pos-cart-column">
+        <div class="cart-box">
+          <div class="cart-box-header">
+            <div class="cart-box-title">
+              <i data-lucide="shopping-bag"></i> Ticket de Venta Actual
+            </div>
+            <button class="btn-icon-subtle" id="btnClearCart" title="Vaciar Carrito">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+
+          <!-- Lista de Renglones del Carrito -->
+          <div class="cart-items-container" id="cartItemsList">
+            <div class="cart-empty-state">
+              <i data-lucide="shopping-basket"></i>
+              <p>El carrito está vacío</p>
+              <span>Selecciona artículos del catálogo para facturar</span>
+            </div>
+          </div>
+
+          <!-- Resumen de Totales e Impuestos -->
+          <div class="cart-summary-box">
+            <div class="cart-summary-row">
+              <span>Subtotal Gravado (sin IVA)</span>
+              <strong id="cartSubtotal">$0.00</strong>
+            </div>
+            <div class="cart-summary-row">
+              <span>IVA (13%)</span>
+              <strong id="cartIva">$0.00</strong>
+            </div>
+            <div class="cart-summary-row cart-total-row">
+              <span>TOTAL A COBRAR</span>
+              <strong id="cartTotal">$0.00</strong>
+            </div>
+
+            <!-- Parámetros de la Transacción -->
+            <div class="pos-transaction-options">
+              <div class="form-field-sm">
+                <label for="posCustomerType">Cliente:</label>
+                <select id="posCustomerType" class="form-select-sm">
+                  <option value="CONSUMIDOR_FINAL" selected>Consumidor Final</option>
+                  <option value="CONTRATISTA">Contratista / Maestro Obra</option>
+                  <option value="TALLER_INDUSTRIAL">Taller Industrial</option>
+                </select>
+              </div>
+
+              <div class="form-field-sm">
+                <label for="posPaymentMethod">Método de Pago:</label>
+                <select id="posPaymentMethod" class="form-select-sm">
+                  <option value="EFECTIVO" selected>Efectivo</option>
+                  <option value="TRANSFERENCIA_QR">Transferencia QR</option>
+                  <option value="TARJETA">Tarjeta Débito/Crédito</option>
+                </select>
+              </div>
+
+              <!-- Calculador de Cambio en Efectivo (Solo visible si Método es Efectivo) -->
+              <div class="pos-cash-calc" id="posCashBox">
+                <div class="form-field-sm">
+                  <div class="pos-cash-label-row">
+                    <label for="posCashGiven">Efectivo Recibido ($):</label>
+                    <button type="button" class="btn-exact-cash" id="btnExactCash" title="Cobrar con monto exacto">
+                      <i data-lucide="zap"></i> Exacto
+                    </button>
+                  </div>
+                  <input type="number" id="posCashGiven" class="form-input-sm" placeholder="0.00" step="0.01" min="0">
+                </div>
+
+                <!-- Billetes Rápidos -->
+                <div class="pos-quick-bills" id="posQuickBills">
+                  <button type="button" class="btn-bill" data-amount="5">$5</button>
+                  <button type="button" class="btn-bill" data-amount="10">$10</button>
+                  <button type="button" class="btn-bill" data-amount="20">$20</button>
+                  <button type="button" class="btn-bill" data-amount="50">$50</button>
+                  <button type="button" class="btn-bill" data-amount="100">$100</button>
+                </div>
+
+                <div class="pos-change-display" id="posChangeContainer">
+                  <span id="posChangeLabel">Cambio / Vuelto:</span>
+                  <strong id="posCashChange">$0.00</strong>
+                </div>
+              </div>
+
+              <!-- Mensaje para Pagos Electrónicos (Tarjeta / Transferencia QR) -->
+              <div class="pos-electronic-box" id="posElectronicBox" style="display: none;">
+                <div class="pos-electronic-notice">
+                  <i data-lucide="credit-card" id="posElectronicIcon"></i>
+                  <span id="posElectronicText">Cobro electrónico exacto en terminal POS</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de Ejecución de Checkout ACID -->
+            <button class="btn btn-primary btn-block btn-checkout" id="btnConfirmCheckout" disabled>
+              <i data-lucide="check-circle-2"></i>
+              <span>Cobrar y Procesar Venta</span>
+            </button>
+            <div class="pos-acid-guarantee">
+              <i data-lucide="lock"></i> Transacción ACID atómica en SQLite WAL (&lt; 50 ms)
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: COMPROBANTE DIGITAL DE VENTA (ACID RECEIPT)           -->
+  <!-- ============================================================ -->
+  <div class="modal-overlay" id="modalReceiptOverlay" role="dialog" aria-modal="true">
+    <div class="modal-box modal-receipt">
+      <div class="receipt-header">
+        <img src="/static/img/logo.jpg" alt="Logo" class="receipt-logo" width="56" height="56">
+        <div class="receipt-title">Venta Confirmada Exitosamente</div>
+        <div class="receipt-subtitle">Transacción ACID Procesada en SQLite WAL</div>
+      </div>
+      <div class="receipt-body" id="receiptContent">
+        <!-- Contenido dinámico del ticket -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-block" id="btnCloseReceipt">
+          <i data-lucide="printer"></i> Nueva Venta / Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor de Notificaciones Toast -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Script del Punto de Venta -->
+  <script src="/static/pos.js"></script>
+</body>
+</html>

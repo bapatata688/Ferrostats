@@ -1,0 +1,559 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 920" width="1600" height="920" style="background-color: #080c15; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <defs>
+    <!-- Filtros de sombra profesionales -->
+    <filter id="shadow" x="-3%" y="-3%" width="106%" height="106%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="card-shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Gradientes sobrios (Dark Slate Enterprise) -->
+    <linearGradient id="header-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d1424"/>
+      <stop offset="100%" stop-color="#090e1a"/>
+    </linearGradient>
+
+    <linearGradient id="col-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0d1424"/>
+      <stop offset="100%" stop-color="#090d18"/>
+    </linearGradient>
+
+    <linearGradient id="card-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#121b2f"/>
+      <stop offset="100%" stop-color="#0e1626"/>
+    </linearGradient>
+
+    <!-- Marcador de flecha sobrio Google Cloud Blue -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 7 5 L 0 8 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <!-- Cuadrícula técnica sutil de fondo -->
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+    <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#101726" stroke-width="0.8"/>
+  </pattern>
+  <rect width="100%" height="100%" fill="url(#grid)" />
+
+  <!-- ============================================================ -->
+  <!-- 1. ENCABEZADO CORPORATIVO                                     -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 22)">
+    <rect width="1520" height="84" rx="10" fill="url(#header-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#shadow)"/>
+    
+    <!-- GCP Cloud Badge Sobrio -->
+    <rect x="24" y="24" width="132" height="36" rx="6" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <g transform="translate(34, 32)">
+      <path d="M 12 18 C 8.7 18 6 15.3 6 12 C 6 9.1 8 6.7 10.8 6.1 C 11.9 3.1 14.8 1 18.2 1 C 22.3 1 25.7 3.9 26.3 8 C 28.5 8.3 30.2 10.2 30.2 12.5 C 30.2 15.5 27.7 18 24.7 18 Z" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round"/>
+    </g>
+    <text x="74" y="47" fill="#38bdf8" font-size="12" font-weight="700" letter-spacing="0.8">GCP CLOUD</text>
+
+    <!-- Título y Subtítulo Principal -->
+    <text x="175" y="45" fill="#f8fafc" font-size="21" font-weight="800" letter-spacing="0.2">FERROSTATS — ARQUITECTURA DE DATOS END-TO-END</text>
+    <text x="175" y="67" fill="#94a3b8" font-size="12.5" font-weight="400">Pipeline ELT Medallón Serverless (Bronze, Silver, Gold) • Micro-latencia ACID &lt; 50 ms • FinOps: $0.00 USD / mes</text>
+
+    <!-- Chip FinOps Always Free Tier -->
+    <rect x="1335" y="25" width="160" height="34" rx="6" fill="#132238" stroke="#1e3a66" stroke-width="1"/>
+    <circle cx="1353" cy="42" r="4.5" fill="#38bdf8"/>
+    <text x="1366" y="46" fill="#cbd5e1" font-size="11.5" font-weight="700" letter-spacing="0.4">ALWAYS FREE TIER</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 2. COLUMNA 1: TRANSACCIÓN & EDGE (OLTP)                       -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 122)">
+    <rect width="280" height="664" rx="10" fill="url(#col-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#card-shadow)"/>
+    
+    <!-- Header de Etapa -->
+    <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 48 L 0 48 Z" fill="#0b1120"/>
+    <line x1="0" y1="48" x2="280" y2="48" stroke="#1e293b" stroke-width="1"/>
+    
+    <rect x="16" y="14" width="28" height="20" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <text x="23" y="28" fill="#38bdf8" font-size="11" font-weight="800">01</text>
+    
+    <text x="54" y="27" fill="#f1f5f9" font-size="12" font-weight="700" letter-spacing="0.5">TRANSACCIÓN &amp; EDGE</text>
+    <text x="54" y="40" fill="#64748b" font-size="9.5" font-weight="500">MICRO-LATENCIA LOCAL</text>
+
+    <!-- Tarjeta 1.1: Cloud Run Serverless -->
+    <g transform="translate(14, 58)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Servidor -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <path d="M 6 9 L 20 9 M 6 17 L 20 17 M 9 9 L 9 17" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="17" cy="13" r="1.5" fill="#38bdf8"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Google Cloud Run</text>
+      <rect x="46" y="29" width="72" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">SERVERLESS</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Microservicio FastAPI en us-central1.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Autoescalado de 0 a N instancias.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">2M peticiones mensuales gratuitas.</text>
+      <text x="14" y="116" fill="#38bdf8" font-size="10.5" font-weight="600">Cero consumo en inactividad</text>
+    </g>
+
+    <!-- Tarjeta 1.2: SQLite WAL Engine -->
+    <g transform="translate(14, 204)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Database -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <ellipse cx="13" cy="8" rx="7" ry="2.5" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 6 8 L 6 18 A 7 2.5 0 0 0 20 18 L 20 8" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 6 13 A 7 2.5 0 0 0 20 13" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">SQLite WAL Engine</text>
+      <rect x="46" y="29" width="76" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">ACID &lt; 50MS</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Garantías atómicas en el mostrador.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Write-Ahead-Log sin latencia de red.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Inmune a interrupciones de internet.</text>
+      <text x="14" y="116" fill="#cbd5e1" font-size="10.5" font-weight="600">Bloqueo de saldo negativo</text>
+    </g>
+
+    <!-- Tarjeta 1.3: Terminal POS Mostrador -->
+    <g transform="translate(14, 350)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Monitor -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <rect x="5" y="6" width="16" height="11" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="8" y1="20" x2="18" y2="20" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="13" y1="17" x2="13" y2="20" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Terminal POS Mostrador</text>
+      <rect x="46" y="29" width="65" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">CAJAS POS</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Cobro rápido con desglose IVA 13%.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Búsqueda rápida por nombre o SKU.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Atajos de billetes y cálculo de cambio.</text>
+      <text x="14" y="116" fill="#cbd5e1" font-size="10.5" font-weight="600">Ticket fiscal con UUID único</text>
+    </g>
+
+    <!-- Tarjeta 1.4: Auditoría de Bodega -->
+    <g transform="translate(14, 496)">
+      <rect width="252" height="152" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Caja Almacén -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <path d="M 6 8 L 13 5 L 20 8 L 13 11 Z" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 6 9 L 6 18 L 13 21 L 13 12" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 20 9 L 20 18 L 13 21" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Auditoría en Bodega</text>
+      <rect x="46" y="29" width="60" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">ALMACÉN</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Control por pasillos A, B y C.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Pasillo A: Materiales pesados.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Filtro rápido de existencias bajas.</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">Recepción de mercadería directa.</text>
+      <text x="14" y="132" fill="#38bdf8" font-size="10.5" font-weight="600">Actualización en tiempo real</text>
+    </g>
+  </g>
+
+  <!-- Flecha 1 -> 2 -->
+  <line x1="320" y1="454" x2="346" y2="454" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- 3. COLUMNA 2: INGESTA STREAMING & BRONZE                     -->
+  <!-- ============================================================ -->
+  <g transform="translate(350, 122)">
+    <rect width="280" height="664" rx="10" fill="url(#col-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#card-shadow)"/>
+    
+    <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 48 L 0 48 Z" fill="#0b1120"/>
+    <line x1="0" y1="48" x2="280" y2="48" stroke="#1e293b" stroke-width="1"/>
+    
+    <rect x="16" y="14" width="28" height="20" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <text x="23" y="28" fill="#38bdf8" font-size="11" font-weight="800">02</text>
+    
+    <text x="54" y="27" fill="#f1f5f9" font-size="12" font-weight="700" letter-spacing="0.5">INGESTA &amp; BRONZE</text>
+    <text x="54" y="40" fill="#64748b" font-size="9.5" font-weight="500">ASÍNCRONO &amp; CRUDO</text>
+
+    <!-- Tarjeta 2.1: Streaming Ingestion API -->
+    <g transform="translate(14, 58)">
+      <rect width="252" height="175" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Streaming -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <path d="M 8 13 A 7 7 0 0 1 18 13" fill="none" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M 5 10 A 11 11 0 0 1 21 10" fill="none" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="13" cy="17" r="2" fill="#38bdf8"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">BigQuery Streaming</text>
+      <rect x="46" y="29" width="76" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">TIEMPO REAL</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Ingesta asíncrona por eventos POST.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Copia fiel de cada venta y kardex</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">hacia el Data Warehouse central.</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">Cero bloqueo de interfaz al cajero.</text>
+      <text x="14" y="132" fill="#38bdf8" font-size="10.5" font-weight="600">Desacople total de OLTP y OLAP</text>
+    </g>
+
+    <!-- Tarjeta 2.2: Cloud Storage -->
+    <g transform="translate(14, 245)">
+      <rect width="252" height="165" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Bucket -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <rect x="6" y="7" width="14" height="13" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="6" y1="12" x2="20" y2="12" stroke="#38bdf8" stroke-width="1.3"/>
+        <circle cx="13" cy="16" r="1.5" fill="#38bdf8"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Google Cloud Storage</text>
+      <rect x="46" y="29" width="60" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">STORAGE</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Respaldo inmutable de cargas masivas</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">y catálogos en formato JSONL/Parquet.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Trazabilidad de auditoría de negocio</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">y recuperación ante desastres.</text>
+      <text x="14" y="132" fill="#cbd5e1" font-size="10.5" font-weight="600">5 GB gratuitos mensuales</text>
+    </g>
+
+    <!-- Tarjeta 2.3: Dataset Bronze -->
+    <g transform="translate(14, 422)">
+      <rect width="252" height="226" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Cylinder -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <ellipse cx="13" cy="8" rx="7" ry="2.5" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 6 8 L 6 18 A 7 2.5 0 0 0 20 18 L 20 8" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">BigQuery Capa Bronze</text>
+      <rect x="46" y="29" width="55" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">BRONZE</text>
+
+      <!-- Tabla 1 -->
+      <rect x="14" y="52" width="224" height="28" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="70" fill="#cbd5e1" font-size="10" font-family="monospace">ferrostats_bronze.raw_sales</text>
+
+      <!-- Tabla 2 -->
+      <rect x="14" y="88" width="224" height="28" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="106" fill="#cbd5e1" font-size="10" font-family="monospace">ferrostats_bronze.raw_prod</text>
+
+      <text x="14" y="136" fill="#94a3b8" font-size="10.5">Almacenamiento columnar crudo.</text>
+      <text x="14" y="152" fill="#94a3b8" font-size="10.5">Conserva fidelidad exacta sin</text>
+      <text x="14" y="168" fill="#94a3b8" font-size="10.5">modificaciones sobre la fuente.</text>
+      <text x="14" y="190" fill="#38bdf8" font-size="10.5" font-weight="600">Histórico inmutable particionado</text>
+    </g>
+  </g>
+
+  <!-- Flecha 2 -> 3 -->
+  <line x1="630" y1="454" x2="656" y2="454" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- 4. COLUMNA 3: DATAFORM ELT & SILVER                          -->
+  <!-- ============================================================ -->
+  <g transform="translate(660, 122)">
+    <rect width="280" height="664" rx="10" fill="url(#col-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#card-shadow)"/>
+    
+    <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 48 L 0 48 Z" fill="#0b1120"/>
+    <line x1="0" y1="48" x2="280" y2="48" stroke="#1e293b" stroke-width="1"/>
+    
+    <rect x="16" y="14" width="28" height="20" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <text x="23" y="28" fill="#38bdf8" font-size="11" font-weight="800">03</text>
+    
+    <text x="54" y="27" fill="#f1f5f9" font-size="12" font-weight="700" letter-spacing="0.5">DATAFORM ELT (SILVER)</text>
+    <text x="54" y="40" fill="#64748b" font-size="9.5" font-weight="500">LIMPIEZA &amp; GOBERNANZA</text>
+
+    <!-- Tarjeta 3.1: Dataform Core -->
+    <g transform="translate(14, 58)">
+      <rect width="252" height="175" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Git / DAG -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <circle cx="9" cy="9" r="2.2" fill="#38bdf8"/>
+        <circle cx="9" cy="18" r="2.2" fill="#38bdf8"/>
+        <circle cx="17" cy="13.5" r="2.2" fill="#38bdf8"/>
+        <line x1="9" y1="9" x2="9" y2="18" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="9" y1="9" x2="17" y2="13.5" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Google Cloud Dataform</text>
+      <rect x="46" y="29" width="85" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">ORQUESTADOR</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Pipelines de transformación en SQLX.</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">Resolución nativa de dependencias</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">con ${ref()} y versionado Git.</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">Sin costes de servidores Airflow.</text>
+      <text x="14" y="132" fill="#38bdf8" font-size="10.5" font-weight="600">Compilación serverless en BigQuery</text>
+    </g>
+
+    <!-- Tarjeta 3.2: BigQuery Silver -->
+    <g transform="translate(14, 245)">
+      <rect width="252" height="195" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Silver -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <ellipse cx="13" cy="8" rx="7" ry="2.5" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 6 8 L 6 18 A 7 2.5 0 0 0 20 18 L 20 8" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="6" y1="13" x2="20" y2="13" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">BigQuery Capa Silver</text>
+      <rect x="46" y="29" width="50" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">SILVER</text>
+
+      <rect x="14" y="50" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="66" fill="#cbd5e1" font-size="9.5" font-family="monospace">stg_sales (tipado &amp; neto)</text>
+
+      <rect x="14" y="80" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="96" fill="#cbd5e1" font-size="9.5" font-family="monospace">stg_products (catálogo)</text>
+
+      <rect x="14" y="110" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="126" fill="#cbd5e1" font-size="9.5" font-family="monospace">stg_sale_items (detalle)</text>
+
+      <text x="14" y="152" fill="#94a3b8" font-size="10.5">Datos curados, sin duplicados y</text>
+      <text x="14" y="168" fill="#38bdf8" font-size="10.5" font-weight="600">cálculo matemático de márgenes</text>
+    </g>
+
+    <!-- Tarjeta 3.3: Assertions de Calidad -->
+    <g transform="translate(14, 452)">
+      <rect width="252" height="196" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Shield -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <path d="M 13 5 L 19 8 L 19 13 C 19 17 13 20 13 20 C 13 20 7 17 7 13 L 7 8 Z" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <path d="M 10 12 L 12 14 L 16 10" fill="none" stroke="#38bdf8" stroke-width="1.3" stroke-linecap="round"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Assertions de Calidad</text>
+      <rect x="46" y="29" width="70" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">DATA QUALITY</text>
+
+      <text x="14" y="60" fill="#94a3b8" font-size="10.5">Validaciones pre-publicación:</text>
+      
+      <rect x="14" y="70" width="224" height="26" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="87" fill="#38bdf8" font-size="10" font-family="monospace">uniqueKey: ["sale_id"]</text>
+
+      <rect x="14" y="102" width="224" height="26" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="119" fill="#38bdf8" font-size="10" font-family="monospace">nonNull: ["total_amount_usd"]</text>
+
+      <text x="14" y="146" fill="#94a3b8" font-size="10.5">Previene discrepancias contables.</text>
+      <text x="14" y="164" fill="#cbd5e1" font-size="10.5" font-weight="600">Bloqueo de despliegues anómalos</text>
+    </g>
+  </g>
+
+  <!-- Flecha 3 -> 4 -->
+  <line x1="940" y1="454" x2="966" y2="454" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- 5. COLUMNA 4: CAPA GOLD & DATA MARTS                         -->
+  <!-- ============================================================ -->
+  <g transform="translate(970, 122)">
+    <rect width="280" height="664" rx="10" fill="url(#col-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#card-shadow)"/>
+    
+    <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 48 L 0 48 Z" fill="#0b1120"/>
+    <line x1="0" y1="48" x2="280" y2="48" stroke="#1e293b" stroke-width="1"/>
+    
+    <rect x="16" y="14" width="28" height="20" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <text x="23" y="28" fill="#38bdf8" font-size="11" font-weight="800">04</text>
+    
+    <text x="54" y="27" fill="#f1f5f9" font-size="12" font-weight="700" letter-spacing="0.5">DATA MARTS (GOLD)</text>
+    <text x="54" y="40" fill="#64748b" font-size="9.5" font-weight="500">MODELO DIMENSIONAL</text>
+
+    <!-- Tarjeta 4.1: BigQuery Capa Gold -->
+    <g transform="translate(14, 58)">
+      <rect width="252" height="175" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Gold -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <polygon points="13,6 15.5,11 21,11.5 17,15.5 18,21 13,18 8,21 9,15.5 5,11.5 10.5,11" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">BigQuery Capa Gold</text>
+      <rect x="46" y="29" width="76" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">DIMENSIONAL</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Tablas analíticas pre-agregadas</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">en modelo Star Schema (Facts &amp; Dims).</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Respuestas rápidas en subsegundo</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">con mínimo escaneo de bytes.</text>
+      <text x="14" y="132" fill="#38bdf8" font-size="10.5" font-weight="600">1 TB de consultas gratis al mes</text>
+    </g>
+
+    <!-- Tarjeta 4.2: Data Mart Pareto ABC -->
+    <g transform="translate(14, 245)">
+      <rect width="252" height="195" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Bar Chart -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <line x1="6" y1="19" x2="20" y2="19" stroke="#38bdf8" stroke-width="1.3"/>
+        <rect x="7" y="13" width="3" height="6" fill="#38bdf8"/>
+        <rect x="12" y="9" width="3" height="10" fill="#38bdf8"/>
+        <rect x="17" y="5" width="3" height="14" fill="#38bdf8"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Mart Pareto ABC 80/20</text>
+      <rect x="46" y="29" width="76" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">PARETO 80/20</text>
+
+      <rect x="14" y="50" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="20" y="66" fill="#cbd5e1" font-size="9" font-family="monospace">mart_inventario_pareto_abc</text>
+
+      <text x="14" y="90" fill="#94a3b8" font-size="10.5">Clasificación de 30 SKUs:</text>
+      <text x="14" y="108" fill="#f8fafc" font-size="10.5">• <tspan font-weight="700">Clase A:</tspan> 80% ventas (Cemento, varilla)</text>
+      <text x="14" y="125" fill="#cbd5e1" font-size="10.5">• <tspan font-weight="700">Clase B:</tspan> 15% ventas (Herramientas)</text>
+      <text x="14" y="142" fill="#94a3b8" font-size="10.5">• <tspan font-weight="700">Clase C:</tspan> 5% ventas (Lenta rotación)</text>
+      <text x="14" y="166" fill="#38bdf8" font-size="10.5" font-weight="600">Priorización de compras</text>
+    </g>
+
+    <!-- Tarjeta 4.3: Fact Ventas y ROP -->
+    <g transform="translate(14, 452)">
+      <rect width="252" height="196" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Reloj / Burn Rate -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <circle cx="13" cy="13" r="7.5" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="13" y1="9" x2="13" y2="13" stroke="#38bdf8" stroke-width="1.3"/>
+        <line x1="13" y1="13" x2="17" y2="13" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Fact Ventas y Burn Rate</text>
+      <rect x="46" y="29" width="60" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">FINANZAS</text>
+
+      <rect x="14" y="50" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <text x="22" y="66" fill="#cbd5e1" font-size="9.5" font-family="monospace">dw_fact_daily_sales</text>
+
+      <text x="14" y="90" fill="#94a3b8" font-size="10.5">Métricas operativas diarias:</text>
+      <text x="14" y="108" fill="#94a3b8" font-size="10.5">• Consumo diario promedio (Burn Rate)</text>
+      <text x="14" y="125" fill="#94a3b8" font-size="10.5">• Días de inventario restante (DOI)</text>
+      <text x="14" y="142" fill="#38bdf8" font-size="10.5">• Punto de reorden inteligente (ROP)</text>
+      <text x="14" y="166" fill="#cbd5e1" font-size="10.5" font-weight="600">Protección contra quiebres</text>
+    </g>
+  </g>
+
+  <!-- Flecha 4 -> 5 -->
+  <line x1="1250" y1="454" x2="1276" y2="454" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- 6. COLUMNA 5: BUSINESS INTELLIGENCE                          -->
+  <!-- ============================================================ -->
+  <g transform="translate(1280, 122)">
+    <rect width="280" height="664" rx="10" fill="url(#col-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#card-shadow)"/>
+    
+    <path d="M 0 10 Q 0 0 10 0 L 270 0 Q 280 0 280 10 L 280 48 L 0 48 Z" fill="#0b1120"/>
+    <line x1="0" y1="48" x2="280" y2="48" stroke="#1e293b" stroke-width="1"/>
+    
+    <rect x="16" y="14" width="28" height="20" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+    <text x="23" y="28" fill="#38bdf8" font-size="11" font-weight="800">05</text>
+    
+    <text x="54" y="27" fill="#f1f5f9" font-size="12" font-weight="700" letter-spacing="0.5">BUSINESS INTELLIGENCE</text>
+    <text x="54" y="40" fill="#64748b" font-size="9.5" font-weight="500">TOMA DE DECISIONES</text>
+
+    <!-- Tarjeta 5.1: Google Looker Studio -->
+    <g transform="translate(14, 58)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Icono Pie Chart -->
+      <g transform="translate(12, 12)">
+        <rect width="26" height="26" rx="5" fill="#152033" stroke="#253552" stroke-width="1"/>
+        <path d="M 13 6 A 7 7 0 0 1 20 13 L 13 13 Z" fill="#38bdf8"/>
+        <path d="M 12 7 L 12 14 L 5 14 A 7 7 0 1 1 12 7" fill="none" stroke="#38bdf8" stroke-width="1.3"/>
+      </g>
+      
+      <text x="46" y="24" fill="#f8fafc" font-size="12" font-weight="700">Google Looker Studio</text>
+      <rect x="46" y="29" width="65" height="15" rx="3" fill="#152033"/>
+      <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">BI ENGINE</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">Conexión nativa a BigQuery con</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">aceleración BI Engine en memoria.</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">Tableros interactivos para gerencia.</text>
+      <text x="14" y="116" fill="#38bdf8" font-size="10.5" font-weight="600">Latencia subsegundo en dashboards</text>
+    </g>
+
+    <!-- Tarjeta 5.2: Pág 1 Ventas -->
+    <g transform="translate(14, 204)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <text x="14" y="24" fill="#f8fafc" font-size="12" font-weight="700">Pág 1: Ventas &amp; Finanzas</text>
+      <rect x="14" y="29" width="60" height="15" rx="3" fill="#152033"/>
+      <text x="19" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">FINANZAS</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">• Tendencia de ingresos a 30 días</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">• Costo de mercancía vendida (COGS)</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">• Margen bruto porcentual (&gt; 28%)</text>
+      <text x="14" y="116" fill="#cbd5e1" font-size="10.5" font-weight="600">Visualización de salud financiera</text>
+    </g>
+
+    <!-- Tarjeta 5.3: Pág 2 Pareto ABC -->
+    <g transform="translate(14, 350)">
+      <rect width="252" height="136" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <text x="14" y="24" fill="#f8fafc" font-size="12" font-weight="700">Pág 2: Pareto ABC &amp; DOI</text>
+      <rect x="14" y="29" width="70" height="15" rx="3" fill="#152033"/>
+      <text x="19" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">INVENTARIO</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">• Matriz completa de 30 productos</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">• Semáforo de riesgo de quiebre</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">• Días de inventario restante por SKU</text>
+      <text x="14" y="116" fill="#38bdf8" font-size="10.5" font-weight="600">Detección preventiva de quiebres</text>
+    </g>
+
+    <!-- Tarjeta 5.4: Pág 3 Distribución -->
+    <g transform="translate(14, 496)">
+      <rect width="252" height="152" rx="8" fill="url(#card-grad)" stroke="#1e293b" stroke-width="1"/>
+      
+      <text x="14" y="24" fill="#f8fafc" font-size="12" font-weight="700">Pág 3: Distribución 80/20</text>
+      <rect x="14" y="29" width="70" height="15" rx="3" fill="#152033"/>
+      <text x="19" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">ESTRATEGIA</text>
+
+      <text x="14" y="62" fill="#94a3b8" font-size="10.5">• Gráfico circular Pareto (80/15/5)</text>
+      <text x="14" y="78" fill="#94a3b8" font-size="10.5">• Valuación total de bodega en USD</text>
+      <text x="14" y="94" fill="#94a3b8" font-size="10.5">• Respaldo para pedidos de compra</text>
+      <text x="14" y="110" fill="#94a3b8" font-size="10.5">• Control del capital inmovilizado</text>
+      <text x="14" y="132" fill="#cbd5e1" font-size="10.5" font-weight="600">Protección del flujo de caja</text>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- 7. FOOTER CORPORATIVO (GOBERNANZA, FINOPS & SEGURIDAD)        -->
+  <!-- ============================================================ -->
+  <g transform="translate(40, 798)">
+    <rect width="1520" height="100" rx="10" fill="url(#header-grad)" stroke="#1e293b" stroke-width="1.2" filter="url(#shadow)"/>
+    
+    <!-- Item 1: FinOps -->
+    <g transform="translate(30, 24)">
+      <rect width="90" height="24" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+      <text x="14" y="16" fill="#38bdf8" font-size="11" font-weight="700">FINOPS $0.00</text>
+      <text x="105" y="17" fill="#f8fafc" font-size="13" font-weight="700">Coste de Servidores: $0.00 USD / mes</text>
+      <text x="105" y="38" fill="#94a3b8" font-size="11.5">Aprovechamiento al 100% del Always Free Tier (Cloud Run 2M peticiones + BigQuery 1TB consultas + Dataform gratuito).</text>
+    </g>
+
+    <!-- Item 2: Gobernanza & Seguridad -->
+    <g transform="translate(800, 24)">
+      <rect width="130" height="24" rx="4" fill="#152033" stroke="#253552" stroke-width="1"/>
+      <text x="14" y="16" fill="#38bdf8" font-size="11" font-weight="700">GOBERNANZA &amp; IAM</text>
+      <text x="145" y="17" fill="#f8fafc" font-size="13" font-weight="700">Seguridad Empresarial en la Nube</text>
+      <text x="145" y="38" fill="#94a3b8" font-size="11.5">Roles de mínimo privilegio IAM, Cloud Audit Logs inmutables y encriptación de datos en reposo y tránsito (TLS 1.3).</text>
+    </g>
+  </g>
+</svg>

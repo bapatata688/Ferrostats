@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FERROSTATS — Executive Architecture & Production Platform</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-dark: #080c15;
+      --bg-card: #0f172a;
+      --bg-card-hover: #152238;
+      --border-color: #1e293b;
+      --border-focus: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --accent-blue: #38bdf8;
+      --accent-blue-glow: rgba(56, 189, 248, 0.12);
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* TOP BAR CORPORATIVO CON LOGO */
+    header {
+      height: 3.75rem;
+      background: rgba(8, 12, 21, 0.96);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-logo-img {
+      height: 2.25rem;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-left: 0.5rem;
+      padding-left: 0.65rem;
+      border-left: 1px solid var(--border-color);
+      letter-spacing: 0.02em;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .slide-counter {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--accent-blue);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.3rem 0.85rem;
+      border-radius: 9999px;
+      letter-spacing: 0.04em;
+    }
+
+    /* SLIDE STAGE */
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.75rem 2.5rem;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1320px;
+      height: 100%;
+      max-height: 720px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease-out;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* SLIDE TYPOGRAPHY */
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      background: var(--accent-blue-glow);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      width: fit-content;
+      margin-bottom: 0.75rem;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .slide-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 880px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* GRIDS & CARDS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+      width: 100%;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.65rem;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.45rem;
+      color: #f8fafc;
+    }
+
+    .card-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* 50% SPLIT IMAGE CONTAINER */
+    .image-half-container {
+      width: 100%;
+      height: 100%;
+      max-height: 530px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050811;
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .image-half-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.25s ease;
+    }
+
+    .image-half-container img:hover {
+      transform: scale(1.02);
+    }
+
+    /* FULL WIDTH IMAGE CONTAINER FOR ARCHITECTURE */
+    .image-full-container {
+      width: 100%;
+      height: 100%;
+      max-height: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050811;
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .image-full-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* BULLET LIST SOBRIO */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+
+    .bullet-dot {
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 0.4rem;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .bullet-dot i {
+      width: 0.85rem;
+      height: 0.85rem;
+    }
+
+    /* TAGS & BADGES */
+    .hero-tags {
+      display: flex;
+      gap: 0.65rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-tag {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-tag i {
+      width: 0.9rem;
+      height: 0.9rem;
+      color: var(--accent-blue);
+    }
+
+    /* BOTTOM CONTROLS */
+    footer {
+      height: 3.75rem;
+      background: rgba(8, 12, 21, 0.96);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 50;
+    }
+
+    .btn-nav {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: #f8fafc;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.86rem;
+      padding: 0.5rem 1.15rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-nav:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: var(--border-color);
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      max-width: 420px;
+      height: 5px;
+      background: var(--bg-card);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 0 1.5rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent-blue);
+      width: 16.66%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-wrap">
+      <img src="logo.png" alt="Logo FERROSTATS" class="brand-logo-img">
+      <div class="brand-title">FERROSTATS</div>
+      <div class="brand-sub">Cloud Data Platform & BI Engine</div>
+    </div>
+    <div class="top-controls">
+      <span class="slide-counter" id="slideCounter">1 / 6</span>
+    </div>
+  </header>
+
+  <!-- SLIDE STAGE -->
+  <main>
+
+    <!-- SLIDE 1: PORTADA OFICIAL CON LOGO -->
+    <section class="slide active" data-index="1">
+      <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.15rem;">
+        <img src="logo.png" alt="Logo FERROSTATS"
+          style="height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));">
+        <div>
+          <h1 class="slide-title" style="font-size: 3.4rem; letter-spacing: -0.03em; margin-bottom: 0;">FERROSTATS</h1>
+        </div>
+      </div>
+
+      <p class="slide-desc" style="font-size: 1.25rem; color: #e2e8f0; max-width: 950px; line-height: 1.45;">
+        Plataforma Integral de Inteligencia de Negocios, Control de Existencias por Pasillos y Punto de Venta Atómico
+        (ACID) para Ferreterías.
+      </p>
+
+      <div class="hero-tags">
+        <span class="hero-tag"><i data-lucide="shield-check"></i> Arquitectura Serverless $0.00 USD</span>
+        <span class="hero-tag"><i data-lucide="database"></i> Google BigQuery + Dataform</span>
+        <span class="hero-tag"><i data-lucide="bar-chart-2"></i> Looker Studio BI Engine</span>
+        <span class="hero-tag"><i data-lucide="zap"></i> SQLite WAL ACID &lt; 50 ms</span>
+      </div>
+
+      <div class="card" style="max-width: 760px; background: rgba(15, 23, 42, 0.75); border-color: #253552;">
+        <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.5;">
+          <strong style="color: #f8fafc;">Tesis Central:</strong> Cómo la ingeniería de datos moderna en la nube y el
+          rigor transaccional permiten que la micro y pequeña ferretería salvadoreña compita con cadenas transnacionales
+          sin incurrir en costes fijos de software.
+        </p>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: DIAGNÓSTICO DEL SECTOR & PROPUESTA DE VALOR (UNIFICADOS) -->
+    <section class="slide" data-index="2">
+      <div class="slide-badge"><i data-lucide="compass"></i> Diagnóstico &amp; Solución</div>
+      <h2 class="slide-title">Del Problema Tradicional a la Solución FERROSTATS</h2>
+      <p class="slide-desc">Transformación de la micro y pequeña ferretería mediante tecnología transaccional y
+        analítica en la nube.</p>
+
+      <div class="grid-2">
+        <!-- Columna 1: El Dolor del Sector -->
+        <div class="card"
+          style="border-color: rgba(239, 68, 68, 0.25); background: rgba(15, 23, 42, 0.85); justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="card-icon"
+              style="margin-bottom: 0; background: rgba(239, 68, 68, 0.12); color: #f87171; border-color: rgba(239, 68, 68, 0.25);">
+              <i data-lucide="alert-triangle"></i></div>
+            <h3 class="card-title" style="color: #f87171; margin-bottom: 0; font-size: 1.12rem;">El Dolor de la
+              Ferretería Tradicional</h3>
+          </div>
+
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-dot"
+                style="background: rgba(239, 68, 68, 0.12); color: #f87171; border-color: rgba(239, 68, 68, 0.25);"><i
+                  data-lucide="trending-down"></i></span>
+              <span><strong style="color: #f8fafc;">Quiebres de Stock Crítico:</strong> 3 de cada 10 clientes se marchan
+                al no encontrar cemento, varilla o tubería. Si no halla lo básico, compra todo su presupuesto con la
+                competencia.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"
+                style="background: rgba(239, 68, 68, 0.12); color: #f87171; border-color: rgba(239, 68, 68, 0.25);"><i
+                  data-lucide="lock"></i></span>
+              <span><strong style="color: #f8fafc;">Capital Inmovilizado:</strong> Hasta un 25% del capital de trabajo
+                queda atrapado en mercadería de lenta rotación («hueso»), provocando asfixia de liquidez.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"
+                style="background: rgba(239, 68, 68, 0.12); color: #f87171; border-color: rgba(239, 68, 68, 0.25);"><i
+                  data-lucide="dollar-sign"></i></span>
+              <span><strong style="color: #f8fafc;">Márgenes Ciegos:</strong> Venta en mostrador sin desglose de costos
+                ni cálculo automático de IVA (13%). Mermas no detectadas hasta inventarios semestrales.</span>
+            </li>
+          </ul>
+
+          <div class="hero-tags" style="margin-top: 1rem; margin-bottom: 0;">
+            <span class="hero-tag" style="border-color: rgba(239, 68, 68, 0.3); color: #fca5a5;"><i
+                data-lucide="x-circle" style="color: #f87171;"></i> Pérdida de Clientes &amp; Fuga de Margen</span>
+          </div>
+        </div>
+
+        <!-- Columna 2: La Solución FERROSTATS -->
+        <div class="card"
+          style="border-color: rgba(56, 189, 248, 0.3); background: rgba(15, 23, 42, 0.85); justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="card-icon" style="margin-bottom: 0;"><i data-lucide="shield-check"></i></div>
+            <h3 class="card-title" style="color: var(--accent-blue); margin-bottom: 0; font-size: 1.12rem;">Ecosistema
+              Unificado FERROSTATS</h3>
+          </div>
+
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="shopping-cart"></i></span>
+              <span><strong style="color: #f8fafc;">1. Terminal POS ACID (&lt; 50 ms):</strong> Cobro ágil en mostrador
+                con salvaguardas preventivas contra sobreventas, atajos de billetes y ticket con desglose de IVA
+                (13%).</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="boxes"></i></span>
+              <span><strong style="color: #f8fafc;">2. Bodega por Pasillos (A, B, C):</strong> Organización física para
+                el bodeguero, filtro rápido de existencias en riesgo de quiebre y recepción directa de
+                mercadería.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="bar-chart-2"></i></span>
+              <span><strong style="color: #f8fafc;">3. Business Intelligence en Vivo:</strong> Conexión nativa a
+                BigQuery para clasificación Pareto 80/20, Burn Rate diario y Días de Inventario Restante (DOI).</span>
+            </li>
+          </ul>
+
+          <div class="hero-tags" style="margin-top: 1rem; margin-bottom: 0;">
+            <span class="hero-tag"><i data-lucide="check"></i> Margen Protegido &gt; 28%</span>
+            <span class="hero-tag"><i data-lucide="dollar-sign"></i> Coste Operativo $0.00 USD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: ARQUITECTURA TÉCNICA GCP END-TO-END -->
+    <section class="slide" data-index="3">
+      <div class="slide-badge"><i data-lucide="cloud"></i> Arquitectura Técnica en Google Cloud</div>
+      <h2 class="slide-title">Pipeline de Datos End-to-End en GCP</h2>
+      <p class="slide-desc">Arquitectura Medallón serverless (Bronze, Silver, Gold), ELT con Dataform y coste operativo
+        $0.00 USD.</p>
+
+      <!-- Imagen de Arquitectura a Pantalla Completa (Sin Texto a la Izquierda) -->
+      <div class="image-full-container">
+        <img src="capturas/arquitectura_gcp_end_to_end.png"
+          alt="Arquitectura de Datos End-to-End Google Cloud Platform">
+      </div>
+    </section>
+
+    <!-- SLIDE 4: GCP REAL BIGQUERY DW -->
+    <section class="slide" data-index="4">
+      <div class="slide-badge"><i data-lucide="database"></i> Google Cloud Platform en Producción</div>
+      <h2 class="slide-title">Google BigQuery Data Warehouse</h2>
+      <p class="slide-desc">Almacenamiento analítico columnar con separación formal de capas Bronze, Silver y Gold.</p>
+
+      <div class="grid-2">
+        <!-- Columna Izquierda (50%): Explicación Técnica -->
+        <div class="card" style="justify-content: space-between;">
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="layers"></i></span>
+              <span><strong>Capa Bronze (Crudo):</strong> Dataset <code>ferrostats_bronze</code> almacena ventas y
+                catálogos en su estado original sin transformaciones destructivas.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="check-circle"></i></span>
+              <span><strong>Capa Silver (Curado):</strong> Dataset <code>ferrostats_silver</code> con deduplicación,
+                tipado numérico estricto y cálculo de márgenes netos.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="star"></i></span>
+              <span><strong>Capa Gold (Dimensional):</strong> Tablas <code>mart_inventario_pareto_abc</code> y
+                <code>dw_fact_daily_sales</code> en Star Schema para alimentar Looker Studio.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="cpu"></i></span>
+              <span><strong>Eficiencia &amp; Cuota:</strong> Consultas optimizadas con escaneo mínimo de bytes
+                aprovechando el terabyte mensual gratuito de BigQuery.</span>
+            </li>
+          </ul>
+
+          <div class="hero-tags" style="margin-top: 1rem; margin-bottom: 0;">
+            <span class="hero-tag"><i data-lucide="hard-drive"></i> Columnar Capacitor Engine</span>
+            <span class="hero-tag"><i data-lucide="activity"></i> Latencia subsegundo en BI</span>
+          </div>
+        </div>
+
+        <!-- Columna Derecha (50%): Imagen Real Consola BigQuery -->
+        <div class="image-half-container">
+          <img src="capturas/07_gcp_captura_dw.png" alt="Google Cloud BigQuery Console Real">
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: GCP REAL DATAFORM & ASSERTIONS -->
+    <section class="slide" data-index="5">
+      <div class="slide-badge"><i data-lucide="check-square"></i> Gobernanza &amp; Calidad de Datos</div>
+      <h2 class="slide-title">Google Cloud Dataform &amp; Data Quality</h2>
+      <p class="slide-desc">Orquestación declarativa en SQLX con control de versiones Git y validaciones automáticas
+        pre-publicación.</p>
+
+      <div class="grid-2">
+        <!-- Columna Izquierda (50%): Explicación Técnica -->
+        <div class="card" style="justify-content: space-between;">
+          <ul class="bullet-list">
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="git-commit"></i></span>
+              <span><strong>Código SQLX Versionado:</strong> Definición modular de vistas y tablas incrementales con
+                dependencias declarativas <code>${ref()}</code>.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="shield"></i></span>
+              <span><strong>Aserción uniqueKey:</strong> Verificación estricta de que <code>sale_id</code> no posea
+                duplicados en ninguna fase del pipeline.</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="alert-triangle"></i></span>
+              <span><strong>Aserción nonNull:</strong> Bloqueo automático ante registros con montos o costos nulos
+                (<code>total_amount_usd</code>).</span>
+            </li>
+            <li class="bullet-item">
+              <span class="bullet-dot"><i data-lucide="zap"></i></span>
+              <span><strong>Serverless Nativo:</strong> Sin necesidad de desplegar ni mantener infraestructura pesada de
+                Apache Airflow.</span>
+            </li>
+          </ul>
+
+          <div class="hero-tags" style="margin-top: 1rem; margin-bottom: 0;">
+            <span class="hero-tag"><i data-lucide="git-pull-request"></i> CI/CD Integrado en GCP</span>
+            <span class="hero-tag"><i data-lucide="lock"></i> Calidad Contable 100%</span>
+          </div>
+        </div>
+
+        <!-- Columna Derecha (50%): Imagen Real Consola Dataform -->
+        <div class="image-half-container">
+          <img src="capturas/08_dataform.png" alt="Google Cloud Dataform Repository Console Real">
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: DEMOSTRACIÓN EN VIVO (LIVE DEMO) -->
+    <section class="slide" data-index="6">
+      <div class="slide-badge"><i data-lucide="play-circle"></i> Demostración Práctica</div>
+      <h2 class="slide-title">Pase a Demostración en Vivo</h2>
+      <p class="slide-desc">Transición oficial a la plataforma en tiempo real desplegada en Google Cloud Run.</p>
+
+      <div class="card"
+        style="max-width: 820px; background: rgba(15, 23, 42, 0.75); border-color: #253552; margin-bottom: 2rem;">
+        <ul class="bullet-list">
+          <li class="bullet-item">
+            <span class="bullet-dot"><i data-lucide="check"></i></span>
+            <span><strong>Terminal POS Mostrador (ACID):</strong> Registro de venta con cálculo automático de IVA (13%),
+              atajos de billetes y emisión de ticket digital.</span>
+          </li>
+          <li class="bullet-item">
+            <span class="bullet-dot"><i data-lucide="check"></i></span>
+            <span><strong>Control Físico de Bodega:</strong> Auditoría de existencias por pasillos A, B y C con
+              actualización instantánea de stock.</span>
+          </li>
+          <li class="bullet-item">
+            <span class="bullet-dot"><i data-lucide="check"></i></span>
+            <span><strong>Tablero Looker Studio:</strong> Sincronización de analítica en tiempo real con BigQuery sin
+              costo de servidores.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <a href="https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app" target="_blank" class="btn-nav"
+          style="background: var(--accent-blue); color: #080c15; border-color: var(--accent-blue); font-weight: 800; padding: 0.65rem 1.4rem;">
+          <i data-lucide="external-link"></i> Abrir Portal Gerencial (Looker BI)
+        </a>
+        <a href="https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos" target="_blank" class="btn-nav"
+          style="padding: 0.65rem 1.25rem;">
+          <i data-lucide="shopping-cart"></i> Abrir Terminal POS Mostrador
+        </a>
+        <a href="https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/bodega" target="_blank" class="btn-nav"
+          style="padding: 0.65rem 1.25rem;">
+          <i data-lucide="boxes"></i> Abrir Control de Bodega
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER NAVIGATION -->
+  <footer>
+    <button class="btn-nav" id="btnPrev" disabled>
+      <i data-lucide="arrow-left"></i> Anterior
+    </button>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <button class="btn-nav" id="btnNext">
+      Siguiente <i data-lucide="arrow-right"></i>
+    </button>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    const slides = document.querySelectorAll('.slide');
+    const counterEl = document.getElementById('slideCounter');
+    const progressEl = document.getElementById('progressBar');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+
+    function goToSlide(n) {
+      if (n < 1 || n > totalSlides) return;
+      slides.forEach(s => s.classList.remove('active'));
+      currentSlide = n;
+
+      const target = document.querySelector(`.slide[data-index="${currentSlide}"]`);
+      if (target) target.classList.add('active');
+
+      counterEl.textContent = `${currentSlide} / ${totalSlides}`;
+      progressEl.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      btnPrev.disabled = (currentSlide === 1);
+      btnNext.disabled = (currentSlide === totalSlides);
+      btnNext.innerHTML = (currentSlide === totalSlides) ? 'Comenzar Demo en Vivo <i data-lucide="play-circle"></i>' : 'Siguiente <i data-lucide="arrow-right"></i>';
+
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    btnPrev.addEventListener('click', () => goToSlide(currentSlide - 1));
+    btnNext.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        goToSlide(currentSlide - 1);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+
+</html>
