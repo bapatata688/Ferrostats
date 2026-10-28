@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "policy_name": "FERROSTATS_GCP_SERVERLESS_FREE_TIER_PRODUCTION_POLICY",
+  "version": "1.0.0",
+  "effective_date": "2026-10-21",
+  "project_metadata": {
+    "project_name": "FERROSTATS",
+    "lead_architect": "Diego Alejandro Escobar Barahona",
+    "environment": "Production (GCP us-central1)",
+    "architecture_tier": "Google Cloud Always Free Tier",
+    "projected_monthly_cost_usd": 0.00,
+    "strict_maximum_budget_usd": 0.00
+  },
+  "allowed_serverless_services": [
+    {
+      "service": "Google Cloud Run",
+      "tier": "Always Free Tier",
+      "free_quota_monthly": "2,000,000 requests, 360,000 GiB-seconds, 180,000 vCPU-seconds, 1GB egress",
+      "mandatory_flags": {
+        "--min-instances": "0",
+        "--max-instances": "2",
+        "--memory": "512Mi",
+        "--cpu": "1",
+        "--region": "us-central1",
+        "--timeout": "60s"
+      },
+      "idle_cost_usd": 0.00
+    },
+    {
+      "service": "Google Cloud Storage (GCS)",
+      "tier": "Always Free Tier",
+      "free_quota_monthly": "5 GB Standard Storage in us-central1, 5,000 Class A ops, 50,000 Class B ops",
+      "usage": "Optional volume mount point for SQLite database persistence",
+      "idle_cost_usd": 0.00
+    },
+    {
+      "service": "Google BigQuery Sandbox",
+      "tier": "Free Tier (No Credit Card Required for queries)",
+      "free_quota_monthly": "10 GB active storage, 1 TB queries per month",
+      "dataset_name": "ferrostats_dw",
+      "location": "US",
+      "idle_cost_usd": 0.00
+    },
+    {
+      "service": "Google Artifact Registry",
+      "tier": "Always Free Tier",
+      "free_quota_monthly": "0.5 GB storage per month",
+      "enforcement": "deploy_gcp.sh deletes previous Docker images keeping only the latest version",
+      "idle_cost_usd": 0.00
+    },
+    {
+      "service": "Google Cloud Build",
+      "tier": "Free Tier",
+      "free_quota_monthly": "120 free build-minutes per day on standard machines",
+      "average_build_duration_seconds": 45,
+      "idle_cost_usd": 0.00
+    }
+  ],
+  "strictly_prohibited_services": [
+    {
+      "service": "Google Cloud SQL (MySQL / PostgreSQL / SQL Server)",
+      "reason": "No permanent free tier; minimum base cost of ~$9.50-$15.00/month plus $2.50/month for public IPv4",
+      "status": "FORBIDDEN"
+    },
+    {
+      "service": "Google Compute Engine (VMs e2/n1)",
+      "reason": "Persistent disk and unallocated IP fees create surprise billing hazards",
+      "status": "FORBIDDEN"
+    },
+    {
+      "service": "Serverless VPC Access Connectors",
+      "reason": "Deploys 2 persistent f1-micro instances billing ~$14.00/month",
+      "status": "FORBIDDEN"
+    },
+    {
+      "service": "External HTTP(S) Cloud Load Balancer",
+      "reason": "Base forwarding rule charges ~$18.00/month; Cloud Run already provides free managed HTTPS",
+      "status": "FORBIDDEN"
+    },
+    {
+      "service": "Google Kubernetes Engine (GKE)",
+      "reason": "Cluster management fee of $74.40/month",
+      "status": "FORBIDDEN"
+    }
+  ],
+  "monitoring_and_governance": {
+    "budget_alert_name": "Ferrostats-ZeroCost-Production-Guardrail",
+    "budget_amount_usd": 1.00,
+    "email_alert_thresholds": [0.20, 0.50, 0.90],
+    "kill_switch_script": "scripts/emergency_kill_switch.sh",
+    "audit_script": "scripts/verify_zero_cost.sh"
+  }
+}
