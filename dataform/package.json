@@ -1,0 +1,8 @@
+{
+  "name": "ferrostats-dataform",
+  "version": "1.0.0",
+  "description": "Pipeline ELT en Google Cloud Platform con Dataform y BigQuery para Ferrostats",
+  "dependencies": {
+    "@dataform/core": "3.0.0"
+  }
+}

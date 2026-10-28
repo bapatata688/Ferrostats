@@ -1,0 +1,38 @@
+config {
+  type: "view",
+  schema: "ferrostats_silver",
+  description: "Catálogo maestro de productos SKU limpio y enriquecido",
+  assertions: {
+    uniqueKey: ["product_id"],
+    nonNull: ["product_id", "sku", "product_name", "category_id", "current_stock"]
+  }
+}
+
+SELECT
+  CAST(p.product_id AS INT64) AS product_id,
+  UPPER(TRIM(p.sku)) AS sku,
+  TRIM(p.product_name) AS product_name,
+  CAST(p.category_id AS INT64) AS category_id,
+  TRIM(c.category_name) AS category_name,
+  TRIM(c.category_code) AS category_code,
+  CAST(p.supplier_id AS INT64) AS supplier_id,
+  TRIM(s.supplier_name) AS supplier_name,
+  CAST(COALESCE(s.lead_time_days, 7) AS INT64) AS lead_time_days,
+  TRIM(p.unit_measure) AS unit_measure,
+  ROUND(CAST(p.unit_cost_usd AS FLOAT64), 2) AS unit_cost_usd,
+  ROUND(CAST(p.unit_price_usd AS FLOAT64), 2) AS unit_price_usd,
+  CAST(p.current_stock AS INT64) AS current_stock,
+  CAST(p.min_stock AS INT64) AS min_stock,
+  TRIM(p.aisle_location) AS aisle_location,
+  CASE
+    WHEN CAST(p.current_stock AS INT64) = 0 THEN 'AGOTADO'
+    WHEN CAST(p.current_stock AS INT64) <= CAST(p.min_stock AS INT64) THEN 'BAJO_STOCK'
+    ELSE 'OPTIMO'
+  END AS stock_status,
+  ROUND(CAST(p.unit_price_usd AS FLOAT64) - CAST(p.unit_cost_usd AS FLOAT64), 2) AS unit_margin_usd
+FROM
+  ${ref("raw_products")} p
+LEFT JOIN
+  ${ref("raw_categories")} c ON CAST(p.category_id AS INT64) = CAST(c.category_id AS INT64)
+LEFT JOIN
+  ${ref("raw_suppliers")} s ON CAST(p.supplier_id AS INT64) = CAST(s.supplier_id AS INT64)

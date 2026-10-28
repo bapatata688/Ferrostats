@@ -1,0 +1,25 @@
+config {
+  type: "view",
+  schema: "ferrostats_silver",
+  description: "Renglones de venta normalizados de la capa Bronze",
+  assertions: {
+    uniqueKey: ["sale_item_id"],
+    nonNull: ["sale_item_id", "sale_id", "product_id", "quantity", "subtotal_usd"]
+  }
+}
+
+SELECT
+  CAST(sale_item_id AS INT64) AS sale_item_id,
+  CAST(sale_id AS INT64) AS sale_id,
+  CAST(product_id AS INT64) AS product_id,
+  CAST(quantity AS INT64) AS quantity,
+  ROUND(CAST(unit_price_snapshot_usd AS FLOAT64), 2) AS unit_price_usd,
+  ROUND(CAST(unit_cost_snapshot_usd AS FLOAT64), 2) AS unit_cost_usd,
+  ROUND(CAST(subtotal_usd AS FLOAT64), 2) AS subtotal_usd,
+  ROUND(CAST(quantity AS INT64) * CAST(unit_cost_snapshot_usd AS FLOAT64), 2) AS cogs_usd,
+  ROUND(CAST(subtotal_usd AS FLOAT64) - (CAST(quantity AS INT64) * CAST(unit_cost_snapshot_usd AS FLOAT64)), 2) AS item_profit_usd
+FROM
+  ${ref("raw_sale_items")}
+WHERE
+  sale_item_id IS NOT NULL
+  AND CAST(quantity AS INT64) > 0

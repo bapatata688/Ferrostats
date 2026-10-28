@@ -1,0 +1,28 @@
+config {
+  type: "table",
+  schema: "ferrostats_gold",
+  description: "Dimensión maestra de productos ferreteros para Looker Studio",
+  assertions: {
+    uniqueKey: ["product_id"],
+    nonNull: ["product_id", "sku", "product_name"]
+  }
+}
+
+SELECT
+  product_id,
+  sku,
+  product_name,
+  category_id,
+  category_name,
+  supplier_id,
+  supplier_name,
+  unit_measure,
+  unit_cost_usd,
+  unit_price_usd,
+  unit_margin_usd,
+  current_stock,
+  min_stock,
+  aisle_location,
+  stock_status
+FROM
+  ${ref("stg_products")}

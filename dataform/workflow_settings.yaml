@@ -1,0 +1,4 @@
+defaultProject: ferrostats
+defaultDataset: ferrostats_silver
+defaultLocation: US
+defaultAssertionDataset: ferrostats_assertions

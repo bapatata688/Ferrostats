@@ -1,0 +1,114 @@
+config {
+  type: "table",
+  schema: "ferrostats_gold",
+  description: "Data Mart de Clasificación ABC Pareto (80/20), Burn Rate, Días de Inventario (DOI) y ROP para Looker Studio",
+  assertions: {
+    uniqueKey: ["product_id"],
+    nonNull: ["product_id", "sku", "product_name", "abc_class", "stock_status"]
+  }
+}
+
+WITH ventas_30d AS (
+  SELECT
+    i.product_id,
+    SUM(i.quantity) AS units_sold_30d,
+    SUM(i.subtotal_usd) AS revenue_30d_usd,
+    SUM(i.item_profit_usd) AS profit_30d_usd
+  FROM
+    ${ref("stg_sale_items")} i
+  JOIN
+    ${ref("stg_sales")} s ON i.sale_id = s.sale_id
+  WHERE
+    s.sale_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+  GROUP BY
+    i.product_id
+),
+
+base_productos AS (
+  SELECT
+    p.product_id,
+    p.sku,
+    p.product_name,
+    p.category_name,
+    p.current_stock,
+    p.min_stock,
+    p.stock_status,
+    p.unit_cost_usd,
+    p.unit_price_usd,
+    p.lead_time_days,
+    COALESCE(v.units_sold_30d, 0) AS units_sold_30d,
+    ROUND(COALESCE(v.revenue_30d_usd, 0.0), 2) AS revenue_30d_usd,
+    ROUND(COALESCE(v.profit_30d_usd, 0.0), 2) AS profit_30d_usd,
+    ROUND(p.current_stock * p.unit_cost_usd, 2) AS inventory_valuation_cost_usd
+  FROM
+    ${ref("stg_products")} p
+  LEFT JOIN
+    ventas_30d v ON p.product_id = v.product_id
+),
+
+pareto_calc AS (
+  SELECT
+    *,
+    SUM(revenue_30d_usd) OVER() AS total_revenue_all,
+    SUM(revenue_30d_usd) OVER(
+      ORDER BY revenue_30d_usd DESC, units_sold_30d DESC, product_id ASC
+      ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_revenue
+  FROM
+    base_productos
+),
+
+pareto_classified AS (
+  SELECT
+    product_id,
+    sku,
+    product_name,
+    category_name,
+    current_stock,
+    min_stock,
+    stock_status,
+    unit_cost_usd,
+    unit_price_usd,
+    lead_time_days,
+    units_sold_30d,
+    revenue_30d_usd,
+    profit_30d_usd,
+    inventory_valuation_cost_usd,
+    ROUND(SAFE_DIVIDE(running_revenue, NULLIF(total_revenue_all, 0)) * 100.0, 2) AS cumulative_rev_pct,
+    ROUND(SAFE_DIVIDE(units_sold_30d, 30.0), 3) AS daily_burn_rate
+  FROM
+    pareto_calc
+)
+
+SELECT
+  product_id,
+  sku,
+  product_name,
+  category_name,
+  current_stock,
+  min_stock,
+  stock_status,
+  units_sold_30d,
+  revenue_30d_usd,
+  profit_30d_usd,
+  COALESCE(cumulative_rev_pct, 100.0) AS cumulative_rev_pct,
+  CASE
+    WHEN cumulative_rev_pct <= 80.0 THEN 'A'
+    WHEN cumulative_rev_pct <= 95.0 THEN 'B'
+    ELSE 'C'
+  END AS abc_class,
+  daily_burn_rate,
+  CASE
+    WHEN daily_burn_rate > 0 THEN ROUND(SAFE_DIVIDE(current_stock, daily_burn_rate), 1)
+    ELSE 999.0
+  END AS days_of_inventory_left,
+  CASE
+    WHEN current_stock <= min_stock THEN
+      GREATEST(CAST(min_stock + CEIL(daily_burn_rate * lead_time_days) + CEIL(daily_burn_rate * 15) - current_stock AS INT64), CAST(min_stock AS INT64), 5)
+    ELSE 0
+  END AS recommended_reorder_qty,
+  inventory_valuation_cost_usd
+FROM
+  pareto_classified
+ORDER BY
+  revenue_30d_usd DESC, units_sold_30d DESC

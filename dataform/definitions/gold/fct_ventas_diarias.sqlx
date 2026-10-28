@@ -1,0 +1,42 @@
+config {
+  type: "table",
+  schema: "ferrostats_gold",
+  description: "Tabla de hechos analíticos diarios de ventas para Google Looker Studio",
+  assertions: {
+    uniqueKey: ["date_key", "category_name"],
+    nonNull: ["date_key", "category_name", "total_transactions", "gross_revenue_usd"]
+  }
+}
+
+WITH base_ventas AS (
+  SELECT
+    s.sale_date,
+    p.category_name,
+    COUNT(DISTINCT s.sale_id) AS total_transactions,
+    SUM(i.quantity) AS units_sold,
+    ROUND(SUM(i.subtotal_usd), 2) AS gross_revenue_usd,
+    ROUND(SUM(i.cogs_usd), 2) AS cogs_usd,
+    ROUND(SUM(i.item_profit_usd), 2) AS gross_profit_usd
+  FROM
+    ${ref("stg_sales")} s
+  JOIN
+    ${ref("stg_sale_items")} i ON s.sale_id = i.sale_id
+  JOIN
+    ${ref("stg_products")} p ON i.product_id = p.product_id
+  GROUP BY
+    1, 2
+)
+SELECT
+  CAST(sale_date AS STRING) AS date_key,
+  sale_date,
+  category_name,
+  total_transactions,
+  units_sold,
+  gross_revenue_usd,
+  cogs_usd,
+  gross_profit_usd,
+  ROUND(SAFE_DIVIDE(gross_profit_usd, gross_revenue_usd) * 100, 2) AS gross_margin_pct
+FROM
+  base_ventas
+ORDER BY
+  sale_date DESC, gross_revenue_usd DESC
