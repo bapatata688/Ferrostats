@@ -63,11 +63,14 @@ if ($images) {
     $imgList = $images -split "`r?`n" | Where-Object { $_ -ne "" }
     if ($imgList.Count -gt 2) {
         $oldImages = $imgList | Select-Object -Skip 2
+        $prevEAP2 = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
         foreach ($oldVersion in $oldImages) {
             $shortDigest = $oldVersion.Substring(0, [Math]::Min(18, $oldVersion.Length))
             Write-Host "  Eliminando digest antiguo: $shortDigest..." -ForegroundColor DarkGray
-            gcloud artifacts docker images delete "$imageRepo@$oldVersion" --quiet 2>$null
+            (& gcloud artifacts docker images delete "$imageRepo@$oldVersion" --quiet 2>&1 | Out-Null)
         }
+        $ErrorActionPreference = $prevEAP2
     }
 }
 
