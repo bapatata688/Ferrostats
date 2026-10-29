@@ -20,12 +20,12 @@
 </p>
 
 <p align="center">
-  🌐 <strong>Idioma / Language:</strong> <strong>Español</strong> | <a href="README.md">English Version</a>
+  <strong>Idioma / Language:</strong> <strong>Español</strong> | <a href="README.md">English Version</a>
 </p>
 
 ---
 
-## ⚡ Enlaces Oficiales en Producción (Google Cloud Platform)
+## Enlaces Oficiales en Producción (Google Cloud Platform)
 
 | Recurso | URL en Vivo | Descripción |
 |---|---|---|
@@ -38,7 +38,7 @@
 
 ---
 
-## 📐 Desarrollo Guiado por Especificaciones (SDD) y Atribución Arquitectónica
+## Desarrollo Guiado por Especificaciones (SDD) y Atribución Arquitectónica
 
 Esta plataforma empresarial fue diseñada e implementada bajo la metodología **Spec-Driven Development (SDD)** con total transparencia técnica:
 

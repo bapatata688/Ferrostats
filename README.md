@@ -20,12 +20,12 @@
 </p>
 
 <p align="center">
-  🌐 <strong>Language / Idioma:</strong> <strong>English</strong> | <a href="README.es.md">Versión en Español</a>
+  <strong>Language / Idioma:</strong> <strong>English</strong> | <a href="README.es.md">Versión en Español</a>
 </p>
 
 ---
 
-## ⚡ Live Production Endpoints (Google Cloud Platform)
+## Live Production Endpoints (Google Cloud Platform)
 
 | Resource | Live Production URL | Description |
 |---|---|---|
@@ -38,7 +38,7 @@
 
 ---
 
-## 📐 Spec-Driven Development (SDD) & Architecture Attribution
+## Spec-Driven Development (SDD) & Architecture Attribution
 
 This enterprise platform was engineered using **Spec-Driven Development (SDD)** with full architectural transparency:
 

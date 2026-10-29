@@ -87,3 +87,8 @@ docs/.folio/
 
 # Antigravity & Local Agent Directives
 .agents/
+
+# Candidate Interview Defense & Preparation (Local Only)
+docs/*INTERVIEW*.md
+docs/*DEFENSE*.md
+docs/STAFF_DATA_ENGINEER_INTERVIEW_DEFENSE.md
