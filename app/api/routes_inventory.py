@@ -8,14 +8,32 @@ from app.db.connection import get_db_connection
 from app.api.auth_rbac import require_role
 from app.etl.bigquery_sync import stream_movement_to_bronze, stream_product_to_bronze
 
-router = APIRouter(prefix="/api/v1", tags=["Inventario y Catálogo"])
+router = APIRouter(prefix="/api/v1", tags=["Inventory & Catalog"])
+
+MOVEMENT_TYPE_TO_DB = {
+    "SUPPLIER_RESTOCK": "INGRESO_PROVEEDOR",
+    "INGRESO_PROVEEDOR": "INGRESO_PROVEEDOR",
+    "AUDIT_ADJUSTMENT": "AJUSTE_AUDITORIA",
+    "AJUSTE_AUDITORIA": "AJUSTE_AUDITORIA",
+    "POS_SALE": "VENTA_POS",
+    "VENTA_POS": "VENTA_POS"
+}
+
+MOVEMENT_TYPE_TO_EN = {
+    "INGRESO_PROVEEDOR": "SUPPLIER_RESTOCK",
+    "SUPPLIER_RESTOCK": "SUPPLIER_RESTOCK",
+    "AJUSTE_AUDITORIA": "AUDIT_ADJUSTMENT",
+    "AUDIT_ADJUSTMENT": "AUDIT_ADJUSTMENT",
+    "VENTA_POS": "POS_SALE",
+    "POS_SALE": "POS_SALE"
+}
 
 class InventoryAdjustmentRequest(BaseModel):
     product_id: int
-    user_id: int = Field(default=4, description="ID del usuario que realiza el ajuste")
-    movement_type: str = Field(..., description="INGRESO_PROVEEDOR o AJUSTE_AUDITORIA")
-    quantity_delta: int = Field(..., description="Cambio de inventario (positivo o negativo)")
-    reference_note: str = Field(default="Ajuste de inventario en pasillo")
+    user_id: int = Field(default=4, description="User ID performing the inventory adjustment")
+    movement_type: str = Field(..., description="SUPPLIER_RESTOCK or AUDIT_ADJUSTMENT")
+    quantity_delta: int = Field(..., description="Stock adjustment delta (positive or negative)")
+    reference_note: str = Field(default="Aisle inventory adjustment")
 
 class ProductCreateUpdateRequest(BaseModel):
     sku: str
@@ -31,15 +49,16 @@ class ProductCreateUpdateRequest(BaseModel):
 
 @router.get("/products")
 def list_products(
-    q: Optional[str] = Query(None, description="Búsqueda rápida por SKU o nombre de producto"),
-    category_id: Optional[int] = Query(None, description="Filtrar por ID de categoría"),
-    stock_status: Optional[str] = Query(None, description="OPTIMO, BAJO_STOCK, AGOTADO"),
+    q: Optional[str] = Query(None, description="Fast search by SKU, product name, or aisle location"),
+    category_id: Optional[int] = Query(None, description="Filter by category ID"),
+    stock_status: Optional[str] = Query(None, description="OPTIMAL / OPTIMO, LOW_STOCK / BAJO_STOCK, OUT_OF_STOCK / AGOTADO"),
     abc_class: Optional[str] = Query(None, description="A, B, C"),
-    role: str = Depends(require_role("ADMIN", "CAJERO", "BODEGUERO"))
+    role: str = Depends(require_role("ADMIN", "CASHIER", "WAREHOUSE"))
 ) -> List[Dict[str, Any]]:
     """
-    Consulta el catálogo maestro de artículos SKU enriquecido con datos dimensionales
-    (estado de stock, clasificación ABC, ubicación física y recomendaciones de compra).
+    Retrieves the master SKU catalog enriched with dimensional analytics:
+    stock status, Pareto ABC classification, physical warehouse location,
+    burn rate, days of inventory (DOI), and replenishment recommendations.
     """
     conn = get_db_connection()
     try:
@@ -64,9 +83,9 @@ def list_products(
             p.aisle_location,
             p.updated_at,
             COALESCE(m.stock_status, CASE
-                WHEN p.current_stock = 0 THEN 'AGOTADO'
-                WHEN p.current_stock <= p.min_stock THEN 'BAJO_STOCK'
-                ELSE 'OPTIMO'
+                WHEN p.current_stock = 0 THEN 'OUT_OF_STOCK'
+                WHEN p.current_stock <= p.min_stock THEN 'LOW_STOCK'
+                ELSE 'OPTIMAL'
             END) AS stock_status,
             COALESCE(m.abc_class, 'C') AS abc_class,
             COALESCE(m.daily_burn_rate, 0.0) AS daily_burn_rate,
@@ -90,8 +109,17 @@ def list_products(
             params.append(category_id)
 
         if stock_status:
-            query += " AND stock_status = ?"
-            params.append(stock_status.upper().strip())
+            stat_upper = stock_status.upper().strip()
+            # Support both English and legacy Spanish status filters
+            if stat_upper in ("AGOTADO", "OUT_OF_STOCK"):
+                query += " AND (stock_status IN ('AGOTADO', 'OUT_OF_STOCK'))"
+            elif stat_upper in ("BAJO_STOCK", "LOW_STOCK"):
+                query += " AND (stock_status IN ('BAJO_STOCK', 'LOW_STOCK'))"
+            elif stat_upper in ("OPTIMO", "OPTIMAL"):
+                query += " AND (stock_status IN ('OPTIMO', 'OPTIMAL'))"
+            else:
+                query += " AND stock_status = ?"
+                params.append(stat_upper)
 
         if abc_class:
             query += " AND abc_class = ?"
@@ -108,17 +136,20 @@ def list_products(
 @router.post("/inventory/adjust")
 def adjust_inventory(
     payload: InventoryAdjustmentRequest,
-    role: str = Depends(require_role("ADMIN", "BODEGUERO"))
+    role: str = Depends(require_role("ADMIN", "WAREHOUSE"))
 ) -> Dict[str, Any]:
     """
-    Registra una recepción de mercadería de proveedor o un ajuste físico de pasillo.
-    Valida invariantes de no negatividad de stock y actualiza de inmediato el Mart analítico.
+    Records a supplier restock arrival or physical warehouse aisle audit adjustment.
+    Enforces non-negative inventory invariants and updates transactional & analytical records.
     """
-    if payload.movement_type not in ("INGRESO_PROVEEDOR", "AJUSTE_AUDITORIA"):
+    raw_type = payload.movement_type.upper().strip()
+    db_type = MOVEMENT_TYPE_TO_DB.get(raw_type)
+    if not db_type or db_type not in ("INGRESO_PROVEEDOR", "AJUSTE_AUDITORIA"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="movement_type debe ser INGRESO_PROVEEDOR o AJUSTE_AUDITORIA"
+            detail=f"Invalid movement_type '{payload.movement_type}'. Allowed: SUPPLIER_RESTOCK (INGRESO_PROVEEDOR), AUDIT_ADJUSTMENT (AJUSTE_AUDITORIA)"
         )
+    norm_en_type = MOVEMENT_TYPE_TO_EN.get(db_type, "AUDIT_ADJUSTMENT")
 
     conn = get_db_connection()
     try:
@@ -131,7 +162,7 @@ def adjust_inventory(
             conn.execute("ROLLBACK;")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Producto ID {payload.product_id} no encontrado"
+                detail=f"Product with ID {payload.product_id} not found."
             )
 
         stock_before = prod["current_stock"]
@@ -141,12 +172,12 @@ def adjust_inventory(
             conn.execute("ROLLBACK;")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Ajuste inválido: el stock no puede ser negativo ({stock_before} + {payload.quantity_delta} = {stock_after})"
+                detail=f"Invalid adjustment: inventory stock cannot be negative ({stock_before} + {payload.quantity_delta} = {stock_after})"
             )
 
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 1. Actualizar stock en catálogo maestro
+        # 1. Update stock in master catalog
         cursor.execute(
             """
             UPDATE products
@@ -156,7 +187,7 @@ def adjust_inventory(
             (stock_after, now_str, payload.product_id)
         )
 
-        # 2. Registrar en bitácora inmutable de movimientos
+        # 2. Record in immutable audit log
         cursor.execute(
             """
             INSERT INTO inventory_movements (
@@ -169,7 +200,7 @@ def adjust_inventory(
                 now_str,
                 payload.product_id,
                 payload.user_id,
-                payload.movement_type,
+                db_type,
                 payload.quantity_delta,
                 stock_before,
                 stock_after,
@@ -179,11 +210,11 @@ def adjust_inventory(
 
         conn.execute("COMMIT;")
         
-        # 3. Ingesta continua a la capa Bronze de BigQuery (Dataform gestiona el ELT)
+        # 3. Stream event to BigQuery Bronze
         stream_movement_to_bronze(
             product_id=payload.product_id,
             user_id=payload.user_id,
-            movement_type=payload.movement_type,
+            movement_type=norm_en_type,
             quantity_delta=payload.quantity_delta,
             stock_before=stock_before,
             stock_after=stock_after,
@@ -193,11 +224,11 @@ def adjust_inventory(
 
         return {
             "status": "SUCCESS",
-            "message": "Ajuste de inventario aplicado exitosamente",
+            "message": "Inventory adjustment applied successfully",
             "product_id": payload.product_id,
             "sku": prod["sku"],
             "product_name": prod["product_name"],
-            "movement_type": payload.movement_type,
+            "movement_type": norm_en_type,
             "quantity_delta": payload.quantity_delta,
             "stock_before": stock_before,
             "stock_after": stock_after
@@ -206,7 +237,7 @@ def adjust_inventory(
         raise
     except Exception as exc:
         conn.execute("ROLLBACK;")
-        raise HTTPException(status_code=500, detail=f"Error en ajuste de inventario: {str(exc)}")
+        raise HTTPException(status_code=500, detail=f"Inventory adjustment failed: {str(exc)}")
     finally:
         conn.close()
 
@@ -215,9 +246,9 @@ def create_product(
     payload: ProductCreateUpdateRequest,
     role: str = Depends(require_role("ADMIN"))
 ) -> Dict[str, Any]:
-    """Crea un nuevo SKU en el catálogo maestro (Exclusivo ADMIN)."""
+    """Creates a new SKU in master catalog (Exclusive to ADMIN)."""
     if payload.unit_price_usd < payload.unit_cost_usd:
-        raise HTTPException(status_code=400, detail="El precio de venta debe ser >= al costo unitario")
+        raise HTTPException(status_code=400, detail="Unit selling price must be >= unit purchase cost")
 
     conn = get_db_connection()
     try:
@@ -256,6 +287,6 @@ def create_product(
         })
         return {"status": "SUCCESS", "product_id": new_id, "sku": payload.sku}
     except sqlite3.IntegrityError as ie:
-        raise HTTPException(status_code=400, detail=f"Violación de integridad: {str(ie)}")
+        raise HTTPException(status_code=400, detail=f"Database integrity violation: {str(ie)}")
     finally:
         conn.close()

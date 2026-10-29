@@ -1,20 +1,133 @@
 /**
- * FERROSTATS — TERMINAL DE PUNTO DE VENTA (POS ACID)
- * Aplicación de mostrador para cajeros y empleados de la ferretería.
- * Arquitectura transaccional de ultra-baja latencia (< 50ms) en SQLite WAL.
+ * FERROSTATS — POINT-OF-SALE (POS) CASHIER TERMINAL
+ * Ultra-low latency (< 50ms) ACID transactional cashier engine powered by SQLite WAL.
+ * Lead Architect: Diego Alejandro Escobar Barahona
  */
 
+const PosTranslations = {
+  en: {
+    langLabel: 'EN',
+    activeRegister: 'Active Register',
+    searchPlaceholder: 'Search SKU or product name (e.g., MC-001, Cordless Drill, PVC, Cement)...',
+    allCategories: 'All Items',
+    emptyCartTitle: 'Cart is empty',
+    emptyCartSubtitle: 'Select products from the catalog to ring up',
+    subtotal: 'Subtotal (excl. Tax)',
+    tax: 'Sales Tax / VAT (13%)',
+    totalDue: 'TOTAL AMOUNT DUE',
+    customerLabel: 'Customer Type:',
+    customerFinal: 'Retail / Final Consumer',
+    customerContractor: 'General Contractor / Builder',
+    customerWorkshop: 'Industrial Workshop',
+    paymentLabel: 'Payment Method:',
+    paymentCash: 'Cash (USD)',
+    paymentQr: 'QR Transfer / Mobile',
+    paymentCard: 'Debit / Credit Card',
+    cashTendered: 'Cash Tendered ($):',
+    exactBtn: 'Exact',
+    changeDue: 'Change Due:',
+    amountShort: 'Amount Due (Short):',
+    completeSaleBtn: 'Complete Sale & Print Receipt',
+    processingBtn: 'Processing Checkout...',
+    acidGuarantee: 'Atomic ACID transaction on SQLite WAL (< 50 ms)',
+    receiptModalTitle: 'Sale Confirmed Successfully',
+    receiptModalSub: 'Atomic ACID Transaction Committed to SQLite WAL',
+    newSaleBtn: 'New Sale / Done',
+    statusOptimal: 'Optimal',
+    statusLowStock: 'Low Stock',
+    statusOutOfStock: 'Out of Stock',
+    addBtn: 'Add',
+    unitPriceEach: 'ea.',
+    clearCartToast: 'Cart cleared',
+    emptyTicketToast: 'Sales ticket is empty',
+    cashRequiredToast: 'Please enter cash tendered ($) or click "Exact"',
+    insufficientCashToast: 'Insufficient cash tendered. Total: $',
+    saleSuccessToast: 'Sale completed successfully!',
+    receiptTitle: 'SALES RECEIPT & TAX INVOICE',
+    receiptBranch: 'Central Retail Branch • Register 01',
+    receiptTicket: 'Ticket ID:',
+    receiptDate: 'Date & Time:',
+    receiptCashier: 'Cashier:',
+    receiptPayment: 'Payment:',
+    receiptTotalCharged: 'TOTAL CHARGED:',
+    receiptCashTendered: 'Cash Tendered:',
+    receiptChangeGiven: 'Change Returned:',
+    receiptElectronicMode: 'Electronic Charge Approved (Auth #OK)',
+    receiptThanks: 'Thank you for your business! • Hardware Quality Guaranteed',
+    noItemsFound: 'No products found matching your search query.'
+  },
+  es: {
+    langLabel: 'ES',
+    activeRegister: 'Mostrador Activo',
+    searchPlaceholder: 'Buscar SKU o nombre (ej. MC-001, Taladro, PVC, Cemento, Broca)...',
+    allCategories: 'Todos los Artículos',
+    emptyCartTitle: 'El carrito está vacío',
+    emptyCartSubtitle: 'Selecciona artículos del catálogo para facturar',
+    subtotal: 'Subtotal Gravado (sin IVA)',
+    tax: 'IVA (13%)',
+    totalDue: 'TOTAL A COBRAR',
+    customerLabel: 'Cliente:',
+    customerFinal: 'Consumidor Final',
+    customerContractor: 'Contratista / Maestro Obra',
+    customerWorkshop: 'Taller Industrial',
+    paymentLabel: 'Método de Pago:',
+    paymentCash: 'Efectivo',
+    paymentQr: 'Transferencia QR',
+    paymentCard: 'Tarjeta Débito/Crédito',
+    cashTendered: 'Efectivo Recibido ($):',
+    exactBtn: 'Exacto',
+    changeDue: 'Cambio / Vuelto:',
+    amountShort: 'Faltan cobrar:',
+    completeSaleBtn: 'Cobrar y Procesar Venta',
+    processingBtn: 'Procesando Venta...',
+    acidGuarantee: 'Transacción ACID atómica en SQLite WAL (< 50 ms)',
+    receiptModalTitle: 'Venta Confirmada Exitosamente',
+    receiptModalSub: 'Transacción ACID Procesada en SQLite WAL',
+    newSaleBtn: 'Nueva Venta / Listo',
+    statusOptimal: 'Óptimo',
+    statusLowStock: 'Bajo Stock',
+    statusOutOfStock: 'Agotado',
+    addBtn: 'Agregar',
+    unitPriceEach: 'c/u',
+    clearCartToast: 'Carrito vaciado',
+    emptyTicketToast: 'El ticket de venta está vacío',
+    cashRequiredToast: 'Ingrese el efectivo recibido ($) o presione "Exacto"',
+    insufficientCashToast: 'Efectivo insuficiente. Total a cobrar: $',
+    saleSuccessToast: '¡Venta completada con éxito!',
+    receiptTitle: 'COMPROBANTE DE PAGO',
+    receiptBranch: 'Sucursal Central • Terminal 01',
+    receiptTicket: 'Ticket:',
+    receiptDate: 'Fecha:',
+    receiptCashier: 'Cajero:',
+    receiptPayment: 'Pago:',
+    receiptTotalCharged: 'TOTAL COBRADO:',
+    receiptCashTendered: 'Efectivo Recibido:',
+    receiptChangeGiven: 'Cambio Entregado:',
+    receiptElectronicMode: 'Cobro Electrónico Aprobado',
+    receiptThanks: '¡Gracias por su compra! • Garantía de calidad ferretera',
+    noItemsFound: 'No se encontraron artículos con el criterio de búsqueda.'
+  }
+};
+
 const PosState = {
+  lang: localStorage.getItem('ferrostats_lang') || 'en',
   products: [],
   cart: [],
   selectedCategory: '',
   searchQuery: '',
-  currentUserId: 3 // Cajero por defecto (Carlos Martínez)
+  currentUserId: 3 // Default cashier (Carlos Martínez)
 };
 
+function t(key) {
+  const dict = PosTranslations[PosState.lang] || PosTranslations.en;
+  return dict[key] || PosTranslations.en[key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  initLanguageToggle();
   initPosEvents();
   loadPosCatalog();
+  applyStaticTranslations();
   refreshIcons();
 });
 
@@ -26,10 +139,61 @@ function refreshIcons() {
   }
 }
 
+function initLanguageToggle() {
+  const btn = document.getElementById('btnPosLangToggle');
+  const label = document.getElementById('posLangLabel');
+  if (label) label.textContent = PosState.lang.toUpperCase();
+
+  btn?.addEventListener('click', () => {
+    PosState.lang = PosState.lang === 'en' ? 'es' : 'en';
+    localStorage.setItem('ferrostats_lang', PosState.lang);
+    if (label) label.textContent = PosState.lang.toUpperCase();
+    applyStaticTranslations();
+    renderProductsGrid();
+    renderCart();
+  });
+}
+
+function applyStaticTranslations() {
+  const isEn = PosState.lang === 'en';
+  const searchInput = document.getElementById('posSearchInput');
+  if (searchInput) searchInput.placeholder = t('searchPlaceholder');
+
+  // Customer options
+  const optFinal = document.querySelector('#posCustomerType option[value="CONSUMIDOR_FINAL"]');
+  const optContr = document.querySelector('#posCustomerType option[value="CONTRATISTA"]');
+  const optWork = document.querySelector('#posCustomerType option[value="TALLER_INDUSTRIAL"]');
+  if (optFinal) optFinal.textContent = t('customerFinal');
+  if (optContr) optContr.textContent = t('customerContractor');
+  if (optWork) optWork.textContent = t('customerWorkshop');
+
+  // Payment options
+  const optCash = document.querySelector('#posPaymentMethod option[value="EFECTIVO"]');
+  const optQr = document.querySelector('#posPaymentMethod option[value="TRANSFERENCIA_QR"]');
+  const optCard = document.querySelector('#posPaymentMethod option[value="TARJETA"]');
+  if (optCash) optCash.textContent = t('paymentCash');
+  if (optQr) optQr.textContent = t('paymentQr');
+  if (optCard) optCard.textContent = t('paymentCard');
+
+  // Checkout button text
+  const btnCheckout = document.getElementById('btnConfirmCheckout');
+  if (btnCheckout && !btnCheckout.disabled) {
+    btnCheckout.innerHTML = `<i data-lucide="check-circle-2"></i> <span>${t('completeSaleBtn')}</span>`;
+  }
+
+  // Active register badge
+  const badge = document.querySelector('.badge-role-cashier');
+  if (badge) {
+    badge.innerHTML = `<span class="pulse-dot"></span> ${t('activeRegister')}`;
+  }
+
+  refreshIcons();
+}
+
 async function apiFetch(endpoint, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
-    'X-User-Role': 'CAJERO',
+    'X-User-Role': 'CASHIER',
     'X-User-Id': String(PosState.currentUserId),
     ...(options.headers || {})
   };
@@ -37,7 +201,7 @@ async function apiFetch(endpoint, options = {}) {
   const res = await fetch(endpoint, { ...options, headers });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.detail || `Error HTTP ${res.status}`);
+    throw new Error(data.detail || `HTTP Error ${res.status}`);
   }
   return data;
 }
@@ -58,7 +222,7 @@ function initPosEvents() {
     searchInput.focus();
   });
 
-  // Filtros de categoría
+  // Category filters
   document.querySelectorAll('#posCategoryFilters .cat-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#posCategoryFilters .cat-pill').forEach(b => b.classList.remove('active'));
@@ -68,54 +232,54 @@ function initPosEvents() {
     });
   });
 
-  // Calculadora de cambio y billetes rápidos
+  // Cash change calculator
   const cashInput = document.getElementById('posCashGiven');
   cashInput?.addEventListener('input', updateCashChange);
 
-  // Cambio de método de pago (Efectivo vs Tarjeta vs QR)
+  // Payment method switcher
   document.getElementById('posPaymentMethod')?.addEventListener('change', () => {
     updatePaymentMethodUI();
     refreshIcons();
   });
 
-  // Botón monto exacto
+  // Exact cash button
   document.getElementById('btnExactCash')?.addEventListener('click', () => {
     const total = getCartTotal();
-    const cashInput = document.getElementById('posCashGiven');
-    if (cashInput) {
-      cashInput.value = total.toFixed(2);
+    const input = document.getElementById('posCashGiven');
+    if (input) {
+      input.value = total.toFixed(2);
       updateCashChange();
     }
   });
 
-  // Botones de billetes rápidos ($5, $10, $20, $50, $100)
+  // Quick bills ($5, $10, $20, $50, $100)
   document.querySelectorAll('#posQuickBills .btn-bill').forEach(btn => {
     btn.addEventListener('click', () => {
       const amount = btn.getAttribute('data-amount');
-      const cashInput = document.getElementById('posCashGiven');
-      if (cashInput && amount) {
-        cashInput.value = parseFloat(amount).toFixed(2);
+      const input = document.getElementById('posCashGiven');
+      if (input && amount) {
+        input.value = parseFloat(amount).toFixed(2);
         updateCashChange();
       }
     });
   });
 
-  // Vaciar carrito
+  // Clear cart
   document.getElementById('btnClearCart')?.addEventListener('click', () => {
     if (PosState.cart.length > 0) {
       PosState.cart = [];
       renderCart();
-      showToast('Carrito vaciado', 'info');
+      showToast(t('clearCartToast'), 'info');
     }
   });
 
   // Checkout
   document.getElementById('btnConfirmCheckout')?.addEventListener('click', handleCheckout);
 
-  // Cerrar recibo
+  // Close receipt
   document.getElementById('btnCloseReceipt')?.addEventListener('click', () => {
     document.getElementById('modalReceiptOverlay').classList.remove('active');
-    searchInput.focus();
+    searchInput?.focus();
   });
 }
 
@@ -125,12 +289,13 @@ async function loadPosCatalog() {
     PosState.products = products;
     renderProductsGrid();
   } catch (err) {
-    showToast(`Error al cargar catálogo: ${err.message}`, 'error');
+    showToast(`Failed to load catalog: ${err.message}`, 'error');
   }
 }
 
 function renderProductsGrid() {
   const grid = document.getElementById('posProductsGrid');
+  if (!grid) return;
   grid.innerHTML = '';
 
   let filtered = PosState.products;
@@ -150,7 +315,7 @@ function renderProductsGrid() {
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">
         <i data-lucide="package-search" style="width: 2.5rem; height: 2.5rem; margin-bottom: 0.5rem; color: #64748b;"></i>
-        <p>No se encontraron artículos con el criterio de búsqueda.</p>
+        <p>${t('noItemsFound')}</p>
       </div>
     `;
     refreshIcons();
@@ -162,16 +327,16 @@ function renderProductsGrid() {
     const isAgotado = p.current_stock <= 0;
     const isBajo = p.current_stock > 0 && p.current_stock <= p.min_stock;
     
-    let statusText = 'Óptimo';
+    let statusText = t('statusOptimal');
     let statusClass = 'wh-status-optimo';
     let statusIcon = 'check-circle-2';
 
     if (isAgotado) {
-      statusText = 'Agotado';
+      statusText = t('statusOutOfStock');
       statusClass = 'wh-status-agotado';
       statusIcon = 'alert-circle';
     } else if (isBajo) {
-      statusText = 'Bajo Stock';
+      statusText = t('statusLowStock');
       statusClass = 'wh-status-reorden';
       statusIcon = 'alert-triangle';
     }
@@ -196,9 +361,9 @@ function renderProductsGrid() {
           class="btn-pos-add ${isAgotado ? 'disabled' : ''}" 
           onclick="addToCart(${p.product_id})"
           ${isAgotado ? 'disabled' : ''}
-          title="${isAgotado ? 'Artículo agotado' : 'Agregar al ticket'}"
+          title="${isAgotado ? t('statusOutOfStock') : t('addBtn')}"
         >
-          <i data-lucide="plus"></i> Agregar
+          <i data-lucide="plus"></i> ${t('addBtn')}
         </button>
       </div>
     `;
@@ -213,14 +378,14 @@ function addToCart(productId) {
   if (!prod) return;
 
   if (prod.current_stock <= 0) {
-    showToast(`Artículo ${prod.sku} agotado.`, 'error');
+    showToast(`${prod.sku} is out of stock.`, 'error');
     return;
   }
 
   const existing = PosState.cart.find(item => item.product_id === productId);
   if (existing) {
     if (existing.quantity >= prod.current_stock) {
-      showToast(`Stock máximo alcanzado (${prod.current_stock} uds disponibles).`, 'error');
+      showToast(`Maximum stock reached (${prod.current_stock} units available).`, 'error');
       return;
     }
     existing.quantity += 1;
@@ -248,7 +413,7 @@ function updateCartQty(productId, delta) {
     return;
   }
   if (newQty > item.current_stock) {
-    showToast(`Solo hay ${item.current_stock} unidades disponibles de ${item.sku}.`, 'error');
+    showToast(`Only ${item.current_stock} units available for ${item.sku}.`, 'error');
     return;
   }
   item.quantity = newQty;
@@ -272,8 +437,8 @@ function renderCart() {
     list.innerHTML = `
       <div class="cart-empty-state">
         <i data-lucide="shopping-basket"></i>
-        <p>El carrito está vacío</p>
-        <span>Selecciona artículos del catálogo para facturar</span>
+        <p>${t('emptyCartTitle')}</p>
+        <span>${t('emptyCartSubtitle')}</span>
       </div>
     `;
     document.getElementById('cartSubtotal').textContent = '$0.00';
@@ -284,7 +449,7 @@ function renderCart() {
     const changeContainer = document.getElementById('posChangeContainer');
     if (changeContainer) changeContainer.classList.remove('insufficient', 'sufficient');
     const labelEl = document.getElementById('posChangeLabel');
-    if (labelEl) labelEl.textContent = 'Cambio / Vuelto:';
+    if (labelEl) labelEl.textContent = t('changeDue');
 
     btnCheckout.disabled = true;
     refreshIcons();
@@ -303,7 +468,7 @@ function renderCart() {
     row.innerHTML = `
       <div class="cart-item-meta">
         <div class="cart-item-title" title="${escapeHtml(item.product_name)}">${item.sku} - ${escapeHtml(item.product_name)}</div>
-        <div class="cart-item-price-unit">$${item.unit_price_usd.toFixed(2)} c/u</div>
+        <div class="cart-item-price-unit">$${item.unit_price_usd.toFixed(2)} ${t('unitPriceEach')}</div>
       </div>
       <div class="cart-item-actions">
         <div class="qty-control">
@@ -312,7 +477,7 @@ function renderCart() {
           <button class="btn-qty" onclick="updateCartQty(${item.product_id}, 1)">+</button>
         </div>
         <div class="item-subtotal">$${itemTotal.toFixed(2)}</div>
-        <button class="btn-remove-item" onclick="removeFromCart(${item.product_id})" title="Quitar">
+        <button class="btn-remove-item" onclick="removeFromCart(${item.product_id})" title="Remove item">
           <i data-lucide="trash-2"></i>
         </button>
       </div>
@@ -320,8 +485,7 @@ function renderCart() {
     list.appendChild(row);
   });
 
-  // En El Salvador los precios al consumidor son IVA incluido (13%).
-  // Desglose fiscal exacto de acuerdo a la ley tributaria y al backend SQLite/BigQuery:
+  // VAT (13%) breakdown
   const subtotalNeto = Math.round((totalVenta / 1.13) * 100) / 100;
   const iva = Math.round((totalVenta - subtotalNeto) * 100) / 100;
 
@@ -329,6 +493,7 @@ function renderCart() {
   document.getElementById('cartIva').textContent = `$${iva.toFixed(2)}`;
   document.getElementById('cartTotal').textContent = `$${totalVenta.toFixed(2)}`;
   btnCheckout.disabled = false;
+  btnCheckout.innerHTML = `<i data-lucide="check-circle-2"></i> <span>${t('completeSaleBtn')}</span>`;
 
   updatePaymentMethodUI();
   refreshIcons();
@@ -342,7 +507,7 @@ function updatePaymentMethodUI() {
   const elecIcon = document.getElementById('posElectronicIcon');
   const total = getCartTotal();
 
-  if (method === 'EFECTIVO') {
+  if (method === 'EFECTIVO' || method === 'CASH') {
     if (cashBox) cashBox.style.display = 'block';
     if (elecBox) elecBox.style.display = 'none';
     updateCashChange();
@@ -350,11 +515,15 @@ function updatePaymentMethodUI() {
     if (cashBox) cashBox.style.display = 'none';
     if (elecBox) elecBox.style.display = 'block';
     if (elecText) {
-      if (method === 'TRANSFERENCIA_QR') {
-        elecText.textContent = `Cobro QR Chivo / Banco por $${total.toFixed(2)} exactos`;
+      if (method === 'TRANSFERENCIA_QR' || method === 'QR_TRANSFER') {
+        elecText.textContent = PosState.lang === 'en'
+          ? `QR Mobile Transfer charge for exact $${total.toFixed(2)}`
+          : `Cobro QR Chivo / Banco por $${total.toFixed(2)} exactos`;
         if (elecIcon) elecIcon.setAttribute('data-lucide', 'qr-code');
       } else {
-        elecText.textContent = `Cobro con Tarjeta Débito/Crédito por $${total.toFixed(2)} exactos`;
+        elecText.textContent = PosState.lang === 'en'
+          ? `Debit / Credit card charge for exact $${total.toFixed(2)}`
+          : `Cobro con Tarjeta Débito/Crédito por $${total.toFixed(2)} exactos`;
         if (elecIcon) elecIcon.setAttribute('data-lucide', 'credit-card');
       }
     }
@@ -363,7 +532,7 @@ function updatePaymentMethodUI() {
 
 function updateCashChange() {
   const method = document.getElementById('posPaymentMethod').value;
-  if (method !== 'EFECTIVO') return;
+  if (method !== 'EFECTIVO' && method !== 'CASH') return;
 
   const total = getCartTotal();
   const cashInput = document.getElementById('posCashGiven');
@@ -375,7 +544,7 @@ function updateCashChange() {
   if (!rawCash) {
     changeEl.textContent = '$0.00';
     changeEl.style.color = '#94a3b8';
-    if (labelEl) labelEl.textContent = 'Cambio / Vuelto:';
+    if (labelEl) labelEl.textContent = t('changeDue');
     if (changeContainer) changeContainer.classList.remove('insufficient', 'sufficient');
     return;
   }
@@ -385,7 +554,7 @@ function updateCashChange() {
   if (total <= 0) {
     changeEl.textContent = '$0.00';
     changeEl.style.color = '#94a3b8';
-    if (labelEl) labelEl.textContent = 'Cambio / Vuelto:';
+    if (labelEl) labelEl.textContent = t('changeDue');
     if (changeContainer) changeContainer.classList.remove('insufficient', 'sufficient');
     return;
   }
@@ -394,7 +563,7 @@ function updateCashChange() {
     const change = cashVal - total;
     changeEl.textContent = `$${change.toFixed(2)}`;
     changeEl.style.color = '#10b981';
-    if (labelEl) labelEl.textContent = 'Cambio a Entregar:';
+    if (labelEl) labelEl.textContent = t('changeDue');
     if (changeContainer) {
       changeContainer.classList.remove('insufficient');
       changeContainer.classList.add('sufficient');
@@ -403,7 +572,7 @@ function updateCashChange() {
     const missing = total - cashVal;
     changeEl.textContent = `- $${missing.toFixed(2)}`;
     changeEl.style.color = '#ef4444';
-    if (labelEl) labelEl.textContent = 'Faltan cobrar:';
+    if (labelEl) labelEl.textContent = t('amountShort');
     if (changeContainer) {
       changeContainer.classList.remove('sufficient');
       changeContainer.classList.add('insufficient');
@@ -413,7 +582,7 @@ function updateCashChange() {
 
 async function handleCheckout() {
   if (PosState.cart.length === 0) {
-    showToast('El ticket de venta está vacío', 'info');
+    showToast(t('emptyTicketToast'), 'info');
     return;
   }
 
@@ -423,16 +592,15 @@ async function handleCheckout() {
   const rawCash = cashInput.value.trim();
   const cashGiven = parseFloat(rawCash) || 0;
 
-  // Validación estricta para ventas en efectivo
-  if (method === 'EFECTIVO') {
+  if (method === 'EFECTIVO' || method === 'CASH') {
     if (!rawCash) {
-      showToast(`Ingrese el efectivo recibido ($${total.toFixed(2)}) o presione "Exacto"`, 'error');
+      showToast(`${t('cashRequiredToast')} ($${total.toFixed(2)})`, 'error');
       cashInput.focus();
       return;
     }
     if (cashGiven < total) {
       const missing = (total - cashGiven).toFixed(2);
-      showToast(`Efectivo insuficiente. Total a cobrar: $${total.toFixed(2)}, entregó: $${cashGiven.toFixed(2)} (Faltan $${missing})`, 'error');
+      showToast(`${t('insufficientCashToast')}${total.toFixed(2)}, received: $${cashGiven.toFixed(2)} (Missing $${missing})`, 'error');
       cashInput.focus();
       return;
     }
@@ -440,7 +608,7 @@ async function handleCheckout() {
 
   const btnCheckout = document.getElementById('btnConfirmCheckout');
   btnCheckout.disabled = true;
-  btnCheckout.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Procesando...';
+  btnCheckout.innerHTML = `<i data-lucide="loader-2" class="spin"></i> <span>${t('processingBtn')}</span>`;
   refreshIcons();
 
   const payload = {
@@ -460,13 +628,12 @@ async function handleCheckout() {
       body: JSON.stringify(payload)
     });
 
-    res.cash_given = method === 'EFECTIVO' ? cashGiven : total;
-    res.cash_change = method === 'EFECTIVO' ? Math.max(0, cashGiven - total) : 0;
+    res.cash_given = (method === 'EFECTIVO' || method === 'CASH') ? cashGiven : total;
+    res.cash_change = (method === 'EFECTIVO' || method === 'CASH') ? Math.max(0, cashGiven - total) : 0;
 
-    showToast('¡Venta completada con éxito!', 'success');
+    showToast(t('saleSuccessToast'), 'success');
     showReceiptModal(res);
 
-    // Actualizar catálogo local
     await loadPosCatalog();
     PosState.cart = [];
     document.getElementById('posCashGiven').value = '';
@@ -476,7 +643,7 @@ async function handleCheckout() {
     showToast(err.message, 'error');
   } finally {
     btnCheckout.disabled = false;
-    btnCheckout.innerHTML = '<i data-lucide="check-circle-2"></i> <span>Cobrar y Procesar Venta</span>';
+    btnCheckout.innerHTML = `<i data-lucide="check-circle-2"></i> <span>${t('completeSaleBtn')}</span>`;
     refreshIcons();
   }
 }
@@ -495,7 +662,7 @@ function showReceiptModal(txData) {
     const itemSubtotal = Number(it.subtotal_usd ?? (qty * Number(it.unit_price_usd || 0)));
     return `
       <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-size: 0.8rem;">
-        <span>${qty}x ${escapeHtml(it.product_name || 'Artículo')}</span>
+        <span>${qty}x ${escapeHtml(it.product_name || 'Item')}</span>
         <strong>$${itemSubtotal.toFixed(2)}</strong>
       </div>
     `;
@@ -503,60 +670,60 @@ function showReceiptModal(txData) {
 
   const ticketUuid = escapeHtml(txData.transaction_uuid || `TICKET-${txData.sale_id || Date.now()}`);
   const ticketDate = escapeHtml(txData.timestamp || txData.sale_timestamp || new Date().toLocaleString());
-  const cashier = escapeHtml(txData.cashier_name || `Cajero #${txData.user_id || 1}`);
-  const paymentMethod = escapeHtml(txData.payment_method || 'EFECTIVO');
-  const isEfectivo = paymentMethod === 'EFECTIVO';
+  const cashier = escapeHtml(txData.cashier_name || `Cashier #${txData.user_id || 1}`);
+  const paymentMethod = escapeHtml(txData.payment_method || 'CASH');
+  const isEfectivo = paymentMethod === 'EFECTIVO' || paymentMethod === 'CASH';
   const cashGiven = Number(txData.cash_given ?? totalAmount);
   const cashChange = Number(txData.cash_change ?? 0);
 
   content.innerHTML = `
     <div class="receipt-ticket">
       <div style="text-align: center; margin-bottom: 0.75rem;">
-        <div style="font-weight: 800; font-size: 0.95rem;">COMPROBANTE DE PAGO</div>
-        <div style="font-size: 0.72rem; color: #94a3b8;">Sucursal Central • Terminal 01</div>
+        <div style="font-weight: 800; font-size: 0.95rem;">${t('receiptTitle')}</div>
+        <div style="font-size: 0.72rem; color: #94a3b8;">${t('receiptBranch')}</div>
       </div>
       <div class="receipt-divider"></div>
       <div style="font-size: 0.75rem; color: #cbd5e1; margin-bottom: 0.5rem;">
-        <div><strong>Ticket:</strong> ${ticketUuid}</div>
-        <div><strong>Fecha:</strong> ${ticketDate}</div>
-        <div><strong>Cajero:</strong> ${cashier}</div>
-        <div><strong>Pago:</strong> ${paymentMethod}</div>
+        <div><strong>${t('receiptTicket')}</strong> ${ticketUuid}</div>
+        <div><strong>${t('receiptDate')}</strong> ${ticketDate}</div>
+        <div><strong>${t('receiptCashier')}</strong> ${cashier}</div>
+        <div><strong>${t('receiptPayment')}</strong> ${paymentMethod}</div>
       </div>
       <div class="receipt-divider"></div>
       <div style="margin: 0.75rem 0;">
-        ${itemsRows || '<div style="font-size: 0.75rem; color: #94a3b8; text-align: center;">Sin desglose de artículos</div>'}
+        ${itemsRows || '<div style="font-size: 0.75rem; color: #94a3b8; text-align: center;">No items found</div>'}
       </div>
       <div class="receipt-divider"></div>
       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 0.35rem;">
-        <span>Subtotal:</span>
+        <span>${t('subtotal')}:</span>
         <span>$${subtotal.toFixed(2)}</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 0.15rem;">
-        <span>IVA (13%):</span>
+        <span>${t('tax')}:</span>
         <span>$${iva.toFixed(2)}</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; color: #f59e0b; margin-top: 0.5rem; border-top: 1px dashed #475569; padding-top: 0.5rem;">
-        <span>TOTAL COBRADO:</span>
+        <span>${t('receiptTotalCharged')}</span>
         <span>$${totalAmount.toFixed(2)}</span>
       </div>
       ${isEfectivo ? `
       <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 0.4rem; color: #94a3b8;">
-        <span>Efectivo Recibido:</span>
+        <span>${t('receiptCashTendered')}</span>
         <span>$${cashGiven.toFixed(2)}</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 0.2rem; color: #10b981; font-weight: 600;">
-        <span>Cambio Entregado:</span>
+        <span>${t('receiptChangeGiven')}</span>
         <span>$${cashChange.toFixed(2)}</span>
       </div>
       ` : `
       <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 0.4rem; color: #38bdf8;">
-        <span>Modalidad:</span>
-        <span>Cobro Electrónico Aprobado</span>
+        <span>Status:</span>
+        <span>${t('receiptElectronicMode')}</span>
       </div>
       `}
       <div class="receipt-divider"></div>
       <div style="text-align: center; font-size: 0.7rem; color: #94a3b8; margin-top: 0.5rem;">
-        ¡Gracias por su compra!<br>Garantía de calidad ferretera
+        ${t('receiptThanks')}
       </div>
     </div>
   `;

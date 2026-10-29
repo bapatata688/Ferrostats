@@ -1,22 +1,77 @@
 /**
- * FERROSTATS — PORTAL GERENCIAL (BODEGA, LOOKER STUDIO & DATAFORM OBSERVABILITY)
- * Author: Diego Alejandro Escobar Barahona
- * Framework: Vanilla JS + Lucide Icons + BigQuery / Dataform Medallion Architecture
+ * FERROSTATS — MANAGERIAL PORTAL (WAREHOUSE AUDITING & GOOGLE LOOKER BI)
+ * Author & Lead Architect: Diego Alejandro Escobar Barahona
+ * Tech Stack: Vanilla JS + Lucide Icons + Google BigQuery Medallion Architecture
  */
 
 const DEFAULT_LOOKER_URL = 'https://datastudio.google.com/embed/reporting/2389e684-fc9b-431d-9c56-487b3067eb87/page/p_dwbfqrtk8d';
 
+const AppTranslations = {
+  en: {
+    langLabel: 'EN',
+    statusOptimal: 'Optimal',
+    statusLowStock: 'Low Stock',
+    statusOutOfStock: 'Out of Stock',
+    unitLabel: 'Unit:',
+    classLabel: 'Class',
+    currentStockLabel: 'Current Stock',
+    minStockLabel: 'Minimum',
+    burnRateLabel: 'Burn Rate',
+    restockBtn: 'Supplier Restock / Audit',
+    orderBtn: 'Order',
+    itemsAtRisk: 'items at risk',
+    inventoryHealthy: 'All inventory levels are currently above reorder thresholds.',
+    noItemsInAisle: 'No products found in this aisle matching selected filters.',
+    stockNegativeErr: 'Operation canceled: stock cannot be negative.',
+    stockUpdatedToast: 'Stock updated: ',
+    adjustAppliedToast: 'Adjustment applied: new stock ',
+    syncRefreshingToast: 'Refreshing Dataform models & syncing BigQuery...',
+    syncSuccessToast: 'Looker Studio dashboard refreshed successfully.',
+    urlResetToast: 'Looker URL reset to default.',
+    validQuantityErr: 'Please enter a valid non-zero quantity.'
+  },
+  es: {
+    langLabel: 'ES',
+    statusOptimal: 'Óptimo',
+    statusLowStock: 'Bajo Stock',
+    statusOutOfStock: 'Agotado',
+    unitLabel: 'Unidad:',
+    classLabel: 'Clase',
+    currentStockLabel: 'Stock Actual',
+    minStockLabel: 'Mínimo',
+    burnRateLabel: 'Burn Rate',
+    restockBtn: 'Ingreso de Proveedor / Conteo',
+    orderBtn: 'Pedir',
+    itemsAtRisk: 'artículos en riesgo',
+    inventoryHealthy: '¡Excelente! Todo el inventario se encuentra por encima del stock de reorden.',
+    noItemsInAisle: 'No hay artículos en este pasillo con el filtro seleccionado.',
+    stockNegativeErr: 'Operación cancelada: el stock no puede ser negativo.',
+    stockUpdatedToast: 'Stock actualizado: ',
+    adjustAppliedToast: 'Ajuste aplicado: nuevo stock ',
+    syncRefreshingToast: 'Actualizando transformaciones y sincronizando datos...',
+    syncSuccessToast: 'Dashboard de Looker Studio recargado.',
+    urlResetToast: 'URL restablecida a la predeterminada.',
+    validQuantityErr: 'Ingresa una cantidad válida distinta de 0.'
+  }
+};
+
 const State = {
-  activeTab: 'bodega', // 'bodega', 'bi', 'dataform'
+  lang: localStorage.getItem('ferrostats_lang') || 'en',
+  activeTab: 'bodega', // 'bodega', 'bi'
   products: [],
   selectedAisle: 'TODOS',
   onlyCriticalAisles: false,
   analyticsData: null,
-  dataformStats: null,
   lookerUrl: localStorage.getItem('ferrostats_looker_url') || DEFAULT_LOOKER_URL
 };
 
+function t(key) {
+  const dict = AppTranslations[State.lang] || AppTranslations.en;
+  return dict[key] || AppTranslations.en[key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  initLanguageToggle();
   initBottomNav();
   initLookerControls();
   initLookerConfigModal();
@@ -34,6 +89,22 @@ function refreshIcons() {
   }
 }
 
+function initLanguageToggle() {
+  const btn = document.getElementById('btnMainLangToggle');
+  const label = document.getElementById('mainLangLabel');
+  if (label) label.textContent = State.lang.toUpperCase();
+
+  btn?.addEventListener('click', () => {
+    State.lang = State.lang === 'en' ? 'es' : 'en';
+    localStorage.setItem('ferrostats_lang', State.lang);
+    if (label) label.textContent = State.lang.toUpperCase();
+    renderWarehouseCards();
+    if (State.analyticsData) {
+      renderReorderTable(State.analyticsData.reorder_priority_list || []);
+    }
+  });
+}
+
 async function apiFetch(endpoint, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
@@ -45,13 +116,13 @@ async function apiFetch(endpoint, options = {}) {
   const res = await fetch(endpoint, { ...options, headers });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.detail || `Error HTTP ${res.status}`);
+    throw new Error(data.detail || `HTTP Error ${res.status}`);
   }
   return data;
 }
 
 // ==============================================================================
-// 1. NAVEGACIÓN INFERIOR (FOOTER NAV: BODEGA | LOOKER BI | DATAFORM ELT)
+// 1. BOTTOM NAVIGATION (WAREHOUSE | LOOKER BI)
 // ==============================================================================
 function initBottomNav() {
   const navItems = document.querySelectorAll('.bottom-nav-item');
@@ -66,13 +137,11 @@ function initBottomNav() {
 function switchTab(tab) {
   State.activeTab = tab;
 
-  // Actualizar items de la barra inferior
   document.querySelectorAll('.bottom-nav-item').forEach(item => {
     const isTarget = item.getAttribute('data-tab') === tab;
     item.classList.toggle('active', isTarget);
   });
 
-  // Conmutar secciones
   document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
 
   if (tab === 'bodega') {
@@ -88,10 +157,9 @@ function switchTab(tab) {
 }
 
 // ==============================================================================
-// 2. SECCIÓN BODEGA: CONTROL FÍSICO Y AUDITORÍA EN PASILLOS
+// 2. WAREHOUSE CONTROLS & PHYSICAL AUDITING
 // ==============================================================================
 function initWarehouseControls() {
-  // Tabs de pasillos
   document.querySelectorAll('#aisleTabs .aisle-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#aisleTabs .aisle-tab').forEach(b => b.classList.remove('active'));
@@ -101,13 +169,11 @@ function initWarehouseControls() {
     });
   });
 
-  // Filtro de críticos
   document.getElementById('chkOnlyCriticalAisles')?.addEventListener('change', (e) => {
     State.onlyCriticalAisles = e.target.checked;
     renderWarehouseCards();
   });
 
-  // Modal ajuste inventario
   document.getElementById('btnCloseAdjustModal')?.addEventListener('click', closeAdjustModal);
   document.getElementById('btnCancelAdjust')?.addEventListener('click', closeAdjustModal);
   document.getElementById('btnSaveAdjust')?.addEventListener('click', saveAdjustMovement);
@@ -125,7 +191,7 @@ async function loadWarehouseData() {
     renderWarehouseCards();
     renderReorderTable(analytics.reorder_priority_list || []);
   } catch (err) {
-    showToast(`Error al cargar bodega: ${err.message}`, 'error');
+    showToast(`Failed to load warehouse data: ${err.message}`, 'error');
   }
 }
 
@@ -145,7 +211,7 @@ function renderWarehouseCards() {
   }
 
   if (filtered.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">No hay artículos en este pasillo con el filtro seleccionado.</div>';
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">${t('noItemsInAisle')}</div>`;
     refreshIcons();
     return;
   }
@@ -154,16 +220,16 @@ function renderWarehouseCards() {
     const card = document.createElement('div');
     card.className = 'wh-card';
 
-    let statusText = 'Óptimo';
+    let statusText = t('statusOptimal');
     let statusClass = 'wh-status-optimo';
     let statusIcon = 'check-circle-2';
 
     if (p.stock_status === 'AGOTADO') {
-      statusText = 'Agotado';
+      statusText = t('statusOutOfStock');
       statusClass = 'wh-status-agotado';
       statusIcon = 'alert-circle';
     } else if (p.stock_status === 'BAJO_STOCK') {
-      statusText = 'Bajo Stock';
+      statusText = t('statusLowStock');
       statusClass = 'wh-status-reorden';
       statusIcon = 'alert-triangle';
     }
@@ -182,21 +248,21 @@ function renderWarehouseCards() {
           </div>
         </div>
         <div class="wh-prod-name">${escapeHtml(p.product_name)}</div>
-        <div class="wh-prod-measure">Unidad: ${p.unit_measure} • Clase ${p.abc_class || 'A'}</div>
+        <div class="wh-prod-measure">${t('unitLabel')} ${p.unit_measure} • ${t('classLabel')} ${p.abc_class || 'A'}</div>
         
         <div class="wh-stock-section">
           <div class="wh-stock-col wh-stock-primary">
-            <span class="wh-metric-label">Stock Actual</span>
+            <span class="wh-metric-label">${t('currentStockLabel')}</span>
             <div class="wh-metric-val-lg" id="whStockVal-${p.product_id}">${p.current_stock}</div>
           </div>
           <div class="wh-stock-divider"></div>
           <div class="wh-stock-col">
-            <span class="wh-metric-label">Mínimo</span>
+            <span class="wh-metric-label">${t('minStockLabel')}</span>
             <div class="wh-metric-val">${p.min_stock}</div>
           </div>
           <div class="wh-stock-divider"></div>
           <div class="wh-stock-col">
-            <span class="wh-metric-label">Burn Rate</span>
+            <span class="wh-metric-label">${t('burnRateLabel')}</span>
             <div class="wh-metric-val">${p.daily_burn_rate || 0}<small>/d</small></div>
           </div>
         </div>
@@ -210,7 +276,7 @@ function renderWarehouseCards() {
           <button class="btn-touch" onclick="quickAdjust(${p.product_id}, 10)">+10</button>
         </div>
         <button class="btn-touch-modal" onclick="openAdjustModal(${p.product_id}, '${p.sku}', '${escapeHtml(p.product_name)}', ${p.current_stock}, 15)">
-          <i data-lucide="truck"></i> Ingreso de Proveedor / Conteo
+          <i data-lucide="truck"></i> ${t('restockBtn')}
         </button>
       </div>
     `;
@@ -225,7 +291,7 @@ async function quickAdjust(productId, delta) {
   if (!prod) return;
 
   if (prod.current_stock + delta < 0) {
-    showToast(`Operación cancelada: el stock no puede ser negativo.`, 'error');
+    showToast(t('stockNegativeErr'), 'error');
     return;
   }
 
@@ -235,7 +301,7 @@ async function quickAdjust(productId, delta) {
     user_id: 1,
     movement_type: movType,
     quantity_delta: delta,
-    reference_note: `Ajuste táctil rápido (${delta > 0 ? '+' : ''}${delta}) en pasillo ${prod.aisle_location}`
+    reference_note: `Quick touch adjustment (${delta > 0 ? '+' : ''}${delta}) at aisle ${prod.aisle_location}`
   };
 
   try {
@@ -254,9 +320,9 @@ async function quickAdjust(productId, delta) {
     }
 
     renderWarehouseCards();
-    showToast(`Stock actualizado: ${prod.sku} = ${res.stock_after} uds`, 'success');
+    showToast(`${t('stockUpdatedToast')}${prod.sku} = ${res.stock_after} units`, 'success');
   } catch (err) {
-    showToast(`Error al ajustar: ${err.message}`, 'error');
+    showToast(`Error adjusting stock: ${err.message}`, 'error');
   }
 }
 
@@ -266,7 +332,7 @@ function openAdjustModal(productId, sku, name, currentStock, suggestedDelta) {
   document.getElementById('adjustModalName').textContent = name;
   document.getElementById('adjustModalCurrentStock').textContent = currentStock;
   document.getElementById('adjustQuantityDelta').value = suggestedDelta || 10;
-  document.getElementById('adjustNote').value = `Ingreso factura pasillo`;
+  document.getElementById('adjustNote').value = `Supplier Restock Aisle`;
   document.getElementById('modalAdjustOverlay')?.classList.add('active');
 }
 
@@ -281,7 +347,7 @@ async function saveAdjustMovement() {
   const note = document.getElementById('adjustNote').value.trim();
 
   if (isNaN(delta) || delta === 0) {
-    showToast('Ingresa una cantidad válida distinta de 0', 'error');
+    showToast(t('validQuantityErr'), 'error');
     return;
   }
 
@@ -290,7 +356,7 @@ async function saveAdjustMovement() {
     user_id: 1,
     movement_type: movType,
     quantity_delta: delta,
-    reference_note: note || 'Ajuste de bodega manual'
+    reference_note: note || 'Manual warehouse adjustment'
   };
 
   try {
@@ -300,10 +366,10 @@ async function saveAdjustMovement() {
     });
 
     closeAdjustModal();
-    showToast(`Ajuste aplicado: nuevo stock ${res.stock_after} uds`, 'success');
+    showToast(`${t('adjustAppliedToast')}${res.stock_after} units`, 'success');
     loadWarehouseData();
   } catch (err) {
-    showToast(`Error al guardar ajuste: ${err.message}`, 'error');
+    showToast(`Failed to save adjustment: ${err.message}`, 'error');
   }
 }
 
@@ -313,10 +379,9 @@ function renderReorderTable(items) {
   if (!tbody) return;
 
   if (countBadge) {
-    countBadge.textContent = `${items.length} artículos en riesgo`;
+    countBadge.textContent = `${items.length} ${t('itemsAtRisk')}`;
   }
 
-  // Si tableReorder no tiene tbody explícito
   let targetTbody = tbody.tagName === 'TBODY' ? tbody : tbody.querySelector('tbody');
   if (!targetTbody) {
     targetTbody = document.createElement('tbody');
@@ -325,7 +390,7 @@ function renderReorderTable(items) {
   targetTbody.innerHTML = '';
 
   if (items.length === 0) {
-    targetTbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #10b981; padding: 2rem;">¡Excelente! Todo el inventario se encuentra por encima del stock de reorden.</td></tr>';
+    targetTbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #10b981; padding: 2rem;">${t('inventoryHealthy')}</td></tr>`;
     return;
   }
 
@@ -333,16 +398,18 @@ function renderReorderTable(items) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td data-label="SKU"><code>${p.sku}</code></td>
-      <td data-label="Artículo"><strong>${escapeHtml(p.product_name)}</strong></td>
-      <td data-label="Familia">${p.category_name}</td>
-      <td data-label="Stock Actual"><strong>${p.current_stock}</strong> <small>(mín ${p.min_stock})</small></td>
+      <td data-label="Product Name"><strong>${escapeHtml(p.product_name)}</strong></td>
+      <td data-label="Category">${p.category_name}</td>
+      <td data-label="Location"><i data-lucide="map-pin"></i> ${p.aisle_location || 'Aisle A'}</td>
+      <td data-label="ABC Class"><span class="badge-abc-${(p.abc_class || 'A').toLowerCase()}">${p.abc_class || 'A'}</span></td>
+      <td data-label="Stock / Min"><strong>${p.current_stock}</strong> <small>(min ${p.min_stock})</small></td>
       <td data-label="Burn Rate">${p.daily_burn_rate}</td>
-      <td data-label="Días DOI"><strong>${p.days_of_inventory_left} d</strong></td>
-      <td data-label="Sugerido"><strong class="text-accent">+${p.recommended_reorder_qty}</strong></td>
-      <td data-label="Proveedor"><small>${p.supplier_name}<br>${p.contact_phone}</small></td>
-      <td data-label="Acción">
+      <td data-label="DOI (Days)"><strong>${p.days_of_inventory_left} d</strong></td>
+      <td data-label="Suggested Reorder"><strong class="text-accent">+${p.recommended_reorder_qty}</strong></td>
+      <td data-label="Supplier"><small>${p.supplier_name}<br>${p.contact_phone}</small></td>
+      <td data-label="Action">
         <button class="btn btn-secondary btn-sm" onclick="openAdjustModal(${p.product_id}, '${p.sku}', '${escapeHtml(p.product_name)}', ${p.current_stock}, ${p.recommended_reorder_qty})">
-          <i data-lucide="truck"></i> Pedir
+          <i data-lucide="truck"></i> ${t('orderBtn')}
         </button>
       </td>
     `;
@@ -353,7 +420,7 @@ function renderReorderTable(items) {
 }
 
 // ==============================================================================
-// 3. SECCIÓN BI EXCLUSIVO: GOOGLE LOOKER STUDIO
+// 3. LOOKER STUDIO EMBED & DATAFORM SYNC
 // ==============================================================================
 function initLookerControls() {
   document.getElementById('btnReloadLooker')?.addEventListener('click', async () => {
@@ -363,21 +430,19 @@ function initLookerControls() {
     const originalHtml = btn ? btn.innerHTML : '';
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> <span>Actualizando...</span>';
+      btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> <span>Syncing...</span>';
       refreshIcons();
     }
 
-    showToast('Actualizando transformaciones y sincronizando datos...', 'info');
+    showToast(t('syncRefreshingToast'), 'info');
 
     try {
-      // 1. Ejecutar las transformaciones y sincronización en backend hacia BigQuery
       const res = await apiFetch('/api/v1/etl/run', { method: 'POST' });
-      showToast(res.message || 'Transformaciones actualizadas exitosamente', 'success');
+      showToast(res.message || t('syncSuccessToast'), 'success');
     } catch (err) {
-      console.warn('Nota en actualización:', err);
-      showToast('Recargando vista del informe...', 'info');
+      console.warn('Note on ETL refresh:', err);
+      showToast('Reloading report view...', 'info');
     } finally {
-      // 2. Refrescar el iframe de Looker Studio para tomar los datos actualizados
       if (iframe && State.lookerUrl) {
         const cleanUrl = State.lookerUrl;
         iframe.src = 'about:blank';
@@ -387,10 +452,9 @@ function initLookerControls() {
       }
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = originalHtml || '<i data-lucide="rotate-cw"></i> <span>Recargar</span>';
+        btn.innerHTML = originalHtml || '<i data-lucide="rotate-cw"></i> <span>Refresh Dataform &amp; Sync</span>';
         refreshIcons();
       }
-      showToast('Dashboard de Looker Studio recargado', 'success');
     }
   });
 
@@ -433,7 +497,7 @@ function initLookerConfigModal() {
 
   document.getElementById('btnResetDefaultLookerUrl')?.addEventListener('click', () => {
     inputUrl.value = DEFAULT_LOOKER_URL;
-    showToast('URL restablecida a la predeterminada', 'info');
+    showToast(t('urlResetToast'), 'info');
   });
 
   document.getElementById('btnCloseLookerConfigModal')?.addEventListener('click', () => {
@@ -449,53 +513,41 @@ function initLookerConfigModal() {
     State.lookerUrl = newUrl;
     localStorage.setItem('ferrostats_looker_url', newUrl);
     updateLookerDisplay();
-    showToast('URL de Looker Studio guardada y aplicada', 'success');
     modal?.classList.remove('active');
+    showToast('Looker Studio URL updated successfully.', 'success');
   });
 }
 
-
-
-// ==============================================================================
-// 5. UTILIDADES (TOAST & FORMATTERS)
-// ==============================================================================
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-
+  
   let iconName = 'info';
   if (type === 'success') iconName = 'check-circle';
   if (type === 'error') iconName = 'alert-triangle';
 
-  toast.innerHTML = `
-    <i data-lucide="${iconName}"></i>
-    <span>${escapeHtml(message)}</span>
-  `;
-
+  toast.innerHTML = `<i data-lucide="${iconName}"></i> <span>${escapeHtml(message)}</span>`;
   container.appendChild(toast);
   refreshIcons();
 
   setTimeout(() => {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
+    toast.style.transform = 'translateX(100%)';
+    toast.style.transition = 'all 0.25s ease-out';
     setTimeout(() => toast.remove(), 250);
-  }, 4000);
-}
-
-function formatCurrency(val) {
-  const num = parseFloat(val) || 0;
-  return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }, 3500);
 }
 
 function escapeHtml(str) {
   if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return str.replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[m]);
 }

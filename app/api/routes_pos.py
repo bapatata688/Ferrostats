@@ -7,60 +7,87 @@ from app.db.connection import get_db_connection
 from app.api.auth_rbac import require_role
 from app.etl.bigquery_sync import stream_sale_to_bronze
 
-router = APIRouter(prefix="/api/v1/pos", tags=["Punto de Venta POS"])
+router = APIRouter(prefix="/api/v1/pos", tags=["Point-of-Sale (POS)"])
+
+CUSTOMER_TYPE_TO_DB = {
+    "FINAL_CONSUMER": "CONSUMIDOR_FINAL",
+    "CONSUMIDOR_FINAL": "CONSUMIDOR_FINAL",
+    "CONTRACTOR": "CONTRATISTA",
+    "CONTRATISTA": "CONTRATISTA",
+    "INDUSTRIAL_WORKSHOP": "TALLER_INDUSTRIAL",
+    "TALLER_INDUSTRIAL": "TALLER_INDUSTRIAL"
+}
+
+PAYMENT_METHOD_TO_DB = {
+    "CASH": "EFECTIVO",
+    "EFECTIVO": "EFECTIVO",
+    "QR_TRANSFER": "TRANSFERENCIA_QR",
+    "TRANSFERENCIA_QR": "TRANSFERENCIA_QR",
+    "CARD": "TARJETA",
+    "TARJETA": "TARJETA"
+}
 
 class CartItemRequest(BaseModel):
     product_id: int
-    quantity: int = Field(..., gt=0, description="Cantidad solicitada (debe ser > 0)")
+    quantity: int = Field(..., gt=0, description="Requested quantity (must be > 0)")
 
 class CheckoutRequest(BaseModel):
-    transaction_uuid: str = Field(..., description="UUID único de transacción para idempotencia")
-    user_id: int = Field(default=3, description="ID del cajero o administrador")
+    transaction_uuid: str = Field(..., description="Unique client transaction UUID for idempotency")
+    user_id: int = Field(default=3, description="Cashier or administrator user ID")
     customer_type: str = Field(
-        default="CONSUMIDOR_FINAL",
-        description="CONSUMIDOR_FINAL, CONTRATISTA o TALLER_INDUSTRIAL"
+        default="FINAL_CONSUMER",
+        description="FINAL_CONSUMER, CONTRACTOR, or INDUSTRIAL_WORKSHOP"
     )
     payment_method: str = Field(
-        default="EFECTIVO",
-        description="EFECTIVO, TRANSFERENCIA_QR o TARJETA"
+        default="CASH",
+        description="CASH, QR_TRANSFER, or CARD"
     )
-    items: List[CartItemRequest] = Field(..., min_length=1, description="Lista de artículos a cobrar")
+    items: List[CartItemRequest] = Field(..., min_length=1, description="List of items to purchase")
 
 @router.post("/checkout", status_code=status.HTTP_201_CREATED)
 def pos_checkout(
     payload: CheckoutRequest,
-    role: str = Depends(require_role("ADMIN", "CAJERO"))
+    role: str = Depends(require_role("ADMIN", "CASHIER"))
 ) -> Dict[str, Any]:
     """
-    Ejecuta el checkout atómico de punto de venta bajo garantías estrictas ACID:
-    - BEGIN IMMEDIATE TRANSACTION para bloqueo exclusivo de escritura.
-    - Verificación de idempotencia por transaction_uuid.
-    - Verificación preventiva de stock con ROLLBACK inmediato (HTTP 409 Conflict) si no alcanza.
-    - Descuento atómico de existencias con cláusula de guarda WHERE current_stock >= :qty.
-    - Inserción de venta, detalle de ítems y bitácora de auditoría.
-    - Disparo de refresco incremental del Pipeline ETL tras el COMMIT.
+    Executes an atomic point-of-sale checkout under strict ACID guarantees:
+    - BEGIN IMMEDIATE TRANSACTION for exclusive database write locking.
+    - Idempotency verification by transaction_uuid to prevent duplicate charges.
+    - Preventive inventory check with instant ROLLBACK (HTTP 409 Conflict) on depletion.
+    - Atomic stock decrement with SQL guard: WHERE current_stock >= :qty.
+    - Sales receipt, item breakdown, and immutable audit log persistence.
+    - Continuous streaming ingestion into Google BigQuery Bronze layer.
     """
-    if payload.customer_type not in ("CONSUMIDOR_FINAL", "CONTRATISTA", "TALLER_INDUSTRIAL"):
-        raise HTTPException(status_code=400, detail="customer_type no válido")
-    if payload.payment_method not in ("EFECTIVO", "TRANSFERENCIA_QR", "TARJETA"):
-        raise HTTPException(status_code=400, detail="payment_method no válido")
+    normalized_cust = CUSTOMER_TYPE_TO_DB.get(payload.customer_type.upper().strip())
+    if not normalized_cust:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid customer_type '{payload.customer_type}'. Allowed: FINAL_CONSUMER, CONTRACTOR, INDUSTRIAL_WORKSHOP"
+        )
+
+    normalized_pay = PAYMENT_METHOD_TO_DB.get(payload.payment_method.upper().strip())
+    if not normalized_pay:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid payment_method '{payload.payment_method}'. Allowed: CASH, QR_TRANSFER, CARD"
+        )
 
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         cursor.execute("BEGIN IMMEDIATE TRANSACTION;")
 
-        # 1. Verificación de Idempotencia por transaction_uuid
+        # 1. Idempotency Check by transaction_uuid
         cursor.execute("SELECT sale_id FROM sales WHERE transaction_uuid = ?;", (payload.transaction_uuid,))
         existing_sale = cursor.fetchone()
         if existing_sale:
             conn.execute("ROLLBACK;")
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Transacción duplicada: el UUID '{payload.transaction_uuid}' ya fue procesado previamente en la venta #{existing_sale['sale_id']}."
+                detail=f"Duplicate transaction: UUID '{payload.transaction_uuid}' was already processed in sale #{existing_sale['sale_id']}."
             )
 
-        # 2. Verificación de Stock para cada artículo del carrito
+        # 2. Stock Verification & Pre-flight Validation
         items_processed = []
         stock_alerts = []
         sale_total_amount = 0.0
@@ -81,7 +108,7 @@ def pos_checkout(
                 conn.execute("ROLLBACK;")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Producto con ID {item.product_id} no existe en el catálogo."
+                    detail=f"Product with ID {item.product_id} does not exist in catalog."
                 )
 
             current_stock = prod["current_stock"]
@@ -92,12 +119,12 @@ def pos_checkout(
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail=(
-                        f"Stock insuficiente para {prod['sku']} ({prod['product_name']}): "
-                        f"disponible en pasillo: {current_stock} uds, solicitado en carrito: {requested_qty} uds."
+                        f"Insufficient stock for {prod['sku']} ({prod['product_name']}): "
+                        f"available in aisle: {current_stock} units, requested in cart: {requested_qty} units."
                     )
                 )
 
-            # 3. Descuento atómico con cláusula de guarda
+            # 3. Guarded Atomic Stock Decrement
             cursor.execute(
                 """
                 UPDATE products
@@ -113,7 +140,7 @@ def pos_checkout(
                 conn.execute("ROLLBACK;")
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail=f"Condición de carrera detectada para {prod['sku']}. Venta abortada por seguridad ACID."
+                    detail=f"Race condition detected for {prod['sku']}. Transaction rolled back by ACID guard."
                 )
 
             stock_after = current_stock - requested_qty
@@ -135,21 +162,21 @@ def pos_checkout(
                 "stock_after": stock_after
             })
 
-            # Detectar si entró en zona de riesgo o quiebre de stock
+            # Check stock risk / out-of-stock threshold
             if stock_after <= prod["min_stock"]:
                 stock_alerts.append({
                     "sku": prod["sku"],
                     "product_name": prod["product_name"],
                     "stock_left": stock_after,
                     "min_stock": prod["min_stock"],
-                    "status": "AGOTADO" if stock_after == 0 else "BAJO_STOCK"
+                    "status": "OUT_OF_STOCK" if stock_after == 0 else "LOW_STOCK"
                 })
 
         sale_total_amount = round(sale_total_amount, 2)
         sale_total_cost = round(sale_total_cost, 2)
         gross_profit = round(sale_total_amount - sale_total_cost, 2)
 
-        # 4. Insertar encabezado de venta
+        # 4. Insert Sale Header
         cursor.execute(
             """
             INSERT INTO sales (
@@ -162,8 +189,8 @@ def pos_checkout(
                 payload.transaction_uuid,
                 now_ts,
                 payload.user_id,
-                payload.customer_type,
-                payload.payment_method,
+                normalized_cust,
+                normalized_pay,
                 sale_total_cost,
                 sale_total_amount,
                 gross_profit
@@ -171,7 +198,7 @@ def pos_checkout(
         )
         sale_id = cursor.lastrowid
 
-        # 5. Insertar renglones de venta y movimientos de inventario
+        # 5. Insert Sale Line Items & Inventory Movements Audit
         for item in items_processed:
             cursor.execute(
                 """
@@ -206,30 +233,30 @@ def pos_checkout(
                     -item["quantity"],
                     item["stock_before"],
                     item["stock_after"],
-                    f"Venta POS Ticket #{sale_id} (UUID: {payload.transaction_uuid[:18]})"
+                    f"POS Checkout Receipt #{sale_id} (UUID: {payload.transaction_uuid[:18]})"
                 )
             )
 
         conn.execute("COMMIT;")
 
-        # 6. Ingesta continua hacia la capa Bronze de BigQuery (Dataform gestiona el ELT)
+        # 6. Stream event to BigQuery Bronze (non-blocking)
         stream_sale_to_bronze(
             sale_id=sale_id,
             transaction_uuid=payload.transaction_uuid,
             sale_timestamp=now_ts,
             user_id=payload.user_id,
-            customer_type=payload.customer_type,
-            payment_method=payload.payment_method,
+            customer_type=normalized_cust,
+            payment_method=normalized_pay,
             total_cost_usd=sale_total_cost,
             total_amount_usd=sale_total_amount,
             gross_profit_usd=gross_profit,
             items=items_processed
         )
 
-        # 7. Obtener nombre del cajero para el ticket
+        # 7. Get Cashier Name
         cursor.execute("SELECT full_name FROM users WHERE user_id = ?;", (payload.user_id,))
         user_row = cursor.fetchone()
-        cashier_name = user_row["full_name"] if user_row else f"Cajero #{payload.user_id}"
+        cashier_name = user_row["full_name"] if user_row else f"Cashier #{payload.user_id}"
 
         subtotal_neto = round(sale_total_amount / 1.13, 2)
         iva_calc = round(sale_total_amount - subtotal_neto, 2)
@@ -241,8 +268,8 @@ def pos_checkout(
             "sale_timestamp": now_ts,
             "timestamp": now_ts,
             "cashier_name": cashier_name,
-            "customer_type": payload.customer_type,
-            "payment_method": payload.payment_method,
+            "customer_type": normalized_cust,
+            "payment_method": normalized_pay,
             "items_count": len(items_processed),
             "items": items_processed,
             "items_breakdown": items_processed,
@@ -259,6 +286,6 @@ def pos_checkout(
         raise
     except Exception as exc:
         conn.execute("ROLLBACK;")
-        raise HTTPException(status_code=500, detail=f"Fallo en transacción de venta: {str(exc)}")
+        raise HTTPException(status_code=500, detail=f"Checkout transaction failed: {str(exc)}")
     finally:
         conn.close()

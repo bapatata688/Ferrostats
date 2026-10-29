@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Gerencial — Bodega & Business Intelligence</title>
-  <meta name="description" content="Portal Gerencial para control de Bodega, Auditoría de Pasillos e Inteligencia de Negocios en Ferreterías.">
+  <title>Managerial Portal — Warehouse Control &amp; Business Intelligence | FERROSTATS</title>
+  <meta name="description" content="Executive portal for physical warehouse management, aisle auditing, and cloud-native business intelligence.">
   
   <!-- Google Fonts: Outfit (Display) & Inter (Data & Body) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,78 +14,90 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Sistema de Diseño UI/UX Pro Max (Slate/Dark Industrial) -->
-  <link rel="stylesheet" href="/static/styles.css?v=2.1">
+  <!-- Slate Industrial Design System -->
+  <link rel="stylesheet" href="/static/styles.css?v=2.2">
 </head>
 <body class="theme-slate-industrial has-bottom-nav">
 
   <!-- ============================================================ -->
-  <!-- NAVBAR PRINCIPAL: SOLO LOGO Y ENLACE CAJERO                   -->
+  <!-- MINIMALIST TOPBAR: BRANDING & NAVIGATION                     -->
   <!-- ============================================================ -->
   <header class="navbar-minimal">
     <div class="nav-brand-clean">
       <div class="brand-logo-container">
-        <img src="/static/img/logo.jpg" alt="Logo" class="brand-logo" width="42" height="42">
+        <img src="/static/img/logo.jpg" alt="Ferrostats Logo" class="brand-logo" width="42" height="42">
       </div>
       <div class="brand-app-title">
-        <span class="system-title">Sistema Gerencia</span>
-        <span class="system-sub">Bodega &amp; Inteligencia de Negocios</span>
+        <span class="system-title">Managerial System</span>
+        <span class="system-sub">Warehouse Auditing &amp; Business Intelligence</span>
       </div>
+    </div>
+
+    <div class="nav-actions-clean" style="display: flex; align-items: center; gap: 0.75rem;">
+      <button class="btn-lang-toggle" id="btnMainLangToggle" title="Toggle Language (English / Spanish)" type="button">
+        <i data-lucide="globe"></i> <span id="mainLangLabel">EN</span>
+      </button>
+      <a href="/pos" class="btn btn-secondary btn-sm" style="text-decoration: none;" title="Open Cashier POS Terminal">
+        <i data-lucide="calculator"></i> <span>POS Cashier</span>
+      </a>
+      <span class="badge-role-cashier">
+        <span class="pulse-dot"></span> Cloud Run Live
+      </span>
     </div>
   </header>
 
   <!-- ============================================================ -->
-  <!-- CONTENEDOR PRINCIPAL GERENCIAL                               -->
+  <!-- MAIN MANAGERIAL CONTAINER                                    -->
   <!-- ============================================================ -->
   <main class="main-container main-has-footer-nav">
 
     <!-- ========================================================== -->
-    <!-- SECCIÓN 1: BODEGA - CONTROL FÍSICO Y AUDITORÍA EN PASILLOS -->
+    <!-- SECTION 1: WAREHOUSE - PHYSICAL AUDIT & AISLE CONTROL      -->
     <!-- ========================================================== -->
     <section id="viewBodega" class="view-section active">
       <div class="view-header">
         <div class="view-header-info">
-          <h1 class="view-title">Control Físico y Auditoría de Bodega</h1>
-          <p class="view-subtitle">Conteo de stock en pasillos, ajustes rápidos y sugerencias de reabastecimiento</p>
+          <h1 class="view-title">Physical Warehouse &amp; Aisle Audit</h1>
+          <p class="view-subtitle">Real-time stock auditing across functional aisles, fast inventory adjustments, and replenishment suggestions</p>
         </div>
       </div>
 
-      <!-- Barra de Filtros de Pasillos y Artículos Críticos -->
+      <!-- Aisle Filters & Critical Items Toggle -->
       <div class="warehouse-filter-container">
         <div class="aisle-pills-scroller" id="aisleTabs">
-          <button class="aisle-tab active" data-aisle="TODOS">Todos los Pasillos</button>
-          <button class="aisle-tab" data-aisle="Pasillo A">Pasillo A (Herram. Manual)</button>
-          <button class="aisle-tab" data-aisle="Pasillo B">Pasillo B (Herram. Eléctricas)</button>
-          <button class="aisle-tab" data-aisle="Pasillo C">Pasillo C (Tornillería)</button>
-          <button class="aisle-tab" data-aisle="Pasillo D">Pasillo D (Fontanería)</button>
-          <button class="aisle-tab" data-aisle="Pasillo E">Pasillo E (Pinturas)</button>
-          <button class="aisle-tab" data-aisle="Bodega Pesados">Bodega Pesados</button>
-          <button class="aisle-tab" data-aisle="Bodega Tubos">Bodega Tubos</button>
+          <button class="aisle-tab active" data-aisle="TODOS">All Aisles</button>
+          <button class="aisle-tab" data-aisle="Pasillo A">Aisle A (Hand Tools)</button>
+          <button class="aisle-tab" data-aisle="Pasillo B">Aisle B (Power Tools)</button>
+          <button class="aisle-tab" data-aisle="Pasillo C">Aisle C (Fasteners)</button>
+          <button class="aisle-tab" data-aisle="Pasillo D">Aisle D (Plumbing)</button>
+          <button class="aisle-tab" data-aisle="Pasillo E">Aisle E (Paints)</button>
+          <button class="aisle-tab" data-aisle="Bodega Pesados">Heavy Materials Yard</button>
+          <button class="aisle-tab" data-aisle="Bodega Tubos">Pipe &amp; Conduit Yard</button>
         </div>
         
         <label class="filter-critical-checkbox">
           <input type="checkbox" id="chkOnlyCriticalAisles">
-          <span>Solo artículos críticos o agotados</span>
+          <span>Only critical or out-of-stock items</span>
         </label>
       </div>
 
-      <!-- Tarjetas Táctiles Móviles para Conteo Físico en Bodega -->
+      <!-- Warehouse Mobile-Optimized Stock Cards Grid -->
       <div class="warehouse-cards-fluid-grid" id="warehouseCardsGrid">
-        <!-- Se puebla dinámicamente con JavaScript -->
+        <!-- Populated dynamically via JavaScript -->
       </div>
 
-      <!-- TABLA INTELIGENTE DE REABASTECIMIENTO (ADAPTATIVA A MÓVIL) -->
+      <!-- INTELLIGENT REPLENISHMENT TABLE -->
       <div class="bento-cell mt-4">
         <div class="card-header-clean">
           <div>
             <div class="card-title-clean">
-              <i data-lucide="clipboard-list"></i> Sugerencias Inteligentes de Reabastecimiento
+              <i data-lucide="clipboard-list"></i> Intelligent Replenishment Suggestions
             </div>
             <div class="card-subtitle-clean">
-              Artículos con stock crítico ordenados por Pareto ABC, Demanda en Lead Time y Días de Inventario Restantes (DOI)
+              Critical items prioritized by Pareto ABC, Lead-Time Demand, and Days of Inventory (DOI)
             </div>
           </div>
-          <span class="badge-stock-agotado" id="reorderCountBadge">0 artículos en riesgo</span>
+          <span class="badge-stock-agotado" id="reorderCountBadge">0 items at risk</span>
         </div>
 
         <div class="table-responsive-wrapper">
@@ -93,20 +105,20 @@
             <thead>
               <tr>
                 <th>SKU</th>
-                <th>Artículo</th>
-                <th>Familia</th>
-                <th>Ubicación</th>
-                <th>Clase ABC</th>
-                <th>Stock / Mín</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>ABC Class</th>
+                <th>Stock / Min</th>
                 <th>Burn Rate</th>
-                <th>Días DOI</th>
-                <th>Sugerido</th>
-                <th>Proveedor</th>
-                <th>Acción</th>
+                <th>DOI (Days)</th>
+                <th>Suggested Reorder</th>
+                <th>Supplier Contact</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="tbodyReorder">
-              <!-- Se puebla dinámicamente -->
+              <!-- Populated dynamically -->
             </tbody>
           </table>
         </div>
@@ -114,24 +126,21 @@
     </section>
 
     <!-- ========================================================== -->
-    <!-- SECCIÓN 2: BI (BUSINESS INTELLIGENCE & ANALYTICS)          -->
-    <!-- ========================================================== -->
-    <!-- ========================================================== -->
-    <!-- SECCIÓN 2: BI EXCLUSIVO — GOOGLE LOOKER STUDIO               -->
+    <!-- SECTION 2: BI (BUSINESS INTELLIGENCE & ANALYTICS)          -->
     <!-- ========================================================== -->
     <section id="viewBi" class="view-section">
       <div class="view-header">
         <div class="view-header-info">
-          <h1 class="view-title">Inteligencia de Negocios — Google Looker Studio</h1>
-          <p class="view-subtitle">Cuadro de mando analítico corporativo conectado directamente a la Capa Gold de BigQuery</p>
+          <h1 class="view-title">Business Intelligence — Google Looker Studio</h1>
+          <p class="view-subtitle">Enterprise analytical reporting suite natively connected to BigQuery Gold Layer</p>
         </div>
         
         <div class="header-actions">
           <button class="btn btn-secondary btn-sm" id="btnConfigureLookerUrl">
-            <i data-lucide="settings"></i> Configurar URL
+            <i data-lucide="settings"></i> <span>Configure URL</span>
           </button>
           <button class="btn btn-secondary btn-sm" id="btnReloadLooker">
-            <i data-lucide="rotate-cw"></i> Recargar
+            <i data-lucide="rotate-cw"></i> <span>Refresh Dataform &amp; Sync</span>
           </button>
           <a 
             id="linkOpenLookerFull"
@@ -140,12 +149,12 @@
             rel="noopener noreferrer" 
             class="btn btn-primary btn-sm"
           >
-            <i data-lucide="external-link"></i> Abrir en Looker Studio
+            <i data-lucide="external-link"></i> <span>Open in Looker Studio</span>
           </a>
         </div>
       </div>
 
-      <!-- Tarjeta Principal con el iframe de Looker Studio -->
+      <!-- Main Embedded Looker Card -->
       <div class="looker-card">
         <div class="looker-iframe-box">
           <iframe 
@@ -157,53 +166,53 @@
             loading="lazy"
           ></iframe>
 
-          <!-- Fallback informativo cuando aún no se ha pegado URL embebida -->
+          <!-- Fallback when iframe is empty or offline -->
           <div class="looker-offline-fallback" id="lookerOfflineFallback">
             <div class="fallback-icon"><i data-lucide="pie-chart"></i></div>
-            <h3>Google Looker Studio Conectado a BigQuery</h3>
-            <p>Los datos ya están transformados y disponibles en <strong>Google BigQuery (Capa Gold)</strong>.</p>
+            <h3>Google Looker Studio Connected to BigQuery</h3>
+            <p>Data is transformed and available in <strong>Google BigQuery (Gold Layer)</strong>.</p>
             <div class="looker-guide-container">
               <ol class="looker-guide-list">
-                <li>Ve a <a href="https://lookerstudio.google.com" target="_blank" class="text-accent underline font-semibold">Looker Studio</a> y crea un <strong>Informe en blanco</strong>.</li>
-                <li>Selecciona el conector <strong>Google BigQuery &gt; Mi Proyecto &gt; ferrostats &gt; ferrostats_gold</strong>.</li>
-                <li>Elige cualquiera de los 3 Data Marts: <strong>fct_ventas_diarias</strong>, <strong>mart_inventario_pareto_abc</strong> o <strong>dim_productos</strong>.</li>
-                <li>Haz clic en <strong>Compartir &gt; Obtener enlace de inserción (Embed URL)</strong>.</li>
-                <li>Pega tu URL haciendo clic en el botón <strong>«Configurar URL»</strong> arriba.</li>
+                <li>Go to <a href="https://lookerstudio.google.com" target="_blank" class="text-accent underline font-semibold">Looker Studio</a> and create a <strong>Blank Report</strong>.</li>
+                <li>Select the connector <strong>Google BigQuery &gt; My Projects &gt; ferrostats &gt; ferrostats_gold</strong>.</li>
+                <li>Choose any of the 3 Data Marts: <strong>fct_ventas_diarias</strong>, <strong>mart_inventario_pareto_abc</strong>, or <strong>dim_productos</strong>.</li>
+                <li>Click <strong>Share &gt; Embed report &gt; Enable embedding</strong>.</li>
+                <li>Paste your embed URL by clicking the <strong>«Configure URL»</strong> button above.</li>
               </ol>
             </div>
             <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
               <button class="btn btn-primary btn-sm" id="btnOpenConfigModalFromFallback">
-                <i data-lucide="link"></i> Pegar URL del Reporte
+                <i data-lucide="link"></i> <span>Paste Report URL</span>
               </button>
               <a href="https://lookerstudio.google.com" target="_blank" class="btn btn-secondary btn-sm">
-                <i data-lucide="external-link"></i> Ir a Looker Studio
+                <i data-lucide="external-link"></i> <span>Go to Looker Studio</span>
               </a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Guía de Conectores BigQuery Gold -->
+      <!-- BigQuery Gold Connectors Guide -->
       <div class="bento-cell mt-4">
         <div class="card-header-clean">
           <div>
             <div class="card-title-clean">
-              <i data-lucide="database"></i> Data Marts Disponibles en BigQuery Gold para Looker Studio
+              <i data-lucide="database"></i> Analytical Data Marts Available in BigQuery Gold
             </div>
             <div class="card-subtitle-clean">
-              Tablas analíticas generadas automáticamente por Google Dataform ($0.00 USD Free Tier)
+              Serverless analytical tables compiled automatically by Google Dataform ($0.00 USD Free Tier)
             </div>
           </div>
-          <span class="badge-stock-optimo">3 Tablas Conectables</span>
+          <span class="badge-stock-optimo">3 Connectable Marts</span>
         </div>
 
         <div class="connectors-grid">
           <div class="connector-card">
             <div class="connector-header">
-              <span class="connector-tag">Hechos</span>
+              <span class="connector-tag">Facts</span>
               <code>ferrostats_gold.fct_ventas_diarias</code>
             </div>
-            <p class="connector-desc">Ventas diarias agregadas por fecha y familia ferretera con margen y COGS.</p>
+            <p class="connector-desc">Daily sales aggregated by date and category with gross margins and COGS.</p>
             <div class="connector-fields">
               <span>date_key</span> • <span>sale_date</span> • <span>category_name</span> • <span>total_transactions</span> • <span>units_sold</span> • <span>gross_revenue_usd</span> • <span>cogs_usd</span> • <span>gross_profit_usd</span> • <span>gross_margin_pct</span>
             </div>
@@ -214,7 +223,7 @@
               <span class="connector-tag">Data Mart</span>
               <code>ferrostats_gold.mart_inventario_pareto_abc</code>
             </div>
-            <p class="connector-desc">Clasificación ABC 80/20, velocidad de rotación (Burn Rate), Días de Inventario (DOI) y ROP.</p>
+            <p class="connector-desc">80/20 ABC classification, turnover velocity (Daily Burn Rate), Days of Inventory (DOI), and ROP.</p>
             <div class="connector-fields">
               <span>sku</span> • <span>product_name</span> • <span>category_name</span> • <span>stock_status</span> • <span>abc_class (A/B/C)</span> • <span>revenue_30d_usd</span> • <span>daily_burn_rate</span> • <span>days_of_inventory_left</span> • <span>recommended_reorder_qty</span>
             </div>
@@ -222,10 +231,10 @@
 
           <div class="connector-card">
             <div class="connector-header">
-              <span class="connector-tag">Dimensión</span>
+              <span class="connector-tag">Dimension</span>
               <code>ferrostats_gold.dim_productos</code>
             </div>
-            <p class="connector-desc">Catálogo maestro enriquecido con costos, márgenes unitarios y proveedores.</p>
+            <p class="connector-desc">Catalog master dimension enriched with unit costs, margins, and supplier data.</p>
             <div class="connector-fields">
               <span>sku</span> • <span>product_name</span> • <span>category_name</span> • <span>supplier_name</span> • <span>unit_cost_usd</span> • <span>unit_price_usd</span> • <span>unit_margin_usd</span> • <span>current_stock</span> • <span>stock_status</span>
             </div>
@@ -237,37 +246,37 @@
   </main>
 
   <!-- ============================================================ -->
-  <!-- MODAL: CONFIGURAR URL DE LOOKER STUDIO                       -->
+  <!-- MODAL: CONFIGURE LOOKER STUDIO EMBED URL                     -->
   <!-- ============================================================ -->
   <div class="modal-overlay" id="modalLookerConfigOverlay" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <img src="/static/img/logo.jpg" alt="Logo" class="modal-mini-logo">
-          <div class="modal-title">Configurar URL de Google Looker Studio</div>
+          <div class="modal-title">Configure Google Looker Studio URL</div>
         </div>
-        <button class="modal-close" id="btnCloseLookerConfigModal" aria-label="Cerrar modal">&times;</button>
+        <button class="modal-close" id="btnCloseLookerConfigModal" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-field mb-3">
-          <label for="inputLookerUrl">URL Embebida del Informe (embed URL):</label>
+          <label for="inputLookerUrl">Embedded Report URL (embed URL):</label>
           <input 
             type="url" 
             id="inputLookerUrl" 
             class="form-input" 
             placeholder="https://lookerstudio.google.com/embed/reporting/..."
           >
-          <small class="form-help">Asegúrate de que el informe esté configurado como público («Cualquier persona con el enlace puede ver»).</small>
+          <small class="form-help">Ensure your report is set to public («Anyone with the link can view»).</small>
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <button class="btn btn-secondary btn-sm" id="btnResetDefaultLookerUrl" type="button" title="Restablecer URL por defecto">
-          <i data-lucide="rotate-ccw"></i> Predeterminado
+        <button class="btn btn-secondary btn-sm" id="btnResetDefaultLookerUrl" type="button" title="Reset to default URL">
+          <i data-lucide="rotate-ccw"></i> <span>Reset Default</span>
         </button>
         <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-secondary" id="btnCancelLookerConfig">Cancelar</button>
+          <button class="btn btn-secondary" id="btnCancelLookerConfig">Cancel</button>
           <button class="btn btn-primary" id="btnSaveLookerConfig">
-            <i data-lucide="save"></i> Guardar y Aplicar
+            <i data-lucide="save"></i> <span>Save &amp; Apply</span>
           </button>
         </div>
       </div>
@@ -275,60 +284,60 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- MODAL: RECEPCIÓN DE MERCADERÍA / AJUSTE BODEGA               -->
+  <!-- MODAL: SUPPLIER RESTOCK / PHYSICAL INVENTORY ADJUSTMENT      -->
   <!-- ============================================================ -->
   <div class="modal-overlay" id="modalAdjustOverlay" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <img src="/static/img/logo.jpg" alt="Logo" class="modal-mini-logo">
-          <div class="modal-title" id="modalAdjustTitle">Ingreso de Mercadería de Proveedor</div>
+          <div class="modal-title" id="modalAdjustTitle">Supplier Restock / Inventory Adjustment</div>
         </div>
-        <button class="modal-close" id="btnCloseAdjustModal" aria-label="Cerrar modal">&times;</button>
+        <button class="modal-close" id="btnCloseAdjustModal" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="adjustProductId">
         <div class="adjust-product-summary">
           <div class="adjust-sku" id="adjustModalSku">MC-001</div>
-          <div class="adjust-name" id="adjustModalName">Cemento gris uso general tipo UGC 42.5kg</div>
-          <div class="adjust-current-stock">Stock Físico Actual: <strong id="adjustModalCurrentStock">85</strong> uds</div>
+          <div class="adjust-name" id="adjustModalName">Cement grey all-purpose UGC 42.5kg</div>
+          <div class="adjust-current-stock">Current Physical Stock: <strong id="adjustModalCurrentStock">85</strong> units</div>
         </div>
 
         <div class="form-field mb-3">
-          <label for="adjustMovementType">Tipo de Movimiento:</label>
+          <label for="adjustMovementType">Movement Type:</label>
           <select id="adjustMovementType" class="form-select">
-            <option value="INGRESO_PROVEEDOR" selected>INGRESO_PROVEEDOR (Factura de compra)</option>
-            <option value="AJUSTE_AUDITORIA">AJUSTE_AUDITORIA (Corrección por conteo físico)</option>
+            <option value="INGRESO_PROVEEDOR" selected>Supplier Restock (Purchase Invoice)</option>
+            <option value="AJUSTE_AUDITORIA">Physical Audit Adjustment (Count Correction)</option>
           </select>
         </div>
 
         <div class="form-field mb-3">
-          <label for="adjustQuantityDelta">Cantidad de Unidades (Delta):</label>
+          <label for="adjustQuantityDelta">Quantity Delta (Units):</label>
           <input type="number" id="adjustQuantityDelta" class="form-input text-lg font-bold" value="15" min="1" step="1">
-          <small class="form-help">Usa números positivos para entradas y negativos para mermas en conteos.</small>
+          <small class="form-help">Use positive numbers for restocks and negative numbers for breakage/spoilage.</small>
         </div>
 
         <div class="form-field">
-          <label for="adjustNote">Referencia / Factura de Proveedor:</label>
-          <input type="text" id="adjustNote" class="form-input" placeholder="Ej. Factura #F-9412 en Pasillo A">
+          <label for="adjustNote">Invoice Reference / Audit Note:</label>
+          <input type="text" id="adjustNote" class="form-input" placeholder="e.g., Supplier Invoice #INV-9412 in Aisle A">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="btnCancelAdjust">Cancelar</button>
+        <button class="btn btn-secondary" id="btnCancelAdjust">Cancel</button>
         <button class="btn btn-primary" id="btnSaveAdjust">
-          <i data-lucide="check"></i> Aplicar y Sincronizar
+          <i data-lucide="check"></i> <span>Apply &amp; Sync</span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- ============================================================ -->
-  <!-- BARRA DE NAVEGACIÓN INFERIOR (FOOTER NAV ESTILO INSTAGRAM)    -->
+  <!-- BOTTOM NAVIGATION BAR (MOBILE & DESKTOP DOCK)                -->
   <!-- ============================================================ -->
-  <nav class="bottom-nav-instagram" aria-label="Navegación Gerencial">
+  <nav class="bottom-nav-instagram" aria-label="Managerial Navigation">
     <button class="bottom-nav-item active" data-tab="bodega" id="navItemBodega">
       <i data-lucide="boxes"></i>
-      <span>Bodega</span>
+      <span>Warehouse</span>
     </button>
     <button class="bottom-nav-item" data-tab="bi" id="navItemBi">
       <i data-lucide="pie-chart"></i>
@@ -336,10 +345,10 @@
     </button>
   </nav>
 
-  <!-- Contenedor de Notificaciones Toast -->
+  <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
-  <!-- Script Principal de la SPA Gerencial -->
+  <!-- Managerial SPA Script -->
   <script src="/static/app.js"></script>
 </body>
 </html>

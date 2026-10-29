@@ -38,11 +38,13 @@
 
 ---
 
-## 📐 Spec-Driven Development (SDD) & Engineering Methodology
+## 📐 Spec-Driven Development (SDD) & Architecture Attribution
 
-This platform was engineered using **Spec-Driven Development (SDD)**. As a **Google Cloud Certified — Associate Data Practitioner**, the lead architect authored comprehensive architectural blueprints, formal data contracts, database schemas, Medallion DAG definitions, ACID concurrency rules, and FinOps governance guardrails **before any implementation began**.
+This enterprise platform was engineered using **Spec-Driven Development (SDD)** with full architectural transparency:
 
-Autonomous AI engineering agents then implemented the codebase against these specifications, ensuring strict adherence to Cloud Data Engineering best practices, zero hallucinated schemas, and deterministic reproducibility.
+- **Cloud & Data Architecture Ownership:** The entire **Google Cloud Platform (GCP) Data Lakehouse Architecture**, Medallion topologies (Bronze $\to$ Silver $\to$ Gold), BigQuery streaming ingestion protocol, Dataform SQLX pipeline DAGs, $0.00 USD FinOps governance policy, 80/20 Pareto inventory formulation, and transactional ACID isolation rules were designed, authored, and owned by **Diego Alejandro Escobar Barahona** ([Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10)).
+- **Spec-Driven Development (SDD):** Prior to writing implementation code, Diego authored 7 formal architectural specifications ([`specs/spec_01`](specs/spec_01_commit_1_architecture_and_gcp_finops.md) through [`specs/spec_07`](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md)). These specs established formal data contracts, schema invariants, FinOps budget ceilings, ACID concurrency rules, and Data Quality test assertions.
+- **AI Pair-Programming Execution:** Autonomous AI pair-programming agents were directed as high-speed implementation copilots to generate the application codebase strictly against Diego's formal specifications, governed by human-in-the-loop technical reviews, deterministic verification scripts, and automated unit/integration test suites.
 
 ### Specifications Traceability Matrix
 

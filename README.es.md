@@ -38,11 +38,13 @@
 
 ---
 
-## 📐 Desarrollo Guiado por Especificaciones (SDD) y Metodología
+## 📐 Desarrollo Guiado por Especificaciones (SDD) y Atribución Arquitectónica
 
-Esta plataforma fue diseñada y estructurada bajo la metodología **Spec-Driven Development (SDD)**. En calidad de **Google Cloud Certified — Associate Data Practitioner**, el arquitecto líder redactó las especificaciones técnicas completas, contratos de datos formales, esquemas relacionales y dimensionales, DAGs de transformación Medallón, reglas de concurrencia ACID y políticas de gobernanza FinOps **previo a cualquier codificación**.
+Esta plataforma empresarial fue diseñada e implementada bajo la metodología **Spec-Driven Development (SDD)** con total transparencia técnica:
 
-Agentes autónomos de ingeniería de software implementaron el código siguiendo estrictamente estas especificaciones, asegurando cero alucinación de esquemas, adherencia estricta a buenas prácticas de Cloud Data Engineering y reproducibilidad determinista.
+- **Propiedad y Autoría de Arquitectura Cloud:** La totalidad de la **Arquitectura de Data Lakehouse en Google Cloud Platform (GCP)**, las topologías Medallón (Bronze $\to$ Silver $\to$ Gold), el protocolo de streaming continuo a BigQuery, los DAGs de Dataform SQLX, la política de gobernanza FinOps $0.00 USD, las formulaciones analíticas de Pareto 80/20 y las reglas de aislamiento ACID transaccional fueron diseñadas, creadas y son propiedad intelectual de **Diego Alejandro Escobar Barahona** ([Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10)).
+- **Desarrollo Guiado por Especificaciones (SDD):** Previo a escribir código, Diego redactó 7 especificaciones formales ([`specs/spec_01`](specs/spec_01_commit_1_architecture_and_gcp_finops.md) a [`specs/spec_07`](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md)). En ellas se definieron contratos de datos, invariantes de base de datos, topes presupuestarios FinOps, reglas de concurrencia ACID y aserciones de calidad de datos.
+- **Ejecución Asistida por IA:** Agentes autónomos de programación en pares fueron orquestados como copilotos de implementación de alta velocidad para codificar el sistema siguiendo estrictamente las especificaciones de Diego, bajo continua supervisión humana, pruebas automatizadas de regresión y cero deriva no controlada de esquemas.
 
 ### Matriz de Trazabilidad de Especificaciones (SDD)
 

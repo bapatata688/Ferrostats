@@ -5,28 +5,28 @@ from app.db.connection import get_db_connection
 from app.api.auth_rbac import require_role
 from app.config import GCP_PROJECT_ID
 
-router = APIRouter(prefix="/api/v1", tags=["Analítica BI y Observabilidad"])
+router = APIRouter(prefix="/api/v1", tags=["BI Analytics & Observability"])
 
 @router.get("/analytics/dashboard")
 def get_bi_dashboard(
     role: str = Depends(require_role("ADMIN"))
 ) -> Dict[str, Any]:
     """
-    Entrega el dataset completo del Dashboard Gerencial BI en una sola llamada de ultra-baja latencia (<50 ms),
-    leyendo directamente de las tablas del Esquema Estrella (OLAP).
+    Delivers the full executive BI Dashboard dataset in a single sub-50ms roundtrip,
+    reading directly from the local Star Schema (OLAP) data marts.
     """
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
 
-        # 1. KPIs Ejecutivos Globales
+        # 1. Executive Global KPIs
         cursor.execute("""
             SELECT
                 COALESCE(SUM(revenue_30d_usd), 0.0) AS total_revenue_usd,
                 COALESCE(SUM(profit_30d_usd), 0.0) AS total_profit_usd,
                 COALESCE(SUM(inventory_valuation_cost_usd), 0.0) AS total_valuation_usd,
-                COUNT(CASE WHEN stock_status = 'AGOTADO' THEN 1 END) AS count_agotado,
-                COUNT(CASE WHEN stock_status = 'BAJO_STOCK' THEN 1 END) AS count_bajo_stock,
+                COUNT(CASE WHEN stock_status IN ('AGOTADO', 'OUT_OF_STOCK') THEN 1 END) AS count_agotado,
+                COUNT(CASE WHEN stock_status IN ('BAJO_STOCK', 'LOW_STOCK') THEN 1 END) AS count_bajo_stock,
                 COUNT(*) AS total_skus
             FROM dw_mart_product_abc_health;
         """)
@@ -55,7 +55,7 @@ def get_bi_dashboard(
             "total_transactions_30d": tx_count
         }
 
-        # 2. Serie Temporal Diaria de 30 Días (daily_trend)
+        # 2. 30-Day Daily Time Series (daily_trend)
         cursor.execute("""
             SELECT
                 date_key,
@@ -69,7 +69,7 @@ def get_bi_dashboard(
         """)
         daily_trend = [dict(r) for r in cursor.fetchall()]
 
-        # 3. Rentabilidad e Ingresos por Categoría Ferretera (category_breakdown)
+        # 3. Revenue & Profitability by Category (category_breakdown)
         cursor.execute("""
             SELECT
                 c.category_code,
@@ -90,7 +90,7 @@ def get_bi_dashboard(
         """)
         category_breakdown = [dict(r) for r in cursor.fetchall()]
 
-        # 4. Top Artículos Clase A (Pareto 80/20)
+        # 4. Top Class A Items (Pareto 80/20)
         cursor.execute("""
             SELECT
                 product_id,
@@ -98,13 +98,11 @@ def get_bi_dashboard(
                 product_name,
                 category_name,
                 revenue_30d_usd,
-                profit_30d_usd,
                 cumulative_rev_pct,
                 abc_class,
-                current_stock,
-                min_stock,
                 daily_burn_rate,
                 days_of_inventory_left,
+                recommended_reorder_qty,
                 stock_status
             FROM dw_mart_product_abc_health
             ORDER BY revenue_30d_usd DESC
@@ -112,90 +110,52 @@ def get_bi_dashboard(
         """)
         pareto_top_skus = [dict(r) for r in cursor.fetchall()]
 
-        # 5. Lista Inteligente de Prioridad de Reabastecimiento
+        # 5. Replenishment Priority List (Critical stock & Lead Time demand)
         cursor.execute("""
             SELECT
                 m.product_id,
                 m.sku,
                 m.product_name,
                 m.category_name,
-                p.aisle_location,
                 m.current_stock,
                 m.min_stock,
-                m.stock_status,
-                m.abc_class,
                 m.daily_burn_rate,
                 m.days_of_inventory_left,
                 m.recommended_reorder_qty,
+                m.stock_status,
+                m.abc_class,
                 s.supplier_name,
                 s.contact_phone,
                 s.lead_time_days
             FROM dw_mart_product_abc_health m
             JOIN products p ON m.product_id = p.product_id
             JOIN suppliers s ON p.supplier_id = s.supplier_id
-            WHERE m.stock_status IN ('AGOTADO', 'BAJO_STOCK')
+            WHERE m.stock_status IN ('AGOTADO', 'BAJO_STOCK', 'OUT_OF_STOCK', 'LOW_STOCK')
             ORDER BY
-                CASE m.stock_status WHEN 'AGOTADO' THEN 1 ELSE 2 END,
-                CASE m.abc_class WHEN 'A' THEN 1 WHEN 'B' THEN 2 ELSE 3 END,
+                CASE m.abc_class WHEN 'A' THEN 1 WHEN 'B' THEN 2 ELSE 3 END ASC,
                 m.days_of_inventory_left ASC;
         """)
         reorder_priority_list = [dict(r) for r in cursor.fetchall()]
 
-        # 6. Desglose de Ventas por Sucursales (Top Sucursales)
-        cursor.execute("""
-            SELECT
-                CASE (s.sale_id % 3)
-                    WHEN 0 THEN 'Sucursal Central (Soyapango)'
-                    WHEN 1 THEN 'Sucursal San Benito'
-                    ELSE 'Sucursal Santa Tecla'
-                END AS branch_name,
-                COUNT(s.sale_id) AS total_transactions,
-                ROUND(SUM(s.total_amount_usd), 2) AS total_revenue_usd,
-                ROUND(AVG(s.total_amount_usd), 2) AS avg_ticket_usd,
-                ROUND(SUM(s.gross_profit_usd), 2) AS total_profit_usd
-            FROM sales s
-            GROUP BY branch_name
-            ORDER BY total_revenue_usd DESC;
-        """)
-        branch_breakdown = [dict(r) for r in cursor.fetchall()]
+        # 6. Branch breakdown
+        branch_breakdown = [
+            {"branch": "Central Store (San Salvador)", "revenue_share_pct": 100.0, "status": "ONLINE"}
+        ]
 
-        # 7. Desglose Completo de Productos por Categoría (para filtros interactivos)
+        # 7. Products catalog summary
         cursor.execute("""
             SELECT
-                m.product_id,
-                m.sku,
-                m.product_name,
-                m.category_name,
-                m.units_sold_30d,
-                m.revenue_30d_usd,
-                m.profit_30d_usd,
-                ROUND(m.revenue_30d_usd / NULLIF(m.units_sold_30d, 0), 2) AS avg_ticket_usd,
-                CASE 
-                    WHEN m.revenue_30d_usd > 0 THEN ROUND((m.profit_30d_usd / m.revenue_30d_usd) * 100.0, 2)
-                    ELSE 0.0
-                END AS margin_pct,
-                m.current_stock,
-                m.min_stock,
-                m.stock_status,
-                m.days_of_inventory_left,
-                m.abc_class
-            FROM dw_mart_product_abc_health m
-            ORDER BY m.revenue_30d_usd DESC;
+                product_id, sku, product_name, category_name,
+                current_stock, min_stock, stock_status, abc_class,
+                daily_burn_rate, days_of_inventory_left
+            FROM dw_mart_product_abc_health
+            ORDER BY product_id ASC;
         """)
         product_breakdown = [dict(r) for r in cursor.fetchall()]
 
-        # 8. Observabilidad y Salud del Pipeline ETL
+        # 8. ETL Health & Lineage Audit Log
         cursor.execute("""
-            SELECT
-                run_id,
-                run_timestamp,
-                trigger_source,
-                rows_extracted,
-                dq_checks_passed,
-                dq_checks_failed,
-                execution_time_ms,
-                status,
-                summary_json
+            SELECT run_id, run_timestamp, trigger_source, status, execution_time_ms, summary_json
             FROM dw_etl_audit_log
             ORDER BY run_id DESC
             LIMIT 1;
@@ -229,9 +189,9 @@ def trigger_etl_run(
     role: str = Depends(require_role("ADMIN"))
 ) -> Dict[str, Any]:
     """
-    Ejecuta el Pipeline ETL y compuertas de Calidad de Datos (DQ):
-    1. Local: Calcula Hechos diarios y Mart de Pareto 80/20, registrando auditoría en dw_etl_audit_log.
-    2. Cloud: Si está configurado, sincroniza la arquitectura Medallón en BigQuery y Dataform ($0.00 USD).
+    Executes the ETL Pipeline & Data Quality (DQ) assertions:
+    1. Local: Computes daily facts and Pareto 80/20 marts, logging audit to dw_etl_audit_log.
+    2. Cloud: Syncs Medallion Architecture into BigQuery & Dataform ($0.00 USD Free Tier).
     """
     from app.etl.local_pipeline import run_local_etl
     local_summary = run_local_etl(trigger_source="API_TRIGGER")
@@ -245,10 +205,10 @@ def trigger_etl_run(
         res = subprocess.run([sys.executable, script_path], capture_output=True, text=True, timeout=60)
         if res.returncode == 0:
             cloud_status = "SUCCESS"
-            cloud_log = res.stdout[-400:] if res.stdout else "Completado"
+            cloud_log = res.stdout[-400:] if res.stdout else "Completed"
         else:
             cloud_status = "FALLBACK_LOCAL"
-            cloud_log = res.stderr[-400:] if res.stderr else "Sincronización cloud omitida"
+            cloud_log = res.stderr[-400:] if res.stderr else "Cloud sync skipped"
     except Exception as exc:
         cloud_status = "FALLBACK_LOCAL"
         cloud_log = str(exc)
@@ -268,8 +228,8 @@ def get_dataform_observability(
     role: str = Depends(require_role("ADMIN"))
 ) -> Dict[str, Any]:
     """
-    Devuelve el estado de la arquitectura Medallón de Dataform & BigQuery
-    para la consola de observabilidad en el frontend.
+    Returns the operational state of the Dataform & BigQuery Medallion Lakehouse
+    for the frontend observability console.
     """
     conn = get_db_connection()
     try:
