@@ -5,9 +5,12 @@ import base64
 import urllib.request
 import urllib.error
 from pathlib import Path
-from scripts.deploy_dataform_models import get_access_token
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from scripts.deploy_dataform_models import get_access_token
 DATAFORM_DIR = BASE_DIR / "dataform"
 PROJECT_ID = "ferrostats"
 LOCATION = "us-central1"
