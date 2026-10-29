@@ -1,7 +1,7 @@
 # FERROSTATS — Cloud-Native Business Intelligence & Medallion Data Lakehouse Platform
 
 <p align="center">
-  <img src="assets/capturas/logo.png" alt="FERROSTATS Logo" width="220" />
+  <img src="assets/logo.png" alt="FERROSTATS Logo" width="220" />
 </p>
 
 <p align="center">

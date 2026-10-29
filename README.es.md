@@ -1,7 +1,7 @@
 # FERROSTATS — Plataforma de Inteligencia de Negocios y Data Lakehouse Medallón en Google Cloud
 
 <p align="center">
-  <img src="assets/capturas/logo.png" alt="Logo de FERROSTATS" width="220" />
+  <img src="assets/logo.png" alt="Logo de FERROSTATS" width="220" />
 </p>
 
 <p align="center">
