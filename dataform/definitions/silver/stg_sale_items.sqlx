@@ -4,7 +4,11 @@ config {
   description: "Renglones de venta normalizados de la capa Bronze",
   assertions: {
     uniqueKey: ["sale_item_id"],
-    nonNull: ["sale_item_id", "sale_id", "product_id", "quantity", "subtotal_usd"]
+    nonNull: ["sale_item_id", "sale_id", "product_id", "quantity", "subtotal_usd"],
+    rowConditions: [
+      "quantity > 0",
+      "subtotal_usd >= 0"
+    ]
   }
 }
 

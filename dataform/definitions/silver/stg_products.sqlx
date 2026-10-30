@@ -4,7 +4,10 @@ config {
   description: "Catálogo maestro de productos SKU limpio y enriquecido",
   assertions: {
     uniqueKey: ["product_id"],
-    nonNull: ["product_id", "sku", "product_name", "category_id", "current_stock"]
+    nonNull: ["product_id", "sku", "product_name", "category_id", "current_stock"],
+    rowConditions: [
+      "current_stock >= 0"
+    ]
   }
 }
 

@@ -4,7 +4,10 @@ config {
   description: "Ventas limpias normalizadas y validadas desde la capa Bronze",
   assertions: {
     uniqueKey: ["sale_id"],
-    nonNull: ["sale_id", "transaction_uuid", "total_amount_usd", "sale_timestamp"]
+    nonNull: ["sale_id", "transaction_uuid", "total_amount_usd", "sale_timestamp"],
+    rowConditions: [
+      "total_amount_usd >= 0"
+    ]
   }
 }
 
