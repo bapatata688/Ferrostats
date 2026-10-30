@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Enterprise-Grade Business Intelligence, Automated Medallion Data Pipeline, and Sub-50ms ACID Point-of-Sale (POS) Engine for Hardware & Construction Retail.</strong>
+  <strong>Portfolio project: Business Intelligence, Automated Medallion Data Pipeline, and Sub-50ms ACID Point-of-Sale (POS) Engine for Hardware & Construction Retail.</strong>
 </p>
 
 <p align="center">
@@ -23,11 +23,14 @@
   <strong>Language / Idioma:</strong> <strong>English</strong> | <a href="README.es.md">Versión en Español</a>
 </p>
 
+> [!NOTE]
+> **Portfolio Project & Synthetic Data:** This is a portfolio demonstration project. All catalog, inventory, and transaction records are synthetically generated using a deterministic seed of 180 transactions to showcase an end-to-end cloud data architecture at zero operational cost ($0.00 USD).
+
 ---
 
-## Live Production Endpoints (Google Cloud Platform)
+## Live Demo Endpoints (Google Cloud Platform)
 
-| Resource | Live Production URL | Description |
+| Resource | Live Demo URL | Description |
 |---|---|---|
 | **Executive BI Portal** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app) | Real-time managerial portal, warehouse aisle management, and embedded Looker BI. |
 | **Point-of-Sale (POS) Terminal** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos) | Ultra-fast cashier touch interface with sub-50ms ACID checkout and tax receipts. |
@@ -44,7 +47,7 @@ This enterprise platform was engineered using **Spec-Driven Development (SDD)** 
 
 - **Cloud & Data Architecture Ownership:** The entire **Google Cloud Platform (GCP) Data Lakehouse Architecture**, Medallion topologies (Bronze $\to$ Silver $\to$ Gold), BigQuery streaming ingestion protocol, Dataform SQLX pipeline DAGs, $0.00 USD FinOps governance policy, 80/20 Pareto inventory formulation, and transactional ACID isolation rules were designed, authored, and owned by **Diego Alejandro Escobar Barahona** ([Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10)).
 - **Spec-Driven Development (SDD):** Prior to writing implementation code, Diego authored 7 formal architectural specifications ([`specs/spec_01`](specs/spec_01_commit_1_architecture_and_gcp_finops.md) through [`specs/spec_07`](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md)). These specs established formal data contracts, schema invariants, FinOps budget ceilings, ACID concurrency rules, and Data Quality test assertions.
-- **AI Pair-Programming Execution:** Autonomous AI pair-programming agents were directed as high-speed implementation copilots to generate the application codebase strictly against Diego's formal specifications, governed by human-in-the-loop technical reviews, deterministic verification scripts, and automated unit/integration test suites.
+- **AI Pair-Programming Execution:** Autonomous AI pair-programming agents were directed as high-speed implementation copilots to generate the application codebase strictly against Diego's formal specifications, governed by human-in-the-loop technical reviews, deterministic verification scripts (HTTP smoke tests), and Dataform data quality assertions.
 
 ### Specifications Traceability Matrix
 
@@ -55,7 +58,7 @@ This enterprise platform was engineered using **Spec-Driven Development (SDD)** 
 | [**Spec 03**](specs/spec_03_commit_3_etl_pipeline_and_data_quality.md) | **BigQuery Medallion & Data Quality** | Dataform SQLX pipeline (Bronze raw stream $\to$ Silver curated staging $\to$ Gold star marts), automated quality assertions (`uniqueKey`, `nonNull`, row condition checks). | `Verified` |
 | [**Spec 04**](specs/spec_04_commit_4_backend_api_and_acid_pos.md) | **FastAPI Backend & ACID POS Engine** | Sub-50ms POS checkout, `BEGIN IMMEDIATE` locks, UUID idempotency, guarded stock decrements (`current_stock >= :qty`), asynchronous BigQuery streaming. | `Verified` |
 | [**Spec 05**](specs/spec_05_commit_5_frontend_bi_pos_and_mobile.md) | **Frontend Portals & Embedded BI** | Responsive single-page cashier POS with cash/change calculator, aisle inventory management portal (Aisles A, B, C), and 3-page embedded Looker Studio report. | `Verified` |
-| [**Spec 06**](specs/spec_06_commit_6_gcp_deploy_docker_and_qa.md) | **Containerization & GCP Deployment** | Multi-stage `python:3.11-slim` Docker container (~130 MB), scale-to-zero Cloud Run deployment scripts (`deploy_gcp.ps1` / `deploy_gcp.sh`), HTTP smoke test suite. | `Verified` |
+| [**Spec 06**](specs/spec_06_commit_6_gcp_deploy_docker_and_qa.md) | **Containerization & GCP Deployment** | Multi-stage `python:3.11-slim` Docker container (~130 MB), scale-to-zero Cloud Run deployment scripts (`deploy_gcp.ps1` / `deploy_gcp.sh`), HTTP smoke test script (`scripts/smoke_test.py`). | `Verified` |
 | [**Spec 07**](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md) | **FinOps Governance & Kill-Switch** | Machine-readable FinOps policy (`gcp_free_tier_policy.json`), Artifact Registry image digest purger (<0.5 GB threshold), emergency kill-switch scripts. | `Verified` |
 
 ---
@@ -90,7 +93,7 @@ flowchart TD
     end
 
     subgraph CLOUD_RUN["Serverless Edge (Google Cloud Run us-central1 - $0.00 USD)"]
-        FASTAPI["FastAPI App (Python 3.11 / Uvicorn)\n- Pydantic v2 Contract Validation\n- RBAC (Admin, Cashier, Warehouse)\n- Scale-to-Zero (min=0, max=2)"]
+        FASTAPI["FastAPI App (Python 3.11 / Uvicorn)\n- Pydantic v2 Contract Validation\n- Role simulation via header (Admin, Cashier, Warehouse)\n- Scale-to-Zero (min=0, max=2)"]
         SQLITE["SQLite WAL Database (Local OLTP)\n- BEGIN IMMEDIATE Isolation\n- Guarded Stock Updates (current_stock >= requested_qty)\n- Immutable Audit Log"]
         SYNC_ENGINE["Streaming Ingestion Engine\n- Async GCP Metadata Token Resolution\n- urllib.request Native Client (Zero Heavy SDKs)\n- Non-blocking Fallback"]
     end
@@ -168,7 +171,7 @@ flowchart TD
 #### Automated Data Quality (Dataform Assertions)
 - **`uniqueKey: ["sale_id"]`:** Mathematically guarantees zero duplicate transactions in the warehouse.
 - **`nonNull: ["total_amount_usd", "sale_timestamp", "sku"]`:** Rejects incomplete or anomalous records before analytical modeling.
-- **`rowConditions`:** Enforces business logic integrity (e.g., `unit_price_usd >= unit_cost_usd` and `quantity > 0`).
+- **`rowConditions`:** Enforces business logic integrity (e.g., `quantity > 0` and `subtotal_usd >= 0` on `stg_sale_items`, `total_amount_usd >= 0` on `stg_sales`, and `current_stock >= 0` on `stg_products`).
 
 ---
 
@@ -187,16 +190,22 @@ WITH pareto_calc AS (
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
     ) AS running_revenue
   FROM base_productos p
+),
+pareto_cumulative AS (
+  SELECT
+    product_id, sku, product_name, category_name, current_stock, min_stock,
+    ROUND(SAFE_DIVIDE(running_revenue, NULLIF(total_revenue_all, 0)) * 100.0, 2) AS cumulative_rev_pct
+  FROM pareto_calc
 )
 SELECT
   product_id, sku, product_name, category_name, current_stock, min_stock,
-  ROUND(SAFE_DIVIDE(running_revenue, NULLIF(total_revenue_all, 0)) * 100.0, 2) AS cumulative_rev_pct,
+  cumulative_rev_pct,
   CASE
     WHEN cumulative_rev_pct <= 80.0 THEN 'A'
     WHEN cumulative_rev_pct <= 95.0 THEN 'B'
     ELSE 'C'
   END AS abc_class
-FROM pareto_calc;
+FROM pareto_cumulative;
 ```
 
 - **Class A (Core Capital Drivers):** The top ~20% of SKUs generating up to 80% of gross revenue. Prioritized for zero-stockout tolerance.
@@ -241,7 +250,7 @@ FerroStats operates under a strict **Zero Fixed-Cost Cloud Policy** leveraging G
 > **Answer:** We enforce a two-tier locking and validation mechanism:
 > 1. `BEGIN IMMEDIATE TRANSACTION` locks database writes before checking product stock, preventing dirty reads across concurrent threads.
 > 2. The update uses an atomic SQL guard clause: `UPDATE products SET current_stock = current_stock - :qty WHERE product_id = :id AND current_stock >= :qty;`. If `cursor.rowcount == 0`, concurrent transactions depleted stock, triggering an instant `ROLLBACK` and returning `HTTP 409 Conflict`.
-> 3. Each request mandates a client-generated UUID idempotency key to prevent double-billing on retries.
+> 3. Each request mandates a client-generated UUID (`transaction_uuid`) as an idempotency key. In this demo implementation, duplicate UUIDs are rejected with `HTTP 409 Conflict` (rather than returning the cached original sale receipt), and BigQuery Bronze streaming ingestion does not pass deterministic row IDs, relying on Silver `uniqueKey` assertions to detect duplicate records.
 
 ### Q3: How is the Medallion Architecture structured in Google Dataform?
 > **Answer:** Transaction logs stream into immutable raw tables in `ferrostats_bronze`. Google Dataform compiles SQLX models into Directed Acyclic Graphs (DAGs). The **Silver** layer performs schema curation, net margin math, and automated Data Quality assertions (`uniqueKey`, `nonNull`, `rowConditions`). The **Gold** layer aggregates dimensional Star Schema marts (`fct_ventas_diarias`, `mart_inventario_pareto_abc`) consumed by Looker Studio BI Engine.
@@ -253,9 +262,9 @@ FerroStats operates under a strict **Zero Fixed-Cost Cloud Policy** leveraging G
 
 ---
 
-## 7. Production Visual Showcase
+## 7. Demo Visual Showcase
 
-| Component | Production Interface Preview |
+| Component | Interface Preview |
 |---|---|
 | **Point-of-Sale (POS) Terminal**<br>*Sub-50ms reactive touch checkout* | ![POS Mostrador](assets/capturas/01_pos_mostrador.png) |
 | **Fiscal Receipt & ACID Confirmation**<br>*Idempotent transaction token and 13% tax* | ![Confirmar Venta](assets/capturas/02_confirmar_venta.png) |
@@ -274,7 +283,7 @@ FerroStats operates under a strict **Zero Fixed-Cost Cloud Policy** leveraging G
 ferrostats/
 ├── app/
 │   ├── api/
-│   │   ├── auth_rbac.py           # Role-based access control (Admin, Cashier, Warehouse)
+│   │   ├── auth_rbac.py           # Demo role simulation via X-User-Role header
 │   │   ├── routes_analytics.py    # BI KPIs, Pareto analysis, and ELT sync endpoints
 │   │   ├── routes_inventory.py    # Physical aisle management and restock logging
 │   │   └── routes_pos.py          # Atomic ACID cashier checkout with stock guards
@@ -320,7 +329,7 @@ ferrostats/
 │   ├── sync_sqlite_to_bigquery.py # REST batch synchronization engine (SQLite to BigQuery)
 │   ├── verify_zero_cost.ps1       # Automated Cloud Billing verification script
 │   ├── verify_zero_cost.sh        # Bash verification script
-│   └── smoke_test.py              # Automated HTTP and UI smoke test script
+│   └── smoke_test.py              # HTTP smoke test script
 ├── specs/                         # Complete Spec-Driven Development (SDD) Blueprints
 │   ├── spec_01_commit_1_architecture_and_gcp_finops.md
 │   ├── spec_02_commit_2_data_model_and_synthetic_seed.md
@@ -347,8 +356,8 @@ ferrostats/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/diego-escobar/ferrostats.git
-cd ferrostats
+git clone https://github.com/bapatata688/Ferrostats.git
+cd Ferrostats
 ```
 
 ### 2. Set up virtual environment
@@ -395,11 +404,27 @@ The script automatically:
 1. Enables required serverless APIs (`run.googleapis.com`, `cloudbuild.googleapis.com`, `artifactregistry.googleapis.com`).
 2. Builds and deploys the container with strict scale-to-zero flags (`--min-instances 0`, `--max-instances 2`, `--memory 512Mi`, `--cpu 1`).
 3. Queries Artifact Registry and purges older image digests to enforce the free storage threshold (<0.5 GB).
-4. Outputs the public live production URL.
+4. Outputs the public live demo URL.
 
 ---
 
-## 11. Lead Architect & Contact
+## 11. Known Limitations & Engineering Trade-offs
+
+This project is a portfolio prototype designed to demonstrate an end-to-end cloud data architecture within a strict $0.00 USD FinOps budget. As such, deliberate engineering trade-offs and simplifications exist:
+
+1. **Role Simulation vs. Enterprise Authentication:**
+   - The RBAC module (`app/api/auth_rbac.py`) performs role simulation via the HTTP header `X-User-Role` (defaulting to `ADMIN` when omitted), and Cloud Run is deployed with `--allow-unauthenticated`. It is a demo mechanism, not authentication.
+   - A production enterprise deployment would enforce identity via Google Cloud Identity-Aware Proxy (IAP), an enterprise OIDC identity provider, or cryptographically signed JWT bearer tokens.
+   - Demo seed records in `data/seeds/users.csv` store passwords/PINs as plaintext strings in the `pin_hash` column.
+2. **POS Idempotency & Replay Semantics:**
+   - In `app/api/routes_pos.py`, submitting a previously processed `transaction_uuid` triggers an `HTTP 409 Conflict` error rather than replaying the original sale receipt representation (`200 OK` with an `Idempotent-Replay: true` header).
+3. **BigQuery Streaming Ingestion Deduplication:**
+   - In `app/etl/bigquery_sync.py`, `insert_rows_json` does not supply deterministic `row_ids` (e.g., `sale_id`). Network retries can therefore introduce duplicate rows into Bronze raw tables (`raw_sales`, `raw_sale_items`).
+   - The Dataform Silver layer assertion `uniqueKey: ["sale_id"]` alerts on duplicate records during QA compilation, but does not self-heal without explicit window deduplication (`QUALIFY ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY ...) = 1`).
+
+---
+
+## 12. Lead Architect & Contact
 
 - **Lead Architect & Engineer:** Diego Alejandro Escobar Barahona
 - **Certification:** [Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10) (Credential ID: `23e3584a246f4c149f26fea03cebcbbb`)

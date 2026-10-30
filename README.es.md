@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Plataforma Empresarial de Inteligencia de Negocios, Pipeline Automatizado de Datos bajo Arquitectura Medallón y Motor Transaccional Atómico (ACID &lt;50 ms) para Ferreterías y Distribuidoras de Construcción.</strong>
+  <strong>Proyecto de portafolio: Inteligencia de Negocios, Pipeline Automatizado de Datos bajo Arquitectura Medallón y Motor Transaccional Atómico (ACID &lt;50 ms) para Ferreterías y Distribuidoras de Construcción.</strong>
 </p>
 
 <p align="center">
@@ -23,11 +23,14 @@
   <strong>Idioma / Language:</strong> <strong>Español</strong> | <a href="README.md">English Version</a>
 </p>
 
+> [!NOTE]
+> **Proyecto de Portafolio y Datos Sintéticos:** Este es un proyecto de demostración de portafolio. Todo el catálogo, inventario y registros de ventas son sintéticos (generados mediante una semilla determinista de 180 transacciones) para evidenciar una arquitectura de datos cloud de extremo a extremo con costo operativo cero ($0.00 USD).
+
 ---
 
-## Enlaces Oficiales en Producción (Google Cloud Platform)
+## Enlaces de Demostración en Vivo (Google Cloud Platform)
 
-| Recurso | URL en Vivo | Descripción |
+| Recurso | URL de Demostración en Vivo | Descripción |
 |---|---|---|
 | **Portal Gerencial & BI** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app) | Cuadro de mando administrativo, control físico de bodega por pasillos y Looker BI embebido. |
 | **Terminal de Caja (POS)** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos) | Terminal táctil de cobro ultra-rápido para cajeros con emisión de ticket fiscal y latencia &lt;50 ms. |
@@ -44,7 +47,7 @@ Esta plataforma empresarial fue diseñada e implementada bajo la metodología **
 
 - **Propiedad y Autoría de Arquitectura Cloud:** La totalidad de la **Arquitectura de Data Lakehouse en Google Cloud Platform (GCP)**, las topologías Medallón (Bronze $\to$ Silver $\to$ Gold), el protocolo de streaming continuo a BigQuery, los DAGs de Dataform SQLX, la política de gobernanza FinOps $0.00 USD, las formulaciones analíticas de Pareto 80/20 y las reglas de aislamiento ACID transaccional fueron diseñadas, creadas y son propiedad intelectual de **Diego Alejandro Escobar Barahona** ([Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10)).
 - **Desarrollo Guiado por Especificaciones (SDD):** Previo a escribir código, Diego redactó 7 especificaciones formales ([`specs/spec_01`](specs/spec_01_commit_1_architecture_and_gcp_finops.md) a [`specs/spec_07`](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md)). En ellas se definieron contratos de datos, invariantes de base de datos, topes presupuestarios FinOps, reglas de concurrencia ACID y aserciones de calidad de datos.
-- **Ejecución Asistida por IA:** Agentes autónomos de programación en pares fueron orquestados como copilotos de implementación de alta velocidad para codificar el sistema siguiendo estrictamente las especificaciones de Diego, bajo continua supervisión humana, pruebas automatizadas de regresión y cero deriva no controlada de esquemas.
+- **Ejecución Asistida por IA:** Agentes autónomos de programación en pares fueron orquestados como copilotos de implementación de alta velocidad para codificar el sistema siguiendo estrictamente las especificaciones de Diego, bajo continua supervisión humana, scripts de verificación (smoke test HTTP) y aserciones de calidad en Dataform.
 
 ### Matriz de Trazabilidad de Especificaciones (SDD)
 
@@ -55,7 +58,7 @@ Esta plataforma empresarial fue diseñada e implementada bajo la metodología **
 | [**Spec 03**](specs/spec_03_commit_3_etl_pipeline_and_data_quality.md) | **BigQuery Medallón y Calidad de Datos** | Pipeline Google Dataform SQLX (Bronze crudo $\to$ Silver curado $\to$ Gold marts), aserciones automáticas de calidad (`uniqueKey`, `nonNull`, validaciones condicionales). | `Verificado` |
 | [**Spec 04**](specs/spec_04_commit_4_backend_api_and_acid_pos.md) | **Backend FastAPI y Motor POS ACID** | Cobro en mostrador sub-50ms, bloqueos `BEGIN IMMEDIATE`, idempotencia por UUID, actualización atómica protegida (`current_stock >= :qty`), streaming hacia BigQuery. | `Verificado` |
 | [**Spec 05**](specs/spec_05_commit_5_frontend_bi_pos_and_mobile.md) | **Portales Web y Looker BI Embebido** | SPA responsiva para cajeros con cálculo de cambio, control físico de bodega por pasillos (A, B, C) e incrustación del tablero de 3 páginas de Looker Studio. | `Verificado` |
-| [**Spec 06**](specs/spec_06_commit_6_gcp_deploy_docker_and_qa.md) | **Contenedorización y Despliegue en GCP** | Imagen multi-etapa Docker `python:3.11-slim` (~130 MB), scripts automatizados de despliegue scale-to-zero (`deploy_gcp.ps1` / `deploy_gcp.sh`), suite de pruebas smoke HTTP. | `Verificado` |
+| [**Spec 06**](specs/spec_06_commit_6_gcp_deploy_docker_and_qa.md) | **Contenedorización y Despliegue en GCP** | Imagen multi-etapa Docker `python:3.11-slim` (~130 MB), scripts automatizados de despliegue scale-to-zero (`deploy_gcp.ps1` / `deploy_gcp.sh`), script de verificación smoke test HTTP (`scripts/smoke_test.py`). | `Verificado` |
 | [**Spec 07**](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md) | **Gobernanza FinOps y Kill-Switch** | Política FinOps en JSON (`gcp_free_tier_policy.json`), purga automática de digests en Artifact Registry (<0.5 GB), scripts de apagado de emergencia (kill-switch). | `Verificado` |
 
 ---
@@ -90,7 +93,7 @@ flowchart TD
     end
 
     subgraph CLOUD_RUN["Serverless Edge (Google Cloud Run us-central1 - $0.00 USD)"]
-        FASTAPI["FastAPI Engine (Python 3.11 / Uvicorn)\n- Validación de Contratos con Pydantic v2\n- RBAC (Admin, Cajero, Bodeguero)\n- Scale-to-Zero (min=0, max=2)"]
+        FASTAPI["FastAPI Engine (Python 3.11 / Uvicorn)\n- Validación de Contratos con Pydantic v2\n- Simulación de roles vía header (Admin, Cajero, Bodeguero)\n- Scale-to-Zero (min=0, max=2)"]
         SQLITE["SQLite WAL (OLTP Local)\n- Aislamiento BEGIN IMMEDIATE\n- Descuento Atómico Protegido (stock >= pedido)\n- Bitácora Inmutable de Auditoría"]
         SYNC_ENGINE["Motor de Ingesta Streaming\n- Resolución OAuth asíncrona de metadatos IAM\n- Cliente Nativo urllib (Cero SDKs pesados)\n- Fallback No Bloqueante"]
     end
@@ -168,7 +171,7 @@ flowchart TD
 #### Aserciones Automatizadas de Calidad de Datos (Dataform)
 - **`uniqueKey: ["sale_id"]`:** Garantiza matemáticamente cero duplicidad de comprobantes fiscales en el almacén de datos.
 - **`nonNull: ["total_amount_usd", "sale_timestamp", "sku"]`:** Bloquea la entrada de registros incompletos o corruptos al modelo analítico.
-- **`rowConditions`:** Valida reglas contables estrictas (por ejemplo: `unit_price_usd >= unit_cost_usd` y `quantity > 0`).
+- **`rowConditions`:** Valida reglas contables estrictas (por ejemplo: `quantity > 0` y `subtotal_usd >= 0` en `stg_sale_items`, `total_amount_usd >= 0` en `stg_sales`, y `current_stock >= 0` en `stg_products`).
 
 ---
 
@@ -187,16 +190,22 @@ WITH pareto_calc AS (
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
     ) AS running_revenue
   FROM base_productos p
+),
+pareto_cumulative AS (
+  SELECT
+    product_id, sku, product_name, category_name, current_stock, min_stock,
+    ROUND(SAFE_DIVIDE(running_revenue, NULLIF(total_revenue_all, 0)) * 100.0, 2) AS cumulative_rev_pct
+  FROM pareto_calc
 )
 SELECT
   product_id, sku, product_name, category_name, current_stock, min_stock,
-  ROUND(SAFE_DIVIDE(running_revenue, NULLIF(total_revenue_all, 0)) * 100.0, 2) AS cumulative_rev_pct,
+  cumulative_rev_pct,
   CASE
     WHEN cumulative_rev_pct <= 80.0 THEN 'A'
     WHEN cumulative_rev_pct <= 95.0 THEN 'B'
     ELSE 'C'
   END AS abc_class
-FROM pareto_calc;
+FROM pareto_cumulative;
 ```
 
 - **Clase A (Pilares de Facturación):** El ~20% superior de SKUs que genera hasta el 80% de los ingresos totales. Prioridad máxima para evitar quiebres de existencias.
@@ -241,7 +250,7 @@ FerroStats opera bajo una política estricta de **Cero Costes Fijos** aprovechan
 > **Respuesta:** Se implementa una validación en dos niveles:
 > 1. `BEGIN IMMEDIATE TRANSACTION` bloquea la escritura en la base de datos antes de consultar el stock disponible, serializando los hilos concurrentes.
 > 2. La sentencia SQL de actualización incluye una cláusula de guarda atómica: `UPDATE products SET current_stock = current_stock - :qty WHERE product_id = :id AND current_stock >= :qty;`. Si `cursor.rowcount == 0`, significa que otra transacción consumió el stock en el intervalo, provocando un `ROLLBACK` inmediato y respondiendo con `HTTP 409 Conflict`.
-> 3. Cada solicitud de cobro exige un UUID de idempotencia emitido por el cliente para evitar dobles cobros por reintentos de red.
+> 3. Cada solicitud de cobro exige un UUID de idempotencia (`transaction_uuid`) emitido por el cliente. En esta implementación de demo, UUIDs repetidos son rechazados con `HTTP 409 Conflict` (en lugar de retornar el comprobante de la venta original), y la ingesta por streaming a BigQuery Bronze no pasa IDs deterministas de fila, dependiendo de las aserciones `uniqueKey` de Silver para detectar registros duplicados.
 
 ### P3: ¿Cómo opera la Arquitectura Medallón en Google Dataform?
 > **Respuesta:** Las ventas crudas se transmiten a tablas inmutables en `ferrostats_bronze`. Google Dataform compila los modelos SQLX en grafos dirigidos acíclicos (DAGs). La capa **Silver** estandariza los tipos de datos, calcula los costos contables de venta y ejecuta aserciones de calidad (`uniqueKey`, `nonNull`, `rowConditions`). La capa **Gold** materializa los Data Marts en Esquema Estrella (`fct_ventas_diarias`, `mart_inventario_pareto_abc`) para su consumo directo desde Looker Studio.
@@ -253,9 +262,9 @@ FerroStats opera bajo una política estricta de **Cero Costes Fijos** aprovechan
 
 ---
 
-## 7. Muestra Visual de Producción
+## 7. Muestra Visual de la Demostración
 
-| Componente | Captura de Pantalla en Producción |
+| Componente | Captura de Pantalla de la Demostración |
 |---|---|
 | **Terminal de Caja Mostrador (POS)**<br>*Cobro reactivo táctil en &lt;50ms* | ![POS Mostrador](assets/capturas/01_pos_mostrador.png) |
 | **Comprobante Fiscal y Confirmación ACID**<br>*Token de idempotencia y desglose de IVA (13%)* | ![Confirmar Venta](assets/capturas/02_confirmar_venta.png) |
@@ -263,7 +272,7 @@ FerroStats opera bajo una política estricta de **Cero Costes Fijos** aprovechan
 | **Looker Studio BI — Página 1**<br>*Evolución de ventas, margen bruto y tendencias* | ![Looker Pagina 1](assets/capturas/04_inteligencia_negocio_looker_pag1.png) |
 | **Looker Studio BI — Página 2**<br>*Matriz Pareto 80/20 y rotación de inventario (DOI)* | ![Looker Pagina 2](assets/capturas/05_inteligencia_negocio_looker_pag2.png) |
 | **Looker Studio BI — Página 3**<br>*Valoración de capital de trabajo por categoría ABC* | ![Looker Pagina 3](assets/capturas/06_looker_ventas_pag3.png) |
-| **Google BigQuery Data Warehouse**<br>*Datasets Bronze, Silver y Gold en producción* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
+| **Google BigQuery Data Warehouse**<br>*Datasets Bronze, Silver y Gold de demostración* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
 | **Pipeline Google Cloud Dataform**<br>*Orquestación de DAGs SQLX y aserciones de calidad* | ![Dataform Console](assets/capturas/08_dataform.png) |
 
 ---
@@ -274,7 +283,7 @@ FerroStats opera bajo una política estricta de **Cero Costes Fijos** aprovechan
 ferrostats/
 ├── app/
 │   ├── api/
-│   │   ├── auth_rbac.py           # Control de acceso basado en roles (Admin, Cajero, Bodeguero)
+│   │   ├── auth_rbac.py           # Simulación de roles para demo vía header X-User-Role
 │   │   ├── routes_analytics.py    # KPIs de BI, análisis Pareto y endpoints de sincronización ELT
 │   │   ├── routes_inventory.py    # Control de pasillos de bodega y recepción de proveedores
 │   │   └── routes_pos.py          # Cobro atómico ACID en caja con cláusula de guarda de stock
@@ -295,7 +304,7 @@ ferrostats/
 │   ├── config.py                  # Variables de entorno y metadatos del proyecto
 │   └── main.py                    # Aplicación FastAPI, ciclo de vida y enrutamiento
 ├── assets/
-│   ├── capturas/                  # Diagramas de arquitectura y capturas reales de producción
+│   ├── capturas/                  # Diagramas de arquitectura y capturas reales de la interfaz
 │   ├── logo.png                   # Logotipo oficial de FERROSTATS
 │   └── presentacion_ejecutiva_ferrostats.html # Diapositivas ejecutivas interactivas
 ├── data/
@@ -320,7 +329,7 @@ ferrostats/
 │   ├── sync_sqlite_to_bigquery.py # Motor de sincronización batch REST (SQLite a BigQuery)
 │   ├── verify_zero_cost.ps1       # Verificación automatizada de cuotas y facturación en Cloud
 │   ├── verify_zero_cost.sh        # Script de verificación en Bash
-│   └── smoke_test.py              # Suite de pruebas automatizadas de humo HTTP e interfaz
+│   └── smoke_test.py              # Script de verificación smoke test HTTP
 ├── specs/                         # Especificaciones completas de Desarrollo Guiado por Especificaciones (SDD)
 │   ├── spec_01_commit_1_architecture_and_gcp_finops.md
 │   ├── spec_02_commit_2_data_model_and_synthetic_seed.md
@@ -347,8 +356,8 @@ ferrostats/
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/diego-escobar/ferrostats.git
-cd ferrostats
+git clone https://github.com/bapatata688/Ferrostats.git
+cd Ferrostats
 ```
 
 ### 2. Configurar el entorno virtual
@@ -395,11 +404,27 @@ El script ejecuta automáticamente:
 1. Habilita las APIs serverless requeridas (`run.googleapis.com`, `cloudbuild.googleapis.com`, `artifactregistry.googleapis.com`).
 2. Compila y despliega el contenedor con directivas estrictas de scale-to-zero (`--min-instances 0`, `--max-instances 2`, `--memory 512Mi`, `--cpu 1`).
 3. Consulta Artifact Registry y purga digests de imágenes antiguas para respetar la cuota gratuita (<0.5 GB).
-4. Emite la URL pública de producción.
+4. Emite la URL pública de demostración.
 
 ---
 
-## 11. Arquitecto Líder y Contacto
+## 11. Limitaciones Conocidas y Compromisos de Ingeniería
+
+Este proyecto es un prototipo de portafolio diseñado para demostrar una arquitectura de datos en la nube de extremo a extremo bajo un presupuesto FinOps estricto de $0.00 USD. Por tanto, existen simplificaciones deliberadas de ingeniería:
+
+1. **Simulación de Roles vs. Autenticación Empresarial:**
+   - El módulo RBAC (`app/api/auth_rbac.py`) simula roles a través del header HTTP `X-User-Role` (asumiendo `ADMIN` por defecto si se omite), y Cloud Run está desplegado con `--allow-unauthenticated`. Es un mecanismo para propósitos de demostración, no de autenticación real.
+   - Un despliegue empresarial en producción implementaría control de identidad mediante Google Cloud Identity-Aware Proxy (IAP), un proveedor OIDC empresarial o tokens firmados JWT portadores.
+   - Los registros de semilla en `data/seeds/users.csv` almacenan contraseñas/PINs en texto plano dentro de la columna `pin_hash`.
+2. **Idempotencia y Semántica de Reintento en POS:**
+   - En `app/api/routes_pos.py`, el reenvío de un `transaction_uuid` previamente procesado devuelve un error `HTTP 409 Conflict` en lugar de responder con el comprobante de la venta original (`200 OK` con cabecera `Idempotent-Replay: true`).
+3. **Deduplicación en Ingesta Streaming a BigQuery:**
+   - En `app/etl/bigquery_sync.py`, la llamada `insert_rows_json` no suministra `row_ids` deterministas (como `sale_id`). Reintentos de red pueden generar filas duplicadas en las tablas Bronze (`raw_sales`, `raw_sale_items`).
+   - La aserción de Silver en Dataform `uniqueKey: ["sale_id"]` alerta sobre violaciones de unicidad en fase de QA, pero no auto-corrige los duplicados salvo que se aplique una consulta de deduplicación explícita con ventana (`QUALIFY ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY ...) = 1`).
+
+---
+
+## 12. Arquitecto Líder y Contacto
 
 - **Arquitecto e Ingeniero Líder:** Diego Alejandro Escobar Barahona
 - **Certificación:** [Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10) (Credencial ID: `23e3584a246f4c149f26fea03cebcbbb`)
