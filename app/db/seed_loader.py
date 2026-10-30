@@ -51,10 +51,10 @@ def load_csv_seeds() -> None:
                 for row in reader:
                     cursor.execute(
                         """
-                        INSERT OR REPLACE INTO users (user_id, username, full_name, role, pin_hash, is_active)
+                        INSERT OR REPLACE INTO users (user_id, username, full_name, role, pin, is_active)
                         VALUES (?, ?, ?, ?, ?, ?)
                         """,
-                        (int(row["user_id"]), row["username"], row["full_name"], row["role"], row["pin_hash"], int(row["is_active"]))
+                        (int(row["user_id"]), row["username"], row["full_name"], row["role"], row["pin"], int(row["is_active"]))
                     )
 
         # 4. Productos SKU

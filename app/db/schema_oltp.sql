@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT UNIQUE NOT NULL,
     full_name TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('ADMIN', 'CAJERO', 'BODEGUERO')),
-    pin_hash TEXT NOT NULL,
+    pin TEXT NOT NULL,
     is_active INTEGER NOT NULL DEFAULT 1
 );
 

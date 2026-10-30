@@ -415,7 +415,7 @@ Este proyecto es un prototipo de portafolio diseñado para demostrar una arquite
 1. **Simulación de Roles vs. Autenticación Empresarial:**
    - El módulo RBAC (`app/api/auth_rbac.py`) simula roles a través del header HTTP `X-User-Role` (asumiendo `ADMIN` por defecto si se omite), y Cloud Run está desplegado con `--allow-unauthenticated`. Es un mecanismo para propósitos de demostración, no de autenticación real.
    - Un despliegue empresarial en producción implementaría control de identidad mediante Google Cloud Identity-Aware Proxy (IAP), un proveedor OIDC empresarial o tokens firmados JWT portadores.
-   - Los registros de semilla en `data/seeds/users.csv` almacenan contraseñas/PINs en texto plano dentro de la columna `pin_hash`.
+   - Los registros de semilla en `data/seeds/users.csv` almacenan contraseñas/PINs en texto plano dentro de la columna `pin` (tratados explícitamente como credenciales semilla de prueba para la demo).
 2. **Idempotencia y Semántica de Reintento en POS:**
    - En `app/api/routes_pos.py`, el reenvío de un `transaction_uuid` previamente procesado devuelve un error `HTTP 409 Conflict` en lugar de responder con el comprobante de la venta original (`200 OK` con cabecera `Idempotent-Replay: true`).
 3. **Deduplicación en Ingesta Streaming a BigQuery:**

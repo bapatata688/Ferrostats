@@ -415,7 +415,7 @@ This project is a portfolio prototype designed to demonstrate an end-to-end clou
 1. **Role Simulation vs. Enterprise Authentication:**
    - The RBAC module (`app/api/auth_rbac.py`) performs role simulation via the HTTP header `X-User-Role` (defaulting to `ADMIN` when omitted), and Cloud Run is deployed with `--allow-unauthenticated`. It is a demo mechanism, not authentication.
    - A production enterprise deployment would enforce identity via Google Cloud Identity-Aware Proxy (IAP), an enterprise OIDC identity provider, or cryptographically signed JWT bearer tokens.
-   - Demo seed records in `data/seeds/users.csv` store passwords/PINs as plaintext strings in the `pin_hash` column.
+   - Demo seed records in `data/seeds/users.csv` store passwords/PINs as plaintext strings in the `pin` column (explicitly treated as demo testing credentials).
 2. **POS Idempotency & Replay Semantics:**
    - In `app/api/routes_pos.py`, submitting a previously processed `transaction_uuid` triggers an `HTTP 409 Conflict` error rather than replaying the original sale receipt representation (`200 OK` with an `Idempotent-Replay: true` header).
 3. **BigQuery Streaming Ingestion Deduplication:**

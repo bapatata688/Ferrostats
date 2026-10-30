@@ -30,7 +30,7 @@ El motor transaccional debe activar claves foráneas (`PRAGMA foreign_keys = ON;
 - `username` (`TEXT UNIQUE NOT NULL`)
 - `full_name` (`TEXT NOT NULL`)
 - `role` (`TEXT NOT NULL CHECK (role IN ('ADMIN', 'CAJERO', 'BODEGUERO'))`)
-- `pin_hash` (`TEXT NOT NULL`)
+- `pin` (`TEXT NOT NULL`)
 - `is_active` (`INTEGER NOT NULL DEFAULT 1`)
 
 ### 1.4 Tabla `products` (Catálogo Maestro de Artículos SKU)
@@ -117,7 +117,7 @@ supplier_id,supplier_name,contact_phone,lead_time_days,city
 
 ### 3.3 Semilla de Usuarios por Rol (`data/seeds/users.csv`)
 ```csv
-user_id,username,full_name,role,pin_hash,is_active
+user_id,username,full_name,role,pin,is_active
 1,descobar,Diego Alejandro Escobar Barahona (Admin / Lead Data Engineer),ADMIN,admin2026,1
 2,evasquez,Elena Vásquez (Operations & Inventory Manager),ADMIN,gerencia2026,1
 3,cmartinez,Carlos Martínez (Front Desk / POS Cashier),CAJERO,caja101,1
