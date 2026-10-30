@@ -26,7 +26,7 @@ Para cumplir con el objetivo de **cero condiciones de carrera** cuando dos cajer
 
 ```sql
 BEGIN IMMEDIATE TRANSACTION;
--- 1. Verificar idempotencia por transaction_uuid
+-- 1. Verificar idempotencia por transaction_uuid (si ya existe, devolver venta original con HTTP 200 y cabecera Idempotent-Replay: true)
 -- 2. Para cada artículo del carrito:
 SELECT current_stock, unit_cost_usd, unit_price_usd
 FROM products
@@ -81,7 +81,7 @@ COMMIT;
        ]
      }
      ```
-   - Respuesta `201 Created`: Comprobante digital con `sale_id`, desglose de artículos, total cobrado, utilidad bruta calculada y alertas de stock disparadas si algún artículo cruzó su `min_stock` tras la venta.
+   - Respuesta `200 OK`: Comprobante digital con `sale_id`, desglose de artículos, total cobrado, utilidad bruta calculada y alertas de stock disparadas. Si se reenvía un `transaction_uuid` existente, se devuelve la venta original con la cabecera `Idempotent-Replay: true`.
 
 ### 3.3 Analítica BI y Observabilidad ETL (`routes_analytics.py`)
 1. **`GET /api/v1/analytics/dashboard`**

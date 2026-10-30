@@ -247,10 +247,11 @@ FerroStats operates under a strict **Zero Fixed-Cost Cloud Policy** leveraging G
 > **Answer:** In retail and distributed environments, zero fixed operating costs are critical. Cloud SQL incurs mandatory recurring billing (~$15–$25/month plus public IPv4 charges) even when idle. By pairing SQLite WAL on Cloud Run edge with serverless BigQuery streaming, we achieve sub-50ms ACID latency, zero network hops during cashier checkout, and 100% free-tier compliance. Analytical queries never contend with transactional cashier threads.
 
 ### Q2: How do you prevent inventory overselling under high concurrency?
-> **Answer:** We enforce a two-tier locking and validation mechanism:
+> **Answer:** We enforce a multi-tier locking and validation mechanism:
 > 1. `BEGIN IMMEDIATE TRANSACTION` locks database writes before checking product stock, preventing dirty reads across concurrent threads.
 > 2. The update uses an atomic SQL guard clause: `UPDATE products SET current_stock = current_stock - :qty WHERE product_id = :id AND current_stock >= :qty;`. If `cursor.rowcount == 0`, concurrent transactions depleted stock, triggering an instant `ROLLBACK` and returning `HTTP 409 Conflict`.
-> 3. Each request mandates a client-generated UUID (`transaction_uuid`) as an idempotency key. In this demo implementation, duplicate UUIDs are rejected with `HTTP 409 Conflict` (rather than returning the cached original sale receipt), and BigQuery Bronze streaming ingestion does not pass deterministic row IDs, relying on Silver `uniqueKey` assertions to detect duplicate records.
+> 3. Each checkout mandates a client-generated UUID (`transaction_uuid`) as an idempotency key. If a request is replayed with a previously committed UUID, the system responds with `HTTP 200 OK`, returning the original cached sale receipt accompanied by the `Idempotent-Replay: true` header without re-decrementing stock.
+> 4. In BigQuery Bronze streaming ingestion, deterministic row IDs (`row_ids`) are passed to `insert_rows_json`, while Dataform Silver layer models enforce deduplication via `QUALIFY ROW_NUMBER() OVER (...) = 1` and `uniqueKey` assertions.
 
 ### Q3: How is the Medallion Architecture structured in Google Dataform?
 > **Answer:** Transaction logs stream into immutable raw tables in `ferrostats_bronze`. Google Dataform compiles SQLX models into Directed Acyclic Graphs (DAGs). The **Silver** layer performs schema curation, net margin math, and automated Data Quality assertions (`uniqueKey`, `nonNull`, `rowConditions`). The **Gold** layer aggregates dimensional Star Schema marts (`fct_ventas_diarias`, `mart_inventario_pareto_abc`) consumed by Looker Studio BI Engine.
@@ -416,11 +417,8 @@ This project is a portfolio prototype designed to demonstrate an end-to-end clou
    - The RBAC module (`app/api/auth_rbac.py`) performs role simulation via the HTTP header `X-User-Role` (defaulting to `ADMIN` when omitted), and Cloud Run is deployed with `--allow-unauthenticated`. It is a demo mechanism, not authentication.
    - A production enterprise deployment would enforce identity via Google Cloud Identity-Aware Proxy (IAP), an enterprise OIDC identity provider, or cryptographically signed JWT bearer tokens.
    - Demo seed records in `data/seeds/users.csv` store passwords/PINs as plaintext strings in the `pin` column (explicitly treated as demo testing credentials).
-2. **POS Idempotency & Replay Semantics:**
-   - In `app/api/routes_pos.py`, submitting a previously processed `transaction_uuid` triggers an `HTTP 409 Conflict` error rather than replaying the original sale receipt representation (`200 OK` with an `Idempotent-Replay: true` header).
-3. **BigQuery Streaming Ingestion Deduplication:**
-   - In `app/etl/bigquery_sync.py`, `insert_rows_json` does not supply deterministic `row_ids` (e.g., `sale_id`). Network retries can therefore introduce duplicate rows into Bronze raw tables (`raw_sales`, `raw_sale_items`).
-   - The Dataform Silver layer assertion `uniqueKey: ["sale_id"]` alerts on duplicate records during QA compilation, but does not self-heal without explicit window deduplication (`QUALIFY ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY ...) = 1`).
+2. **Local Edge State vs. Distributed Clustering:**
+   - Transactional OLTP state resides in local SQLite WAL mounted on Cloud Run edge with scale-to-zero. In a multi-region multi-master deployment with persistent concurrent instances, this would be replaced with a distributed CockroachDB or Cloud Spanner tier.
 
 ---
 

@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.db.connection import get_db_connection
@@ -78,13 +79,77 @@ def pos_checkout(
         cursor.execute("BEGIN IMMEDIATE TRANSACTION;")
 
         # 1. Idempotency Check by transaction_uuid
-        cursor.execute("SELECT sale_id FROM sales WHERE transaction_uuid = ?;", (payload.transaction_uuid,))
+        cursor.execute(
+            """
+            SELECT s.sale_id, s.transaction_uuid, s.sale_timestamp, s.user_id,
+                   s.customer_type, s.payment_method, s.total_cost_usd,
+                   s.total_amount_usd, s.gross_profit_usd, u.full_name AS cashier_name
+            FROM sales s
+            LEFT JOIN users u ON s.user_id = u.user_id
+            WHERE s.transaction_uuid = ?;
+            """,
+            (payload.transaction_uuid,)
+        )
         existing_sale = cursor.fetchone()
         if existing_sale:
+            sale_id = existing_sale["sale_id"]
+            cursor.execute(
+                """
+                SELECT si.sale_item_id, si.product_id, p.sku, p.product_name, si.quantity,
+                       si.unit_price_snapshot_usd AS unit_price_usd,
+                       si.unit_cost_snapshot_usd AS unit_cost_usd,
+                       si.subtotal_usd
+                FROM sale_items si
+                JOIN products p ON si.product_id = p.product_id
+                WHERE si.sale_id = ?;
+                """,
+                (sale_id,)
+            )
+            items_replayed = []
+            for r in cursor.fetchall():
+                items_replayed.append({
+                    "sale_item_id": r["sale_item_id"],
+                    "product_id": r["product_id"],
+                    "sku": r["sku"],
+                    "product_name": r["product_name"],
+                    "quantity": r["quantity"],
+                    "unit_price_usd": r["unit_price_usd"],
+                    "unit_cost_usd": r["unit_cost_usd"],
+                    "subtotal_usd": r["subtotal_usd"]
+                })
             conn.execute("ROLLBACK;")
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Duplicate transaction: UUID '{payload.transaction_uuid}' was already processed in sale #{existing_sale['sale_id']}."
+
+            sale_total_amount = float(existing_sale["total_amount_usd"])
+            sale_total_cost = float(existing_sale["total_cost_usd"])
+            gross_profit = float(existing_sale["gross_profit_usd"])
+            subtotal_neto = round(sale_total_amount / 1.13, 2)
+            iva_calc = round(sale_total_amount - subtotal_neto, 2)
+            cashier_name = existing_sale["cashier_name"] or f"Cashier #{existing_sale['user_id']}"
+
+            receipt_data = {
+                "status": "SUCCESS",
+                "sale_id": sale_id,
+                "transaction_uuid": existing_sale["transaction_uuid"],
+                "sale_timestamp": existing_sale["sale_timestamp"],
+                "timestamp": existing_sale["sale_timestamp"],
+                "cashier_name": cashier_name,
+                "customer_type": existing_sale["customer_type"],
+                "payment_method": existing_sale["payment_method"],
+                "items_count": len(items_replayed),
+                "items": items_replayed,
+                "items_breakdown": items_replayed,
+                "subtotal_usd": subtotal_neto,
+                "iva_usd": iva_calc,
+                "total_cost_usd": sale_total_cost,
+                "total_amount_usd": sale_total_amount,
+                "gross_profit_usd": gross_profit,
+                "gross_margin_pct": round((gross_profit / sale_total_amount * 100.0), 2) if sale_total_amount > 0 else 0.0,
+                "stock_alerts_triggered": []
+            }
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content=receipt_data,
+                headers={"Idempotent-Replay": "true"}
             )
 
         # 2. Stock Verification & Pre-flight Validation
@@ -217,6 +282,7 @@ def pos_checkout(
                     item["subtotal_usd"]
                 )
             )
+            item["sale_item_id"] = cursor.lastrowid
 
             cursor.execute(
                 """

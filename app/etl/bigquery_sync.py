@@ -39,7 +39,7 @@ def stream_sale_to_bronze(
         return {"status": "LOCAL_FALLBACK", "message": "BigQuery client inactivo o local sin credenciales"}
 
     try:
-        # 1. Ingesta a raw_sales
+        # 1. Ingesta a raw_sales con deduplicación determinista
         sale_row = [{
             "sale_id": int(sale_id),
             "transaction_uuid": str(transaction_uuid),
@@ -51,13 +51,19 @@ def stream_sale_to_bronze(
             "total_amount_usd": float(total_amount_usd),
             "gross_profit_usd": float(gross_profit_usd)
         }]
-        err_sales = client.insert_rows_json(f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_sales", sale_row)
+        sale_row_ids = [f"sale_{sale_id}"]
+        err_sales = client.insert_rows_json(
+            f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_sales",
+            sale_row,
+            row_ids=sale_row_ids
+        )
         if err_sales:
             logger.warning("Error insertando en raw_sales: %s", err_sales)
 
-        # 2. Ingesta a raw_sale_items
+        # 2. Ingesta a raw_sale_items con deduplicación determinista
         item_rows = []
-        for item in items:
+        item_row_ids = []
+        for idx, item in enumerate(items):
             item_rows.append({
                 "sale_id": int(sale_id),
                 "product_id": int(item["product_id"]),
@@ -66,9 +72,14 @@ def stream_sale_to_bronze(
                 "unit_price_snapshot_usd": float(item["unit_price_usd"]),
                 "subtotal_usd": float(item["subtotal_usd"])
             })
+            item_row_ids.append(f"item_{sale_id}_{item['product_id']}_{idx}")
         
         if item_rows:
-            err_items = client.insert_rows_json(f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_sale_items", item_rows)
+            err_items = client.insert_rows_json(
+                f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_sale_items",
+                item_rows,
+                row_ids=item_row_ids
+            )
             if err_items:
                 logger.warning("Error insertando en raw_sale_items: %s", err_items)
 
@@ -103,7 +114,12 @@ def stream_movement_to_bronze(
             "stock_after": int(stock_after),
             "reference_note": str(reference_note)
         }]
-        errs = client.insert_rows_json(f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_inventory_movements", row)
+        mov_row_ids = [f"mov_{product_id}_{user_id}_{movement_timestamp}"]
+        errs = client.insert_rows_json(
+            f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_inventory_movements",
+            row,
+            row_ids=mov_row_ids
+        )
         if errs:
             logger.warning("Error insertando en raw_inventory_movements: %s", errs)
         return {"status": "SUCCESS"}
@@ -132,7 +148,12 @@ def stream_product_to_bronze(product_dict: Dict[str, Any]) -> Dict[str, Any]:
             "aisle_location": str(product_dict["aisle_location"]),
             "updated_at": str(product_dict.get("updated_at", ""))
         }]
-        errs = client.insert_rows_json(f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_products", row)
+        prod_row_ids = [f"prod_{product_dict['product_id']}_{product_dict.get('updated_at', '')}"]
+        errs = client.insert_rows_json(
+            f"{GCP_PROJECT_ID}.{BRONZE_DATASET}.raw_products",
+            row,
+            row_ids=prod_row_ids
+        )
         if errs:
             logger.warning("Error insertando en raw_products: %s", errs)
         return {"status": "SUCCESS"}

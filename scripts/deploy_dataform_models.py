@@ -89,7 +89,9 @@ def main():
       `ferrostats.ferrostats_bronze.raw_sales`
     WHERE
       sale_id IS NOT NULL
-      AND CAST(total_amount_usd AS FLOAT64) >= 0;
+      AND CAST(total_amount_usd AS FLOAT64) >= 0
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY CAST(sale_timestamp AS TIMESTAMP) DESC) = 1;
     """
     run_query(sql_stg_sales, token)
 
@@ -111,7 +113,9 @@ def main():
       `ferrostats.ferrostats_bronze.raw_sale_items`
     WHERE
       sale_item_id IS NOT NULL
-      AND CAST(quantity AS INT64) > 0;
+      AND CAST(quantity AS INT64) > 0
+    QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY sale_item_id ORDER BY CAST(sale_id AS INT64) DESC) = 1;
     """
     run_query(sql_stg_items, token)
 

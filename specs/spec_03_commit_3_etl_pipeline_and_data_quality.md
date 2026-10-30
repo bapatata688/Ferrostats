@@ -71,6 +71,7 @@ El módulo de transformación debe calcular las siguientes métricas de negocio 
 ## 4. Conector Opcional con Google BigQuery Free Tier (`app/etl/bigquery_sync.py`)
 
 - Si la variable de entorno `ENABLE_BIGQUERY_SYNC=true` y `GCP_PROJECT_ID` están definidas, tras actualizar las tablas OLAP locales el pipeline enviará los registros de `dw_fact_daily_sales` y `dw_mart_product_abc_health` al dataset `ferrostats_dw` en BigQuery utilizando la librería estándar o API REST.
+- **Deduplicación en Ingesta y Modelos Silver:** La transmisión en streaming (`insert_rows_json`) envía `row_ids` deterministas (`sale_{sale_id}`, `item_{sale_id}_{product_id}_{idx}`) para deduplicación automática en el búfer de BigQuery. Complementariamente, los modelos SQLX de la capa Silver (`stg_sales`, `stg_sale_items`) ejecutan `QUALIFY ROW_NUMBER() OVER (...) = 1` para garantizar unicidad analítica incondicional.
 - Si `ENABLE_BIGQUERY_SYNC` es `false` (por defecto en desarrollo local o cuando se desee operar 100% sin credenciales externas), el conector devolverá `{"bigquery_sync": "SKIPPED_LOCAL_OLAP_ACTIVE"}` sin interrumpir la ejecución.
 
 ## 5. Criterios de Aceptación de la Fase 3 (Commit 3)

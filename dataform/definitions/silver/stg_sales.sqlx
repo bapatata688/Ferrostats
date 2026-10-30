@@ -28,3 +28,5 @@ FROM
 WHERE
   sale_id IS NOT NULL
   AND CAST(total_amount_usd AS FLOAT64) >= 0
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY CAST(sale_timestamp AS TIMESTAMP) DESC) = 1

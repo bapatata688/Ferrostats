@@ -247,10 +247,11 @@ FerroStats opera bajo una política estricta de **Cero Costes Fijos** aprovechan
 > **Respuesta:** En operaciones ferreteras y comercio minorista, reducir costos fijos es primordial. Cloud SQL impone un coste base obligatorio de ~$15 a $25 USD mensuales más cargos por IP pública IPv4, incluso en períodos sin tráfico. Al implementar SQLite WAL en el borde de Cloud Run emparejado con streaming asíncrono a BigQuery, logramos latencias de cobro sub-50ms, cero saltos de red durante la venta y 100% de cumplimiento con la capa gratuita. Las consultas analíticas pesadas se ejecutan en BigQuery sin interferir con la caja registradora.
 
 ### P2: ¿Cómo se previenen las condiciones de carrera y la sobreventa de inventario?
-> **Respuesta:** Se implementa una validación en dos niveles:
+> **Respuesta:** Se implementa un mecanismo de bloqueo y validación multinivel:
 > 1. `BEGIN IMMEDIATE TRANSACTION` bloquea la escritura en la base de datos antes de consultar el stock disponible, serializando los hilos concurrentes.
 > 2. La sentencia SQL de actualización incluye una cláusula de guarda atómica: `UPDATE products SET current_stock = current_stock - :qty WHERE product_id = :id AND current_stock >= :qty;`. Si `cursor.rowcount == 0`, significa que otra transacción consumió el stock en el intervalo, provocando un `ROLLBACK` inmediato y respondiendo con `HTTP 409 Conflict`.
-> 3. Cada solicitud de cobro exige un UUID de idempotencia (`transaction_uuid`) emitido por el cliente. En esta implementación de demo, UUIDs repetidos son rechazados con `HTTP 409 Conflict` (en lugar de retornar el comprobante de la venta original), y la ingesta por streaming a BigQuery Bronze no pasa IDs deterministas de fila, dependiendo de las aserciones `uniqueKey` de Silver para detectar registros duplicados.
+> 3. Cada solicitud de cobro exige un UUID de idempotencia (`transaction_uuid`) emitido por el cliente. Si se repite una petición con un UUID previamente comprometido, el sistema responde con `HTTP 200 OK`, devolviendo el comprobante original de venta con la cabecera `Idempotent-Replay: true` sin decrementar nuevamente el stock.
+> 4. En la ingesta por streaming a BigQuery Bronze, se suministran IDs deterministas de fila (`row_ids`) a `insert_rows_json`, mientras que los modelos de la capa Silver en Dataform aplican deduplicación mediante `QUALIFY ROW_NUMBER() OVER (...) = 1` y aserciones `uniqueKey`.
 
 ### P3: ¿Cómo opera la Arquitectura Medallón en Google Dataform?
 > **Respuesta:** Las ventas crudas se transmiten a tablas inmutables en `ferrostats_bronze`. Google Dataform compila los modelos SQLX en grafos dirigidos acíclicos (DAGs). La capa **Silver** estandariza los tipos de datos, calcula los costos contables de venta y ejecuta aserciones de calidad (`uniqueKey`, `nonNull`, `rowConditions`). La capa **Gold** materializa los Data Marts en Esquema Estrella (`fct_ventas_diarias`, `mart_inventario_pareto_abc`) para su consumo directo desde Looker Studio.
@@ -416,11 +417,8 @@ Este proyecto es un prototipo de portafolio diseñado para demostrar una arquite
    - El módulo RBAC (`app/api/auth_rbac.py`) simula roles a través del header HTTP `X-User-Role` (asumiendo `ADMIN` por defecto si se omite), y Cloud Run está desplegado con `--allow-unauthenticated`. Es un mecanismo para propósitos de demostración, no de autenticación real.
    - Un despliegue empresarial en producción implementaría control de identidad mediante Google Cloud Identity-Aware Proxy (IAP), un proveedor OIDC empresarial o tokens firmados JWT portadores.
    - Los registros de semilla en `data/seeds/users.csv` almacenan contraseñas/PINs en texto plano dentro de la columna `pin` (tratados explícitamente como credenciales semilla de prueba para la demo).
-2. **Idempotencia y Semántica de Reintento en POS:**
-   - En `app/api/routes_pos.py`, el reenvío de un `transaction_uuid` previamente procesado devuelve un error `HTTP 409 Conflict` en lugar de responder con el comprobante de la venta original (`200 OK` con cabecera `Idempotent-Replay: true`).
-3. **Deduplicación en Ingesta Streaming a BigQuery:**
-   - En `app/etl/bigquery_sync.py`, la llamada `insert_rows_json` no suministra `row_ids` deterministas (como `sale_id`). Reintentos de red pueden generar filas duplicadas en las tablas Bronze (`raw_sales`, `raw_sale_items`).
-   - La aserción de Silver en Dataform `uniqueKey: ["sale_id"]` alerta sobre violaciones de unicidad en fase de QA, pero no auto-corrige los duplicados salvo que se aplique una consulta de deduplicación explícita con ventana (`QUALIFY ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY ...) = 1`).
+2. **Estado en el Borde Local vs. Clustering Distribuido:**
+   - El estado OLTP transaccional reside en SQLite WAL local montado en el borde de Cloud Run con escalado a cero. En un despliegue multi-región con instancias concurrentes permanentes, esto se sustituiría por una capa distribuida como CockroachDB o Cloud Spanner.
 
 ---
 

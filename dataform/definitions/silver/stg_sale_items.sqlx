@@ -27,3 +27,5 @@ FROM
 WHERE
   sale_item_id IS NOT NULL
   AND CAST(quantity AS INT64) > 0
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY sale_item_id ORDER BY CAST(sale_id AS INT64) DESC) = 1
