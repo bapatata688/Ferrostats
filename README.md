@@ -1,91 +1,44 @@
-# FERROSTATS — Decoupled OLTP-to-OLAP Streaming Pipeline & Medallion Data Lakehouse on Google Cloud
+# FERROSTATS — Google Cloud Medallion Data Lakehouse (BigQuery + Dataform SQLX) & Streaming Ingestion Pipeline
 
 <p align="center">
-  <img src="assets/logo.png" alt="FERROSTATS Logo" width="220" />
+  <img src="assets/logo.png" alt="FERROSTATS Logo" width="200" />
 </p>
 
 <p align="center">
-  <strong>Data Engineering Portfolio Project: Serverless OLTP-to-OLAP Streaming Ingestion, Automated Medallion Data Lakehouse (Google BigQuery + Dataform SQLX), Dynamic 80/20 Pareto Inventory Analytics, and $0.00/mo FinOps Governance.</strong>
+  <strong>Data Engineering Portfolio Project: Automated Medallion Data Lakehouse (Bronze / Silver / Gold) in Google BigQuery, Declarative SQLX Orchestration with Google Dataform, Analytical Window Modeling (80/20 Pareto, DOI, ROP), and Permanent $0.00/mo FinOps Governance.</strong>
 </p>
 
 <p align="center">
   <a href="https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10"><img src="https://img.shields.io/badge/Google%20Cloud%20Certified-Associate%20Data%20Practitioner-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="GCP Certified Associate Data Practitioner" /></a>
-  <a href="https://cloud.google.com/bigquery"><img src="https://img.shields.io/badge/Google%20Cloud-BigQuery%20Lakehouse-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="BigQuery" /></a>
-  <a href="https://cloud.google.com/dataform"><img src="https://img.shields.io/badge/Google%20Cloud-Dataform%20SQLX-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Dataform" /></a>
-  <a href="https://lookerstudio.google.com/"><img src="https://img.shields.io/badge/Google%20Cloud-Looker%20Studio%20BI-38bdf8?style=for-the-badge&logo=googlelooker&logoColor=white" alt="Looker Studio" /></a>
-  <a href="https://cloud.google.com/run"><img src="https://img.shields.io/badge/Google%20Cloud-Cloud%20Run%20Serverless-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="GCP Cloud Run" /></a>
-  <a href="finops/gcp_free_tier_policy.json"><img src="https://img.shields.io/badge/FinOps-$0.00%20USD%20Always%20Free%20Tier-10b981?style=for-the-badge" alt="FinOps" /></a>
-  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" /></a>
-  <a href="https://www.sqlite.org/wal.html"><img src="https://img.shields.io/badge/Edge%20OLTP-SQLite%20WAL%20ACID-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite WAL" /></a>
+  <a href="https://cloud.google.com/bigquery"><img src="https://img.shields.io/badge/Google%20BigQuery-Medallion%20Lakehouse-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="BigQuery" /></a>
+  <a href="https://cloud.google.com/dataform"><img src="https://img.shields.io/badge/Google%20Dataform-SQLX%20%26%20Assertions-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Dataform" /></a>
+  <a href="https://lookerstudio.google.com/"><img src="https://img.shields.io/badge/Looker%20Studio-Star%20Schema%20BI-38bdf8?style=for-the-badge&logo=googlelooker&logoColor=white" alt="Looker Studio" /></a>
+  <a href="finops/gcp_free_tier_policy.json"><img src="https://img.shields.io/badge/FinOps-$0.00%20USD%2Fmo%20Always%20Free%20Tier-10b981?style=for-the-badge" alt="FinOps" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python%203.11-ETL%20%26%20Streaming%20Ingestion-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
 </p>
 
 <p align="center">
   <strong>Language / Idioma:</strong> <strong>English</strong> | <a href="README.es.md">Versión en Español</a>
 </p>
 
-> [!NOTE]
-> **Data Engineering Portfolio Scope & Synthetic Workload:** This repository showcases an end-to-end **Data Engineering & Cloud Lakehouse Architecture** operating at a permanent **$0.00 USD/month** cost on Google Cloud Platform. All catalog SKUs, inventory movements, and POS transactions are synthetically generated (deterministic seed of 180 historical sales across 30 hardware SKUs). The web interfaces (`/` and `/pos`) serve as **interactive edge event producers** built via **Spec-Driven Development (SDD)** to generate real-time transactional streams into the BigQuery Medallion pipeline.
+> [!IMPORTANT]
+> **Data Engineering Focus & Role of the Web Simulator:**  
+> This repository is a **Data Engineering & Cloud Architecture** project. The core deliverables are the **Google BigQuery Medallion Lakehouse (`ferrostats_bronze` $\to$ `ferrostats_silver` $\to$ `ferrostats_gold`)**, the **Google Dataform SQLX pipeline & Data Quality assertions**, the **analytical SQL window functions (Pareto 80/20, Burn Rate, DOI, ROP)**, and the **$0.00/mo GCP FinOps architecture**.  
+> Because a streaming data pipeline requires an upstream transactional source, a lightweight web simulator (`/pos` and `/`) was generated via **Spec-Driven Development (SDD)** strictly to act as a **synthetic OLTP event producer** feeding live sales and inventory movements into BigQuery Bronze.
 
 ---
 
-## Live Cloud Endpoints (Google Cloud Platform)
+## Cloud Data Platform & Live Resources
 
-| Component | Live URL / Resource | Architectural Role |
+| Data Platform Layer | Resource / Live Link | Technical Scope |
 |---|---|---|
-| **Looker Studio Executive BI** | [Official FERROSTATS Analytics Report](https://datastudio.google.com/reporting/2389e684-fc9b-431d-9c56-487b3067eb87/page/p_dwbfqrtk8d) | 3-page BI reporting suite querying BigQuery Gold Star Schema marts (`fct_daily_sales`, `mart_inventory_pareto_abc`, `dim_products`). |
-| **Warehouse Audit & BI Portal** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app) | Edge inventory adjustment producer, physical aisle stock monitor, and embedded Looker BI portal. |
-| **POS Edge Event Producer** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos) | Sub-50ms ACID checkout simulator that produces live transactional events into `ferrostats_bronze`. |
-| **Swagger / OpenAPI 3.0** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/docs](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/docs) | Interactive REST API data contracts, idempotency payloads, and observability endpoints. |
-| **Executive Architecture Deck** | [https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/presentacion](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/presentacion) | Interactive slide deck detailing the Medallion DAG and FinOps engineering. |
-| **GCP Project & Dataform** | `ferrostats` (`us-central1`) | Dataform Repository: `ferrostats-pipeline` (`main-workspace`) • Datasets: `ferrostats_bronze`, `ferrostats_silver`, `ferrostats_gold`. |
+| **1. Analytical BI Layer (Looker Studio)** | [**Official FERROSTATS 3-Page Looker Studio Report**](https://datastudio.google.com/reporting/2389e684-fc9b-431d-9c56-487b3067eb87/page/p_dwbfqrtk8d) | Connected natively to BigQuery Gold Star Schema marts (`fct_daily_sales`, `mart_inventory_pareto_abc`, `dim_products`). |
+| **2. Cloud Data Lakehouse (GCP)** | **Project:** `ferrostats` (`US` / `us-central1`)<br>**Dataform Repo:** `ferrostats-pipeline` (`main-workspace`) | **Bronze:** 7 raw immutable tables<br>**Silver:** 3 SQLX curated views + DQ assertions<br>**Gold:** 3 Star Schema analytical tables |
+| **3. Upstream OLTP Event Producer (Cloud Run)** | [**POS Transaction Producer (`/pos`)**](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app/pos) • [**Inventory Audit & ROP View (`/`)**](https://ferrostats-bi-platform-s72yk4nsvq-uc.a.run.app) | Scale-to-zero edge simulator (`<50 ms` ACID SQLite WAL + UUID idempotency) that streams live events into `ferrostats_bronze`. |
 
 ---
 
-## Engineering Authorship & Spec-Driven Development (SDD) Transparency
-
-As a **Data Engineering & Cloud Architecture** project, this repository maintains strict transparency regarding what was architected and engineered directly by the author versus where **Spec-Driven Development (SDD)** and AI-assisted code generation were used as an implementation accelerator (specifically for the HTML/CSS/JS web interfaces, since full-stack web design is not the primary focus of this portfolio):
-
-| Engineering Domain | Ownership & Execution Model | Technical Deliverables |
-|---|---|---|
-| **Cloud Data Architecture & Medallion Design** | **100% Human-Architected**<br>*(Diego Alejandro Escobar Barahona)* | Decoupled OLTP-to-OLAP topology, Google BigQuery dataset partitioning (`ferrostats_bronze`, `ferrostats_silver`, `ferrostats_gold`), and Star Schema dimensional modeling (`fct_daily_sales`, `mart_inventory_pareto_abc`, `dim_products`). |
-| **Dataform SQLX Pipelines & Analytical SQL** | **100% Human-Engineered**<br>*(Diego Alejandro Escobar Barahona)* | Declarative SQLX DAG orchestration, automated Data Quality assertions (`uniqueKey`, `nonNull`, `rowConditions`), dynamic 80/20 Pareto window functions, Daily Burn Rate, Days of Inventory (DOI), and Reorder Point (ROP) formulas. |
-| **FinOps Governance ($0.00/mo Free Tier)** | **100% Human-Architected**<br>*(Diego Alejandro Escobar Barahona)* | Replacement of billable Cloud SQL & VPC Connectors with scale-to-zero Cloud Run containers, internal GCP metadata OAuth token minting, and automated Artifact Registry digest pruning (<0.3 GB). |
-| **OLTP Data Contracts, ACID & Idempotency Rules** | **Human-Specified via SDD** ([`specs/`](specs/))<br>+ *Verified in Python/SQLite WAL* | 3NF relational schema, `BEGIN IMMEDIATE` write locks, atomic guarded stock decrements (`current_stock >= :qty`), and `transaction_uuid` idempotency replay guarantees. |
-| **Web Frontend UI (`app/static/*.html`, `*.js`, `*.css`)** | **SDD + AI-Assisted Scaffolding**<br>*(Directed via [`spec_05`](specs/spec_05_commit_5_frontend_bi_pos_and_mobile.md))* | Single-Page Application (SPA) interfaces for the POS cashier terminal and warehouse aisle monitor, generated from formal specifications to serve as visual event producers for the data pipeline. |
-
-### Specifications Traceability Matrix (`specs/`)
-
-Prior to application scaffolding, 7 formal architectural specifications were authored to enforce data contracts, schema invariants, and FinOps guardrails:
-
-| Spec | Target Phase & Scope | Architectural Deliverables & Data Engineering Competencies | Status |
-|:---:|---|---|:---:|
-| [**Spec 01**](specs/spec_01_commit_1_architecture_and_gcp_finops.md) | **System Architecture & FinOps Guardrails** | Decoupled OLTP-ETL-OLAP blueprint, Google Cloud Free Tier budget limits ($0.00 actual), elimination of fixed-cost services (Cloud SQL, VPC Connectors). | `Verified` |
-| [**Spec 02**](specs/spec_02_commit_2_data_model_and_synthetic_seed.md) | **Data Modeling & Synthetic Seeds** | 3NF Transactional Schema (6 tables), Dimensional Star Schema (Fact + Dimensions), deterministic hardware store synthetic dataset (180 transactions, 30 SKUs). | `Verified` |
-| [**Spec 03**](specs/spec_03_commit_3_etl_pipeline_and_data_quality.md) | **BigQuery Medallion & Data Quality** | Dataform SQLX pipeline (Bronze raw stream $\to$ Silver curated staging $\to$ Gold star marts), automated quality assertions (`uniqueKey`, `nonNull`, `rowConditions`). | `Verified` |
-| [**Spec 04**](specs/spec_04_commit_4_backend_api_and_acid_pos.md) | **Ingestion API & ACID Edge Engine** | Sub-50ms edge checkout, `BEGIN IMMEDIATE` locks, UUID idempotency, guarded stock decrements (`current_stock >= :qty`), asynchronous BigQuery Bronze streaming. | `Verified` |
-| [**Spec 05**](specs/spec_05_commit_5_frontend_bi_pos_and_mobile.md) | **Event Producer Portals & Embedded BI** | SDD frontend specification for the POS event generator, warehouse aisle audit view (`Aisle A-01`..`E-03`), and embedded 3-page Looker Studio report. | `Verified` |
-| [**Spec 06**](specs/spec_06_commit_6_gcp_deploy_docker_and_qa.md) | **Containerization & GCP Deployment** | Multi-stage `python:3.11-slim` Docker container (~130 MB), scale-to-zero Cloud Run deployment scripts (`deploy_gcp.ps1` / `deploy_gcp.sh`), HTTP smoke test suite (`scripts/smoke_test.py`). | `Verified` |
-| [**Spec 07**](specs/spec_07_commit_7_gcp_serverless_free_tier_production_policy.md) | **FinOps Governance & Kill-Switch** | Machine-readable FinOps policy (`gcp_free_tier_policy.json`), Artifact Registry image digest purger (<0.5 GB threshold), emergency billing kill-switch scripts. | `Verified` |
-
----
-
-## 1. Problem Space & Data Engineering Solution
-
-Small and mid-sized hardware and construction retail stores suffer from three fundamental data and inventory problems:
-
-1. **Unplanned Stockouts on Core Revenue Drivers (Class A SKUs):** Up to 30% of lost sales occur when high-velocity structural materials (Portland cement, corrugated rebar, PVC pipes) run out unexpectedly because reorders are based on guesswork rather than real-time burn rate and supplier lead times.
-2. **Trapped Working Capital in Dead Stock (Class C SKUs):** Up to 25% of operating liquidity remains frozen in slow-moving items while high-margin fast movers face stockouts.
-3. **OLTP vs. OLAP Contention & Cloud Cost Barriers:** Traditional cloud relational databases (e.g., Cloud SQL, RDS) charge $25–$50+/month in idle compute and IPv4 fees, while running analytical window queries directly on operational tables causes lock contention during checkout.
-
-**FERROSTATS** solves this through a decoupled, zero-cost data architecture:
-- **Edge OLTP Ingestion (<50 ms Latency, 0% Overselling):** Transactional checkouts and inventory adjustments are validated locally in SQLite Write-Ahead Logging (WAL) mode using `BEGIN IMMEDIATE` locks, atomic SQL guard clauses, and UUID idempotency keys, then streamed asynchronously into **Google BigQuery Bronze**.
-- **Medallion Data Lakehouse in Google BigQuery & Dataform (SQLX):** Raw append-only tables (`ferrostats_bronze`) are curated through declarative Dataform SQLX views (`ferrostats_silver`) with automated Data Quality assertions, and materialized into Star Schema analytical marts (`ferrostats_gold`).
-- **Automated Supply Chain Window Analytics:** BigQuery analytical window functions dynamically compute **80/20 Pareto ABC segmentation**, **30-day Daily Burn Rate**, **Days of Inventory (DOI)**, and **Lead-Time Reorder Point (ROP)** with a 15-day safety buffer.
-- **Permanent $0.00/mo Serverless FinOps:** Scale-to-zero Cloud Run containers, metadata-based OAuth REST ingestion, and BigQuery/Dataform Free Tier allocations keep monthly infrastructure billing at exactly **$0.00 USD**.
-
----
-
-## 2. End-to-End Data Architecture
+## 1. Architecture & Data Lineage (OLTP Edge $\to$ BigQuery Medallion $\to$ BI)
 
 <p align="center">
   <img src="assets/capturas/arquitectura_gcp_end_to_end.png" alt="End-to-End Architecture Diagram" width="900" />
@@ -93,99 +46,67 @@ Small and mid-sized hardware and construction retail stores suffer from three fu
 
 ```mermaid
 flowchart TD
-    subgraph CLIENT["Edge Event Producers (SDD Web Simulators)"]
-        UI_POS["POS Cashier Terminal (/pos)\n- Sub-50ms ACID Checkout\n- UUID Idempotency Producer"]
-        UI_MGR["Warehouse & BI Portal (/)\n- Aisle Stock Audit (Aisle A-01..E-03)\n- Supplier Restock Producer\n- Embedded Looker Studio BI"]
+    subgraph SOURCE["1. Upstream OLTP Event Producer (Cloud Run Edge — $0.00/mo)"]
+        SIM["Synthetic Retail Event Producer (/pos & /)\n- Deterministic Seed (180 Sales, 30 SKUs)\n- SQLite WAL BEGIN IMMEDIATE Lock (<50 ms)\n- Guarded Stock Decrement & UUID Idempotency"]
+        STREAM["Async REST Ingestion Client (bigquery_sync.py)\n- Internal GCP Metadata OAuth Token Minting\n- Zero Heavy SDK Bloat (Python urllib.request)"]
     end
 
-    subgraph CLOUD_RUN["Serverless Edge Ingestion (Google Cloud Run us-central1 - $0.00 USD)"]
-        FASTAPI["FastAPI Ingestion & REST API (Python 3.11)\n- Pydantic v2 Schema Validation\n- Scale-to-Zero (min=0, max=2)"]
-        SQLITE["SQLite WAL Engine (Local OLTP)\n- BEGIN IMMEDIATE Isolation\n- Guarded Stock Decrements (current_stock >= requested_qty)\n- Immutable Movement Audit Log"]
-        SYNC_ENGINE["BigQuery Streaming Client\n- GCP Metadata Server OAuth Token Minting\n- Zero Heavy SDK Overhead (urllib REST)\n- Non-blocking Async Ingestion"]
-    end
-
-    subgraph GCP_DATA_PLATFORM["Google Cloud Platform (BigQuery Medallion Lakehouse - $0.00 USD)"]
-        subgraph BRONZE["Bronze Layer (ferrostats_bronze — Raw Immutable Ingestion)"]
-            BQ_RAW_SALES["raw_sales"]
-            BQ_RAW_ITEMS["raw_sale_items"]
-            BQ_RAW_PROD["raw_products"]
-            BQ_RAW_CAT["raw_categories & raw_suppliers"]
-            BQ_RAW_MOV["raw_inventory_movements"]
+    subgraph LAKEHOUSE["2. Google BigQuery Medallion Data Lakehouse ($0.00/mo Free Tier)"]
+        subgraph BRONZE["Bronze Layer (ferrostats_bronze — 7 Immutable Raw Tables)"]
+            B1["raw_sales (180+ txns)\nraw_sale_items (271+ lines)"]
+            B2["raw_products (30 SKUs)\nraw_categories (6) & raw_suppliers (6)"]
+            B3["raw_inventory_movements (294+ logs)\nraw_users (4)"]
         end
 
-        subgraph SILVER["Silver Layer (ferrostats_silver — Dataform SQLX Staging & DQ)"]
-            DF_STG_SALES["stg_sales (Type Casting, Margin %)"]
-            DF_STG_ITEMS["stg_sale_items (COGS & Line Profit)"]
-            DF_STG_PROD["stg_products (Catalog + Stock Status Enum)"]
-            DF_ASSERT["Dataform Assertions (uniqueKey, nonNull, rowConditions)"]
+        subgraph SILVER["Silver Layer (ferrostats_silver — 3 Dataform SQLX Views & Assertions)"]
+            S1["stg_sales\n- SAFE.PARSE_TIMESTAMP\n- QUALIFY ROW_NUMBER() Deduplication\n- Assertions: uniqueKey, nonNull, total >= 0"]
+            S2["stg_sale_items\n- Historical COGS & Line Profit Math\n- QUALIFY ROW_NUMBER() Deduplication\n- Assertions: quantity > 0, subtotal >= 0"]
+            S3["stg_products\n- Enriched Catalog + Lead Time\n- Canonical stock_status (OPTIMAL, LOW_STOCK, OUT_OF_STOCK)\n- Assertions: price >= cost, stock >= 0"]
         end
 
-        subgraph GOLD["Gold Layer (ferrostats_gold — Analytical Star Schema Marts)"]
-            DM_SALES["fct_daily_sales (Daily Revenue, COGS & Gross Margin)"]
-            DM_PARETO["mart_inventory_pareto_abc (80/20 ABC, Burn Rate, DOI, ROP)"]
-            DM_PROD["dim_products (SKU-to-Name Master Catalog Dimension)"]
+        subgraph GOLD["Gold Layer (ferrostats_gold — 3 Materialized Star Schema Marts)"]
+            G1["fct_daily_sales\nDaily grain by (date_key, category_code)\nGross Revenue, COGS, Profit & Margin %"]
+            G2["mart_inventory_pareto_abc\nRolling 30d Window Functions:\n80/20 ABC Class, Burn Rate, DOI & ROP"]
+            G3["dim_products\nConformed SKU-to-Name Catalog Dimension\nUnit Margins, Suppliers & Aisle Locations"]
         end
     end
 
-    subgraph BI_VIZ["Business Intelligence & Decision Tier"]
-        LOOKER["Google Looker Studio (3-Page Executive Report)\n- Page 1: Revenue, Gross Margin & Category Trends\n- Page 2: 80/20 Pareto Matrix, DOI & Replenishment Priority\n- Page 3: Working Capital Valuation by ABC Class"]
+    subgraph BI["3. Business Intelligence & Consumption Layer"]
+        LOOKER["Google Looker Studio (3-Page Executive Dashboard)\n- Page 1: Revenue, COGS & Gross Margin Evolution\n- Page 2: 80/20 Pareto Matrix, Burn Rate & Replenishment Priority\n- Page 3: Working Capital Valuation by ABC Class"]
     end
 
-    UI_POS -->|HTTP POST /api/v1/pos/checkout| FASTAPI
-    UI_MGR -->|HTTP POST /api/v1/inventory/adjust| FASTAPI
-    FASTAPI -->|Atomic ACID Write <50ms| SQLITE
-    SQLITE -->|Commit Confirmation| FASTAPI
-    FASTAPI -->|Emit Event Payload| SYNC_ENGINE
-    SYNC_ENGINE -->|REST Streaming Insert| BRONZE
-
-    BRONZE -->|Dataform SQLX DAG| SILVER
-    SILVER -->|Window Functions & Star Aggregations| GOLD
-    GOLD -->|Native BigQuery BI Connector| LOOKER
-    LOOKER -.->|Embedded Analytics| UI_MGR
+    SIM -->|Commit Event| STREAM
+    STREAM -->|tabledata.insertAll| BRONZE
+    BRONZE -->|Dataform SQLX Compilation| SILVER
+    SILVER -->|Star Schema Materialization| GOLD
+    GOLD -->|Native BigQuery Connector| LOOKER
 ```
 
 ---
 
-## 3. Core Data Engineering Pillars
+## 2. Medallion Lakehouse Engineering in Google BigQuery & Dataform
 
-### 3.1 Decoupled OLTP-to-OLAP Ingestion & Concurrency Control
-- **Sub-50ms Edge OLTP:** Cashier checkouts execute against local SQLite in **Write-Ahead Logging (WAL)** mode (`PRAGMA journal_mode = WAL`, `PRAGMA synchronous = NORMAL`), isolating transactional writes from analytical scans.
-- **ACID Race Condition Prevention & UUID Idempotency:**
-  ```python
-  cursor.execute("BEGIN IMMEDIATE TRANSACTION;")
-  # 1. Verify transaction_uuid idempotency key (prevents duplicate billing on network retries)
-  # 2. Verify stock availability and execute guarded atomic decrement:
-  cursor.execute("""
-      UPDATE products
-      SET current_stock = current_stock - ?, updated_at = ?
-      WHERE product_id = ? AND current_stock >= ?;
-  """, (qty, now_ts, prod_id, qty))
-  if cursor.rowcount == 0:
-      conn.execute("ROLLBACK;")
-      raise HTTPException(status_code=409, detail="Concurrency conflict: insufficient stock.")
-  ```
-- **Lightweight IAM Metadata Streaming:** Committed transactions stream asynchronously to BigQuery Bronze (`app/etl/bigquery_sync.py`) using Python's native `urllib.request` authenticated via the Cloud Run internal metadata server (`http://metadata.google.internal/.../token`), keeping container memory well below the 512 MiB serverless ceiling.
+The core of the project resides in [`dataform/`](dataform/) and [`app/etl/`](app/etl/), implementing a three-tier Medallion architecture orchestrated via declarative **SQLX**:
 
-### 3.2 Medallion Data Lakehouse in BigQuery & Dataform (SQLX)
+### 2.1 Layer Breakdown (`Bronze` $\to$ `Silver` $\to$ `Gold`)
 
-| Medallion Layer | BigQuery Dataset | Dataform / Table Objects | Engineering Responsibility |
-|---|---|---|---|
-| **Bronze (Raw)** | `ferrostats_bronze` | `raw_sales`<br>`raw_sale_items`<br>`raw_products`<br>`raw_categories`<br>`raw_suppliers`<br>`raw_inventory_movements`<br>`raw_users` | Immutable append-only landing zone preserving raw event payloads and historical snapshots. |
-| **Silver (Curated)** | `ferrostats_silver` | `stg_sales`<br>`stg_sale_items`<br>`stg_products` | Declarative Dataform SQLX views performing strict type casting (`INT64`, `FLOAT64`, `TIMESTAMP`), string normalization, COGS/profit derivation, and canonical `stock_status` classification (`OPTIMAL`, `LOW_STOCK`, `OUT_OF_STOCK`). |
-| **Gold (Marts)** | `ferrostats_gold` | `fct_daily_sales`<br>`mart_inventory_pareto_abc`<br>`dim_products` | Pre-aggregated Star Schema fact and dimension tables optimized for sub-second Looker Studio BI queries. |
-
-#### Automated Data Quality Gates (Dataform Assertions)
-- **`uniqueKey` Assertions:** Enforces primary key uniqueness across `stg_sales` (`sale_id`), `stg_sale_items` (`sale_item_id`), `stg_products` (`product_id`), and `fct_daily_sales` (`date_key, category_code`).
-- **`nonNull` Assertions:** Blocks incomplete records lacking `transaction_uuid`, `sale_timestamp`, `sku`, `product_name`, or financial amounts.
-- **`rowConditions` Assertions:** Enforces domain invariants in SQLX (`unit_cost_usd > 0`, `unit_price_usd >= unit_cost_usd`, `current_stock >= 0`, `quantity > 0`, and `subtotal_usd >= 0`).
+| Layer | BigQuery Dataset | Object Name & Type | Grain & Transformations | Data Quality Assertions (`ferrostats_assertions`) |
+|---|---|---|---|---|
+| **Bronze** | `ferrostats_bronze` | `raw_sales`<br>`raw_sale_items`<br>`raw_products`<br>`raw_categories`<br>`raw_suppliers`<br>`raw_inventory_movements`<br>`raw_users`<br>*(7 Raw Tables)* | Append-only landing tables populated via REST streaming ([`bigquery_sync.py`](app/etl/bigquery_sync.py)) and batch sync ([`sync_sqlite_to_bigquery.py`](scripts/sync_sqlite_to_bigquery.py)). Preserves immutable historical cost/price snapshots. | Schema enforcement on ingestion. |
+| **Silver** | `ferrostats_silver` | [`stg_sales.sqlx`](dataform/definitions/silver/stg_sales.sqlx)<br>*(View)* | 1 row per `sale_id`. Type casting (`INT64`, `FLOAT64`, `TIMESTAMP`), `date_key` extraction, net margin derivation, and streaming deduplication via `QUALIFY ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY sale_timestamp DESC) = 1`. | `uniqueKey: ["sale_id"]`<br>`nonNull: ["sale_id", "transaction_uuid", "sale_timestamp", "total_amount_usd"]`<br>`rowConditions: ["total_amount_usd >= 0", "total_cost_usd >= 0"]` |
+| **Silver** | `ferrostats_silver` | [`stg_sale_items.sqlx`](dataform/definitions/silver/stg_sale_items.sqlx)<br>*(View)* | 1 row per `sale_item_id`. Computes historical line COGS (`quantity * unit_cost_snapshot_usd`) and line gross profit (`subtotal_usd - item_cogs_usd`) with `QUALIFY ROW_NUMBER()` deduplication. | `uniqueKey: ["sale_item_id"]`<br>`nonNull: ["sale_item_id", "sale_id", "product_id", "quantity"]`<br>`rowConditions: ["quantity > 0", "subtotal_usd >= 0"]` |
+| **Silver** | `ferrostats_silver` | [`stg_products.sqlx`](dataform/definitions/silver/stg_products.sqlx)<br>*(View)* | 1 row per `product_id`. Joins `raw_products` with deduplicated `raw_categories` and `raw_suppliers`, computes unit margin, and standardizes `stock_status` (`OUT_OF_STOCK`, `LOW_STOCK`, `OPTIMAL`). | `uniqueKey: ["product_id"]`<br>`nonNull: ["product_id", "sku", "product_name", "unit_cost_usd", "unit_price_usd"]`<br>`rowConditions: ["unit_cost_usd > 0", "unit_price_usd >= unit_cost_usd", "current_stock >= 0"]` |
+| **Gold** | `ferrostats_gold` | [`fct_daily_sales.sqlx`](dataform/definitions/gold/fct_daily_sales.sqlx)<br>*(Table)* | 1 row per `(date_key, category_code)`. Pre-aggregates daily transactions, units sold, `gross_revenue_usd`, `cogs_usd`, `gross_profit_usd`, and `gross_margin_pct` for sub-second Looker Studio time series. | `uniqueKey: ["date_key", "category_code"]`<br>`nonNull: ["date_key", "category_code", "gross_revenue_usd"]` |
+| **Gold** | `ferrostats_gold` | [`mart_inventory_pareto_abc.sqlx`](dataform/definitions/gold/mart_inventory_pareto_abc.sqlx)<br>*(Table)* | 1 row per `product_id`. Computes 30-day rolling revenue, cumulative Pareto % (`abc_class` `A`/`B`/`C`), `daily_burn_rate`, `days_of_inventory_left` (DOI), `recommended_reorder_qty` (ROP), and inventory valuation at cost/retail. | `uniqueKey: ["product_id"]`<br>`nonNull: ["product_id", "sku", "abc_class", "stock_status"]` |
+| **Gold** | `ferrostats_gold` | [`dim_products.sqlx`](dataform/definitions/gold/dim_products.sqlx)<br>*(Table)* | 1 row per `product_id`. Conformed catalog dimension mapping `sku` business keys to English `product_name`, `category_name`, `supplier_name`, `aisle_location`, and `catalog_margin_pct`. | `uniqueKey: ["product_id"]`<br>`nonNull: ["sku", "product_name", "category_name"]` |
 
 ---
 
-## 4. Analytical SQL: Dynamic 80/20 Pareto, DOI & Reorder Point (ROP)
+## 3. Analytical SQL: 80/20 Pareto Window Functions, DOI & Reorder Point (ROP)
 
-The Gold data mart [`dataform/definitions/gold/mart_inventory_pareto_abc.sqlx`](dataform/definitions/gold/mart_inventory_pareto_abc.sqlx) computes inventory health metrics across a rolling 30-day window using BigQuery analytical window functions:
+In [`dataform/definitions/gold/mart_inventory_pareto_abc.sqlx`](dataform/definitions/gold/mart_inventory_pareto_abc.sqlx), supply chain indicators are computed dynamically in BigQuery without hardcoded category thresholds:
 
-### 4.1 Cumulative 80/20 Pareto Window Function
+### 3.1 Monotonic Cumulative Revenue Window (`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`)
 ```sql
 WITH pareto_calc AS (
   SELECT
@@ -217,178 +138,136 @@ SELECT
   END AS abc_class
 FROM pareto_enriched;
 ```
+> **Why `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` with tie-breaking?**  
+> In BigQuery Standard SQL, an `ORDER BY` inside `SUM() OVER()` defaults to `RANGE`, which groups tied revenue values together into a single jump. Explicitly specifying `ROWS` with a deterministic tie-breaker (`units_sold_30d DESC, product_id ASC`) guarantees a strictly monotonic cumulative curve across all 30 SKUs.
 
-- **Class A (0%–80% Cumulative Revenue):** High-velocity core SKUs driving 80% of business revenue; prioritized for zero-stockout tolerance.
-- **Class B (80%–95% Cumulative Revenue):** Medium-rotation hardware items.
-- **Class C (95%–100% Cumulative Revenue):** Slow-moving tail catalog monitored to prevent working-capital lockup.
+### 3.2 Burn Rate, Days of Inventory (DOI), and Lead-Time Reorder Point (ROP)
+$$\text{Daily Burn Rate} = \frac{\text{Units Sold (30d)}}{30.0}, \qquad \text{DOI (Days)} = \frac{\text{Current Stock}}{\text{Daily Burn Rate}}$$
 
-### 4.2 Daily Burn Rate, Days of Inventory (DOI), and Lead-Time ROP
-$$\text{Daily Burn Rate} = \frac{\text{Units Sold in 30 Days}}{30.0}$$
+$$\text{Recommended Reorder Qty} = \max\Big(\text{Min Stock} + \lceil\text{Burn Rate} \times \text{Lead Time}\rceil + \lceil\text{Burn Rate} \times 15\rceil - \text{Current Stock},\; \text{Min Stock},\; 5\Big)$$
 
-$$\text{Days of Inventory Remaining (DOI)} = \frac{\text{Current Stock}}{\text{Daily Burn Rate}}$$
-
-$$\text{Recommended Reorder Quantity} = \max\Big(\text{Min Stock} + \lceil\text{Burn Rate} \times \text{Lead Time}\rceil + \lceil\text{Burn Rate} \times 15\rceil - \text{Current Stock},\; \text{Min Stock},\; 5\Big)$$
-
-Where $\lceil\text{Burn Rate} \times 15\rceil$ provides a dynamic 15-day safety buffer scaled to each SKU's real demand velocity.
+When `current_stock <= min_stock`, the formula automatically scales the replenishment order to cover the minimum threshold, expected demand during the supplier's delivery lead time (`lead_time_days`), and a **15-day safety buffer**.
 
 ---
 
-## 5. FinOps Engineering: Permanent $0.00 USD/Month Architecture
+## 4. OLTP-to-OLAP Ingestion Integrity & FinOps Engineering ($0.00/mo)
 
-FERROSTATS enforces a machine-readable **Zero Fixed-Cost Cloud Policy** ([`finops/gcp_free_tier_policy.json`](finops/gcp_free_tier_policy.json)) within Google Cloud's Always Free Tier (~$40/mo saved compared to standard Cloud SQL + VPC Connector setups):
+### 4.1 Edge Concurrency & Idempotency Rules ([`app/api/routes_pos.py`](app/api/routes_pos.py))
+- **Immediate Write Serialization (`BEGIN IMMEDIATE`):** Prevents `SQLITE_BUSY` read-to-write upgrade deadlocks under concurrent requests.
+- **Guarded Atomic Stock Decrement (`0%` Overselling):**
+  ```sql
+  UPDATE products
+  SET current_stock = current_stock - ?, updated_at = ?
+  WHERE product_id = ? AND current_stock >= ?;
+  ```
+  If `cursor.rowcount == 0`, the transaction triggers an immediate `ROLLBACK` and returns `HTTP 409 Conflict`.
+- **UUID Idempotency Replay:** Every transaction requires a client `transaction_uuid`. Retrying a committed UUID returns `HTTP 200 OK` with `Idempotent-Replay: true` without double-decrementing stock or emitting duplicate rows to BigQuery.
 
-| GCP Service | Always Free Tier Monthly Allowance | FERROSTATS Actual Usage | Monthly Cost |
+### 4.2 Permanent $0.00 USD/Month GCP FinOps Architecture ([`finops/gcp_free_tier_policy.json`](finops/gcp_free_tier_policy.json))
+By replacing persistent Cloud SQL instances (~$25/mo) and Serverless VPC Connectors (~$15/mo) with scale-to-zero Cloud Run containers, metadata OAuth tokens, and BigQuery Free Tier datasets, the platform saves **~$40/month** and runs permanently at **$0.00/mo**:
+
+| GCP Service | Always Free Tier Limit | FERROSTATS Footprint | Billed Cost |
 |---|---|---|:---:|
-| **Google Cloud Run** | 2,000,000 requests + 360,000 vCPU-sec | ~15,000 requests (`min-instances = 0`, `<3 s` cold start) | **$0.00 USD** |
-| **Google BigQuery** | 10 GB active storage + 1 TB query scan / mo | < 50 MB storage + < 25 MB query scan / mo | **$0.00 USD** |
-| **Google Dataform** | Free SQLX repositories, workspaces & DAG runs | 1 repository (`ferrostats-pipeline`) | **$0.00 USD** |
-| **Google Looker Studio** | Free BI reporting & native BigQuery connector | 3-page dashboard connected to `ferrostats_gold` | **$0.00 USD** |
-| **Google Artifact Registry** | 0.5 GB container image storage / mo | Kept < 0.3 GB via automated digest pruning in `deploy_gcp` | **$0.00 USD** |
-| **Cloud SQL (Managed RDBMS)** | *Prohibited (~$15–$25/mo + IPv4 charges)* | Replaced by edge SQLite WAL + BigQuery Bronze streaming | **$0.00 USD** |
-| **Serverless VPC Connectors** | *Prohibited (~$14/mo per connector)* | Replaced by IAM service-account metadata OAuth tokens | **$0.00 USD** |
-| **TOTAL MONTHLY BILL** | — | — | **$0.00 USD** |
+| **Google BigQuery** | 10 GB storage + 1 TB query scan / mo | < 50 MB storage + < 25 MB scan / mo (pre-aggregated Gold tables) | **$0.00 USD** |
+| **Google Dataform** | Free SQLX repositories & workspaces | 1 repository (`ferrostats-pipeline`) | **$0.00 USD** |
+| **Google Looker Studio** | Free BI reporting & native connector | 3-page dashboard connected to `ferrostats_gold` | **$0.00 USD** |
+| **Google Cloud Run** | 2M requests + 360,000 vCPU-sec / mo | ~15,000 req/mo (`--min-instances 0`, `<3 s` cold start) | **$0.00 USD** |
+| **Google Artifact Registry** | 0.5 GB container storage / mo | Kept `< 0.3 GB` via automated image digest pruning in `deploy_gcp.ps1` | **$0.00 USD** |
+| **Cloud SQL & VPC Connectors** | *Prohibited (Fixed hourly billing)* | Replaced by edge SQLite WAL + IAM metadata REST streaming | **$0.00 USD** |
 
 ---
 
-## 6. Architectural Defense & System Design Q&A
+## 5. Engineering Authorship & Spec-Driven Development (SDD) Transparency
 
-### Q1: Why pair SQLite WAL on the edge with BigQuery instead of provisioning Cloud SQL PostgreSQL?
-> **Answer:** Cloud SQL charges ~$15–$25/month in continuous instance uptime plus static IPv4 fees even at zero traffic. By combining local SQLite in `WAL` mode on scale-to-zero Cloud Run with asynchronous REST streaming into Google BigQuery, the system achieves `<50 ms` transactional checkout latency, zero network roundtrips during point-of-sale locking, complete separation between OLTP and OLAP workloads, and a permanent **$0.00/mo** infrastructure footprint.
+To clearly distinguish **Data Engineering ownership** from **AI-assisted frontend scaffolding**, the table below documents how each layer of the repository was built:
 
-### Q2: How does the pipeline guarantee 0% overselling and prevent duplicate transactions?
-> **Answer:** Concurrency and idempotency are enforced at four levels:
-> 1. `BEGIN IMMEDIATE TRANSACTION` acquires an immediate write lock in SQLite WAL before reading `current_stock`, serializing concurrent checkout requests.
-> 2. Stock decrements execute an atomic SQL guard (`UPDATE products SET current_stock = current_stock - :qty WHERE product_id = :id AND current_stock >= :qty`). If `cursor.rowcount == 0`, an instant `ROLLBACK` triggers and returns `HTTP 409 Conflict`.
-> 3. Every checkout requires a client-generated `transaction_uuid`. Replaying a committed UUID returns `HTTP 200 OK` with `Idempotent-Replay: true` and the cached receipt without re-decrementing inventory or re-emitting duplicate events.
-> 4. In the Lakehouse, Dataform Silver models validate `uniqueKey` assertions on `sale_id`, `sale_item_id`, and `product_id`.
-
-### Q3: Why use SKU codes alongside `dim_products` across POS and BI?
-> **Answer:** Following dimensional modeling best practices, short immutable codes (`sku` such as `HM-002`, `MC-001`, `FP-004` and `category_code` such as `HERR_MAN`, `MAT_CONST`) act as language-neutral business keys across operational logs, while [`ferrostats_gold.dim_products`](dataform/definitions/gold/dim_products.sqlx) serves as the canonical catalog dimension mapping every `sku` to its standardized English `product_name`, `category_name`, `aisle_location`, and pricing attributes in both the POS and Looker Studio.
+| Layer / Component | Engineering Ownership | Implementation Details |
+|---|---|---|
+| **BigQuery Medallion Architecture (`Bronze` / `Silver` / `Gold`)** | **100% Designed & Engineered by Author**<br>*(Diego Alejandro Escobar Barahona)* | Dataset topology, table grains, `QUALIFY ROW_NUMBER()` deduplication, and Star Schema modeling (`fct_daily_sales`, `mart_inventory_pareto_abc`, `dim_products`). |
+| **Dataform SQLX DAG, Assertions & Analytical Window SQL** | **100% Engineered by Author**<br>*(Diego Alejandro Escobar Barahona)* | Declarative `.sqlx` definitions, `uniqueKey`/`nonNull`/`rowConditions` quality gates, and 80/20 Pareto / Burn Rate / DOI / ROP window formulas. |
+| **GCP FinOps Policy, IAM Metadata Streaming & Cloud Deployment** | **100% Engineered by Author**<br>*(Diego Alejandro Escobar Barahona)* | Zero-cost architecture design, metadata OAuth REST ingestion (`bigquery_sync.py`), Artifact Registry pruning (`deploy_gcp.ps1`), and Looker Studio dashboard. |
+| **OLTP Data Contracts, 3NF Schema & ACID Concurrency Rules** | **Specified by Author via SDD ([`specs/`](specs/))**<br>+ *Verified via Automated QA (`smoke_test.py`)* | Formal specification of 3NF tables, `BEGIN IMMEDIATE` locking, guarded stock updates, and `transaction_uuid` idempotency. |
+| **Web Simulator UI (`app/static/*.html`, `*.js`, `*.css`)** | **SDD + AI-Generated Scaffolding**<br>*(Governed by [`spec_05`](specs/spec_05_commit_5_frontend_bi_pos_and_mobile.md))* | Because the author's focus is **Data Engineering** (not frontend web design), the HTML/CSS/JS views were generated from formal specs strictly to serve as a visual event generator for the pipeline. |
 
 ---
 
-## 7. Demo Visual Showcase
+## 6. Data Platform & Pipeline Visual Showcase
 
-| Component | Interface Preview |
+| Pipeline Stage | Technical Preview |
 |---|---|
-| **Point-of-Sale (POS) Event Producer**<br>*Sub-50ms ACID checkout & SKU catalog* | ![POS Terminal](assets/capturas/01_pos_mostrador.png) |
-| **Fiscal Receipt & Idempotency Token**<br>*UUID transaction confirmation & 13% tax breakdown* | ![Sale Confirmation](assets/capturas/02_confirmar_venta.png) |
-| **Warehouse Aisle Audit & ROP Table**<br>*Aisles A–E stock status (`OPTIMAL`, `LOW_STOCK`, `OUT_OF_STOCK`)* | ![Warehouse Aisles](assets/capturas/03_bodega_pasillos.png) |
-| **Looker Studio BI — Page 1**<br>*Daily revenue, gross margin, and category performance* | ![Looker Page 1](assets/capturas/04_inteligencia_negocio_looker_pag1.png) |
-| **Looker Studio BI — Page 2**<br>*80/20 Pareto ABC matrix, Daily Burn Rate, and DOI* | ![Looker Page 2](assets/capturas/05_inteligencia_negocio_looker_pag2.png) |
-| **Looker Studio BI — Page 3**<br>*Working capital valuation by ABC classification* | ![Looker Page 3](assets/capturas/06_looker_ventas_pag3.png) |
-| **Google BigQuery Data Warehouse**<br>*`ferrostats_bronze`, `ferrostats_silver`, and `ferrostats_gold`* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
-| **Google Cloud Dataform Pipeline**<br>*Declarative SQLX DAG and Data Quality assertions* | ![Dataform Console](assets/capturas/08_dataform.png) |
+| **1. Google Cloud Dataform (SQLX DAG)**<br>*Compiled Medallion dependency graph (`raw_*` $\to$ `stg_*` $\to$ Gold marts & assertions)* | ![Dataform Console](assets/capturas/08_dataform.png) |
+| **2. Google BigQuery Data Warehouse**<br>*`ferrostats_bronze` (7 raw tables), `ferrostats_silver` (3 views), and `ferrostats_gold` (3 Star Schema marts)* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
+| **3. Looker Studio BI — Page 1 (Sales Fact)**<br>*Powered by `ferrostats_gold.fct_daily_sales`: Revenue, COGS, and gross margin trends* | ![Looker Page 1](assets/capturas/04_inteligencia_negocio_looker_pag1.png) |
+| **4. Looker Studio BI — Page 2 (Pareto & DOI)**<br>*Powered by `ferrostats_gold.mart_inventory_pareto_abc`: 80/20 ABC matrix, Burn Rate & DOI* | ![Looker Page 2](assets/capturas/05_inteligencia_negocio_looker_pag2.png) |
+| **5. Looker Studio BI — Page 3 (Capital Valuation)**<br>*Powered by `dim_products` & `mart_inventory_pareto_abc`: Working capital valuation by ABC class* | ![Looker Page 3](assets/capturas/06_looker_ventas_pag3.png) |
+| **6. Upstream Source A — POS Event Producer (`/pos`)**<br>*Synthetic OLTP checkout generator streaming sales into `ferrostats_bronze.raw_sales`* | ![POS Event Producer](assets/capturas/01_pos_mostrador.png) |
+| **7. Upstream Source B — Inventory & ROP Monitor (`/`)**<br>*Aisle stock audit and replenishment priority table streaming movements into `raw_inventory_movements`* | ![Inventory Audit & ROP](assets/capturas/03_bodega_pasillos.png) |
 
 ---
 
-## 8. Repository Structure
+## 7. Repository Structure (Data Engineering First)
 
 ```text
 ferrostats/
-├── dataform/                      # Google Cloud Dataform Medallion Pipeline (SQLX)
+├── dataform/                      # [CORE] Google Cloud Dataform Medallion Pipeline (SQLX)
 │   ├── definitions/
-│   │   ├── sources/               # BigQuery Bronze source declarations (sources.js)
-│   │   ├── silver/                # Curated Silver views & DQ assertions (stg_sales, stg_sale_items, stg_products)
-│   │   └── gold/                  # Gold Star Schema marts (fct_daily_sales, mart_inventory_pareto_abc, dim_products)
+│   │   ├── sources/               # 7 BigQuery Bronze source declarations (sources.js)
+│   │   ├── silver/                # 3 Silver views + DQ assertions (stg_sales, stg_sale_items, stg_products)
+│   │   └── gold/                  # 3 Gold Star Schema marts (fct_daily_sales, mart_inventory_pareto_abc, dim_products)
 │   ├── package.json               # Dataform dependency configuration
-│   └── workflow_settings.yaml     # GCP project (ferrostats) and dataset defaults
+│   └── workflow_settings.yaml     # GCP project (ferrostats) and dataset defaults (US)
+├── scripts/                       # [CORE] Cloud Synchronization, Compilation & FinOps Automation
+│   ├── sync_sqlite_to_bigquery.py # Batch extraction & ingestion from local OLTP to BigQuery Bronze
+│   ├── deploy_dataform_models.py  # Compiles Silver views & Gold Star Schema tables in BigQuery
+│   ├── sync_dataform_to_gcp.py    # Pushes SQLX definitions to GCP Dataform workspace via REST API
+│   ├── smoke_test.py              # End-to-end HTTP & UUID idempotency verification suite
+│   ├── verify_zero_cost.ps1       # Automated GCP FinOps quota & billing auditor
+│   └── emergency_kill_switch.ps1  # Instant service scale-down for billing contingencies
+├── data/
+│   └── seeds/                     # Master deterministic English CSV seeds (30 SKUs, 6 categories, 6 suppliers)
 ├── app/
 │   ├── etl/
 │   │   ├── bigquery_sync.py       # Asynchronous REST streaming client into BigQuery Bronze
 │   │   └── local_pipeline.py      # Local Star Schema compiler & 6 Data Quality assertions
 │   ├── db/
-│   │   ├── connection.py          # SQLite WAL connection manager & PRAGMA tuning
 │   │   ├── schema_oltp.sql        # 3NF transactional database DDL
-│   │   ├── schema_olap.sql        # Local Star Schema analytical cache DDL
-│   │   └── seed_loader.py         # Deterministic synthetic generator (180 sales, 30 English SKUs)
-│   ├── api/
-│   │   ├── auth_rbac.py           # Header-based role simulation (X-User-Role)
-│   │   ├── routes_analytics.py    # BI KPIs, Pareto marts, and Dataform observability endpoints
-│   │   ├── routes_inventory.py    # Warehouse aisle adjustments & Bronze movement streaming
-│   │   └── routes_pos.py          # Atomic ACID checkout with guarded stock decrements & UUID idempotency
-│   ├── static/                    # SDD Edge Event Producer Web Interfaces (SPA)
-│   │   ├── index.html             # Warehouse aisle audit & embedded Looker Studio BI portal
-│   │   ├── app.js                 # Warehouse adjustment & Looker Studio sync logic
-│   │   ├── pos.html               # Cashier POS checkout simulator
-│   │   ├── pos.js                 # Cart state, change calculator & receipt renderer
-│   │   └── styles.css             # Slate industrial dark theme
-│   ├── config.py                  # Environment & GCP dataset configuration
-│   └── main.py                    # FastAPI application entrypoint
-├── data/
-│   ├── db/                        # Local SQLite WAL mount point (.gitignore protected)
-│   └── seeds/                     # Master English CSV seeds (products_sku, categories, suppliers, users)
-├── scripts/
-│   ├── sync_sqlite_to_bigquery.py # Full Bronze batch synchronization (SQLite -> BigQuery Bronze)
-│   ├── deploy_dataform_models.py  # Compiles Silver views & Gold Star Schema tables in BigQuery
-│   ├── sync_dataform_to_gcp.py    # Uploads local SQLX files to GCP Dataform workspace via REST API
-│   ├── smoke_test.py              # End-to-end HTTP & UUID idempotency verification suite
-│   ├── verify_zero_cost.ps1       # Automated GCP FinOps quota & billing auditor
-│   └── emergency_kill_switch.ps1  # Instant service scale-down for billing contingencies
+│   │   ├── schema_olap.sql        # Local Star Schema analytical DDL
+│   │   └── seed_loader.py         # Deterministic synthetic generator (180 historical sales, Seed=2026)
+│   ├── api/                       # FastAPI Ingestion & Observability Endpoints
+│   └── static/                    # SDD Synthetic Event Producer UI (POS & Warehouse Simulator)
 ├── finops/
 │   └── gcp_free_tier_policy.json  # Machine-readable $0.00/mo FinOps guardrails
 ├── specs/                         # Formal Spec-Driven Development (SDD) Architectural Blueprints (01–07)
-├── docs/
-│   └── architecture_flow.md       # Mermaid end-to-end data lineage specification
-├── assets/                        # Architecture diagrams, presentation deck, and UI screenshots
-├── Dockerfile                     # Multi-stage Python 3.11-slim container definition
-├── deploy_gcp.ps1                 # Scale-to-zero Cloud Run deployment & Artifact Registry pruning
-└── requirements.txt               # Production Python dependencies
+└── deploy_gcp.ps1                 # Scale-to-zero Cloud Run deployment & Artifact Registry pruning
 ```
 
 ---
 
-## 9. Local Quickstart & Cloud Synchronization
+## 8. Quickstart: Run the ETL & Sync to Google BigQuery
 
-### 1. Clone and set up virtual environment
 ```bash
-git clone https://github.com/bapatata688/Ferrostats.git
-cd Ferrostats
-python -m venv .venv
-
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-# Linux / macOS:
-source .venv/bin/activate
-
+# 1. Install dependencies
 pip install --no-cache-dir -r requirements.txt
-```
 
-### 2. Initialize deterministic English seeds & run local Star Schema ETL
-```bash
+# 2. Generate deterministic 30-SKU catalog, 180 historical sales & run local DQ assertions
 python -m app.db.seed_loader
-```
 
-### 3. Launch the local server & run smoke tests
-```bash
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
-```
-In a second terminal, verify all endpoints and UUID idempotency replay:
-```bash
-python scripts/smoke_test.py
-```
-
-### 4. Synchronize Bronze, Silver & Gold layers to Google BigQuery & Dataform
-```bash
+# 3. Synchronize raw tables to BigQuery Bronze & compile Silver/Gold Dataform models
 python scripts/sync_sqlite_to_bigquery.py
 python scripts/deploy_dataform_models.py
 python scripts/sync_dataform_to_gcp.py
+
+# 4. (Optional) Launch the local event producer server & run idempotency smoke tests
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8080
+python scripts/smoke_test.py
 ```
 
 ---
 
-## 10. Known Limitations & Portfolio Trade-offs
+## 9. Author & Contact
 
-This repository is engineered to demonstrate a production-grade **Data Engineering Lakehouse** within a permanent **$0.00 USD/month FinOps constraint**:
-1. **Header-Based Role Simulation vs. Enterprise IAM:** `app/api/auth_rbac.py` simulates roles via the `X-User-Role` HTTP header so reviewers can test all endpoints freely without login barriers. Production deployments would sit behind Google Cloud Identity-Aware Proxy (IAP) or OIDC JWT verification.
-2. **Ephemeral Edge Container State vs. Multi-Region OLTP:** Local SQLite WAL state lives inside the scale-to-zero Cloud Run instance (auto-seeded on cold start), while **Google BigQuery** serves as the persistent cloud analytical system of record.
-
----
-
-## 11. Lead Data Architect & Contact
-
-- **Author & Lead Data Architect:** Diego Alejandro Escobar Barahona
+- **Author:** Diego Alejandro Escobar Barahona — *Data Engineer*
 - **Certification:** [Google Cloud Certified — Associate Data Practitioner](https://www.credly.com/badges/e27fea72-5eaf-47ee-a43c-43faa3a8fb10) (Credential ID: `23e3584a246f4c149f26fea03cebcbbb`)
 - **LinkedIn:** [linkedin.com/in/diego-escobar-459256394](https://linkedin.com/in/diego-escobar-459256394)
 - **Email:** `diegoalejandroescobarahona1@gmail.com`
-- **License:** Released under the [MIT License](LICENSE).
+- **License:** [MIT License](LICENSE)
