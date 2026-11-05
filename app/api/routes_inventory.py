@@ -82,11 +82,11 @@ def list_products(
             p.min_stock,
             p.aisle_location,
             p.updated_at,
-            COALESCE(m.stock_status, CASE
+            CASE
                 WHEN p.current_stock = 0 THEN 'OUT_OF_STOCK'
                 WHEN p.current_stock <= p.min_stock THEN 'LOW_STOCK'
                 ELSE 'OPTIMAL'
-            END) AS stock_status,
+            END AS stock_status,
             COALESCE(m.abc_class, 'C') AS abc_class,
             COALESCE(m.daily_burn_rate, 0.0) AS daily_burn_rate,
             COALESCE(m.days_of_inventory_left, 999.0) AS days_of_inventory_left,

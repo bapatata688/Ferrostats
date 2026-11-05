@@ -117,6 +117,7 @@ def get_bi_dashboard(
                 m.sku,
                 m.product_name,
                 m.category_name,
+                p.aisle_location,
                 m.current_stock,
                 m.min_stock,
                 m.daily_burn_rate,

@@ -671,8 +671,17 @@ function showReceiptModal(txData) {
   const ticketUuid = escapeHtml(txData.transaction_uuid || `TICKET-${txData.sale_id || Date.now()}`);
   const ticketDate = escapeHtml(txData.timestamp || txData.sale_timestamp || new Date().toLocaleString());
   const cashier = escapeHtml(txData.cashier_name || `Cashier #${txData.user_id || 1}`);
-  const paymentMethod = escapeHtml(txData.payment_method || 'CASH');
-  const isEfectivo = paymentMethod === 'EFECTIVO' || paymentMethod === 'CASH';
+  const rawMethod = (txData.payment_method || 'CASH').toUpperCase();
+  let paymentMethodLabel = rawMethod;
+  if (rawMethod === 'EFECTIVO' || rawMethod === 'CASH') {
+    paymentMethodLabel = t('paymentCash');
+  } else if (rawMethod === 'TRANSFERENCIA_QR' || rawMethod === 'QR_TRANSFER') {
+    paymentMethodLabel = t('paymentQr');
+  } else if (rawMethod === 'TARJETA' || rawMethod === 'CARD') {
+    paymentMethodLabel = t('paymentCard');
+  }
+  const paymentMethod = escapeHtml(paymentMethodLabel);
+  const isEfectivo = rawMethod === 'EFECTIVO' || rawMethod === 'CASH';
   const cashGiven = Number(txData.cash_given ?? totalAmount);
   const cashChange = Number(txData.cash_change ?? 0);
 
