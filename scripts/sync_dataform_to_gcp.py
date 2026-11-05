@@ -1,75 +1,98 @@
-import os
-import sys
-import json
+#!/usr/bin/env python3
+"""
+FERROSTATS: SYNC LOCAL DATAFORM SQLX FILES TO GCP DATAFORM WORKSPACE
+Uploads all files under `dataform/` to the Google Cloud Dataform workspace
+`projects/ferrostats/locations/us-central1/repositories/ferrostats-pipeline/workspaces/main-workspace`
+and removes any deprecated Spanish Gold `.sqlx` definitions.
+"""
 import base64
+import json
+import os
+import subprocess
 import urllib.request
 import urllib.error
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-
-from scripts.deploy_dataform_models import get_access_token
-DATAFORM_DIR = BASE_DIR / "dataform"
-PROJECT_ID = "ferrostats"
+PROJECT_ID = os.getenv("GCP_PROJECT_ID", "ferrostats")
 LOCATION = "us-central1"
-REPO_ID = "ferrostats-pipeline"
-WORKSPACE_ID = "main-workspace"
+REPO = "ferrostats-pipeline"
+WORKSPACE = "main-workspace"
+
+GCLOUD_CMD = os.path.expandvars(r"%LOCALAPPDATA%\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd")
+if not os.path.exists(GCLOUD_CMD):
+    GCLOUD_CMD = "gcloud"
+
+
+def get_token() -> str:
+    res = subprocess.run([GCLOUD_CMD, "auth", "print-access-token"], capture_output=True, text=True, check=True)
+    return res.stdout.strip()
+
+
+def write_workspace_file(token: str, relative_path: str, content_bytes: bytes):
+    ws_path = f"projects/{PROJECT_ID}/locations/{LOCATION}/repositories/{REPO}/workspaces/{WORKSPACE}"
+    url = f"https://dataform.googleapis.com/v1beta1/{ws_path}:writeFile"
+    payload = {
+        "path": relative_path,
+        "contents": base64.b64encode(content_bytes).decode("ascii")
+    }
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            resp.read()
+            print(f"[OK] Uploaded to Dataform Workspace: {relative_path}")
+    except urllib.error.HTTPError as e:
+        print(f"[ERROR] Uploading {relative_path}: {e.code} -> {e.read().decode('utf-8')}")
+        raise
+
+
+def remove_workspace_file(token: str, relative_path: str):
+    ws_path = f"projects/{PROJECT_ID}/locations/{LOCATION}/repositories/{REPO}/workspaces/{WORKSPACE}"
+    url = f"https://dataform.googleapis.com/v1beta1/{ws_path}:removeFile"
+    payload = {"path": relative_path}
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            resp.read()
+            print(f"[OK] Removed legacy file from Dataform Workspace: {relative_path}")
+    except urllib.error.HTTPError as e:
+        if e.code == 404 or e.code == 400:
+            print(f"[SKIP] Legacy file already absent in Dataform Workspace: {relative_path}")
+        else:
+            print(f"[WARN] Could not remove {relative_path}: {e.code}")
+
 
 def main():
-    print("=" * 65)
-    print("  SINCRONIZANDO ARCHIVOS SQLX A GOOGLE CLOUD DATAFORM CONSOLE")
-    print("=" * 65)
-    token = get_access_token()
+    base_dir = Path(__file__).resolve().parent.parent / "dataform"
+    token = get_token()
 
-    workspace_full = f"projects/{PROJECT_ID}/locations/{LOCATION}/repositories/{REPO_ID}/workspaces/{WORKSPACE_ID}"
+    # Remove deprecated Spanish Gold SQLX files from remote workspace if present
+    legacy_files = [
+        "definitions/gold/dim_productos.sqlx",
+        "definitions/gold/fct_ventas_diarias.sqlx",
+        "definitions/gold/mart_inventario_pareto_abc.sqlx",
+    ]
+    for old_path in legacy_files:
+        remove_workspace_file(token, old_path)
 
-    # Recorrer todos los archivos dentro de dataform/
-    files_to_sync = []
-    for root, dirs, files in os.walk(DATAFORM_DIR):
-        for f in files:
-            full_path = Path(root) / f
-            rel_path = full_path.relative_to(DATAFORM_DIR).as_posix()
-            files_to_sync.append((rel_path, full_path))
+    for file_path in sorted(base_dir.rglob("*")):
+        if file_path.is_file():
+            rel_path = file_path.relative_to(base_dir).as_posix()
+            write_workspace_file(token, rel_path, file_path.read_bytes())
 
-    print(f"Total de archivos a subir a GCP Dataform: {len(files_to_sync)}\n")
+    print("=================================================================")
+    print("  [SUCCESS] ALL DATAFORM SQLX FILES SYNCHRONIZED TO GCP!")
+    print("=================================================================")
 
-    for rel_path, full_path in files_to_sync:
-        with open(full_path, "rb") as fp:
-            content_bytes = fp.read()
-        
-        b64_content = base64.b64encode(content_bytes).decode("ascii")
-
-        url = f"https://dataform.googleapis.com/v1beta1/{workspace_full}:writeFile"
-        payload = {
-            "path": rel_path,
-            "contents": b64_content
-        }
-
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
-            },
-            method="POST"
-        )
-
-        try:
-            with urllib.request.urlopen(req) as resp:
-                print(f"[OK] Subido a Dataform: {rel_path}")
-        except urllib.error.HTTPError as err:
-            err_text = err.read().decode("utf-8")
-            print(f"[ERR] Fallo al subir {rel_path} ({err.code}): {err_text}")
-
-    print("\n" + "=" * 65)
-    print("  ¡TODOS LOS ARCHIVOS SQLX Y CONFIGURACIONES SUBIDOS A DATAFORM!")
-    print(f"  Repositorio: {REPO_ID}")
-    print(f"  Espacio de trabajo: {WORKSPACE_ID}")
-    print(f"  Consola Web: https://console.cloud.google.com/bigquery/dataform/locations/{LOCATION}/repositories/{REPO_ID}/workspaces/{WORKSPACE_ID}?project={PROJECT_ID}")
-    print("=" * 65)
 
 if __name__ == "__main__":
     main()

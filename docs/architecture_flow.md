@@ -1,36 +1,38 @@
 flowchart TD
-    subgraph ClientLayer["1. Clientes Web & Móvil (POS / Bodega)"]
-        UI_POS["Terminal Caja / POS (Móvil & Desktop)"]
-        UI_BI["Portal Gerencial (Bodega & Bento BI)"]
+    subgraph ClientLayer["1. Edge Event Producers (SDD Web / POS Simulators)"]
+        UI_POS["POS Cashier Terminal (/pos)\nSynthetic Transaction Producer"]
+        UI_BI["Warehouse & BI Portal (/)\nAisle Audit & Embedded Looker BI"]
     end
 
-    subgraph ServerlessLayer["2. Cloud Run (Scale-to-Zero — $0.00 USD)"]
-        FastAPI["API REST FastAPI (Python 3.11)"]
+    subgraph ServerlessLayer["2. Cloud Run Serverless Edge (Scale-to-Zero — $0.00 USD)"]
+        FastAPI["FastAPI Ingestion & REST API (Python 3.11)"]
         
-        subgraph IngestaOLTP["Motor Transaccional (OLTP)"]
-            SQLite["SQLite WAL (/tmp in-memory)<br/>• ACID Atómico (&lt; 5 ms)<br/>• 3ra Forma Normal"]
+        subgraph IngestaOLTP["Local Edge OLTP Engine"]
+            SQLite["SQLite WAL\n• BEGIN IMMEDIATE ACID (< 50 ms)\n• 3NF Operational Schema"]
         end
 
-        subgraph EngineETL["Motor ETL de Ingeniería de Datos"]
-            Extract["Extract: Ventas & Movimientos"]
-            DQ["6 Data Quality Gates (Validación)"]
-            Transform["Transform: Pareto 80/20 ABC, Burn Rate, DOI, ROP"]
-            Load["Load: Esquema Estrella OLAP"]
+        subgraph EngineETL["Hybrid Data Engineering Pipeline"]
+            Extract["Extract & Stream: Sales & Movements"]
+            DQ["6 Data Quality Gates (Assertions)"]
+            Transform["Transform: 80/20 Pareto ABC, Burn Rate, DOI, ROP"]
+            Load["Load: Star Schema OLAP Marts"]
         end
 
         FastAPI --> IngestaOLTP
         IngestaOLTP --> EngineETL
     end
 
-    subgraph AnalyticsLayer["3. Capa Analítica & Data Warehouse ($0.00 USD)"]
-        StarSchema["Esquema Estrella Local<br/>• dw_fact_daily_sales<br/>• dw_mart_product_abc_health"]
-        BQ["Google BigQuery Free Tier (Sandbox)<br/>• Dataset: ferrostats_dw<br/>• 10 GB almacenamiento gratis<br/>• 1 TB consultas/mes gratis"]
-        Looker["Looker Studio (Embebido)"]
+    subgraph AnalyticsLayer["3. Google Cloud Medallion Lakehouse ($0.00 USD Free Tier)"]
+        Bronze["BigQuery Bronze (ferrostats_bronze)\n• raw_sales, raw_sale_items\n• raw_products, raw_inventory_movements"]
+        Silver["Dataform Silver Views (ferrostats_silver)\n• stg_sales, stg_sale_items, stg_products\n• uniqueKey, nonNull, rowConditions"]
+        Gold["BigQuery Gold Star Marts (ferrostats_gold)\n• fct_daily_sales\n• mart_inventory_pareto_abc\n• dim_products"]
+        Looker["Google Looker Studio (3-Page Executive BI)"]
         
-        EngineETL --> StarSchema
-        EngineETL -.->|"bigquery_sync.py (Micro-Batch)"| BQ
-        BQ -.-> Looker
-        StarSchema --> UI_BI
+        EngineETL -.->|"bigquery_sync.py (Async REST Stream)"| Bronze
+        Bronze --> Silver
+        Silver --> Gold
+        Gold --> Looker
+        Looker -.-> UI_BI
     end
 
     UI_POS --> FastAPI

@@ -215,15 +215,15 @@ def compute_product_abc_health_mart(conn: sqlite3.Connection) -> List[Dict[str, 
         else:
             abc_class = "C"
 
-        # Inventory stock status
+        # Inventory stock status (English canonical enum)
         c_stock = int(p["current_stock"])
         m_stock = int(p["min_stock"])
         if c_stock == 0:
-            stock_status = "AGOTADO"
+            stock_status = "OUT_OF_STOCK"
         elif c_stock <= m_stock:
-            stock_status = "BAJO_STOCK"
+            stock_status = "LOW_STOCK"
         else:
-            stock_status = "OPTIMO"
+            stock_status = "OPTIMAL"
 
         # Burn rate and Days of Inventory (DOI)
         units_30d = int(p["units_sold_30d"])

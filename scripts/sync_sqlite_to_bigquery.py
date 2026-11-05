@@ -102,7 +102,14 @@ def sync_table_to_bq(cursor, table_name: str, target_dataset: str, target_table:
             "mode": "NULLABLE"
         })
     
-    # 1. Crear tabla si no existe
+    # 1. Recreate table cleanly (drops any legacy Spanish rows or stale schemas)
+    try:
+        del_url = f"https://bigquery.googleapis.com/bigquery/v2/projects/{PROJECT_ID}/datasets/{target_dataset}/tables/{target_table}"
+        del_req = urllib.request.Request(del_url, headers={"Authorization": f"Bearer {token}"}, method="DELETE")
+        urllib.request.urlopen(del_req).read()
+    except Exception:
+        pass
+
     table_data = {
         "tableReference": {
             "projectId": PROJECT_ID,
@@ -175,16 +182,6 @@ def main():
     print("\n>>> SINCRONIZANDO CAPA BRONZE (RAW) <<<")
     for src, dst in bronze_tables:
         sync_table_to_bq(cursor, src, BRONZE_DATASET, dst, token)
-
-    # 4. Tablas Gold (Data Marts listos para Looker Studio)
-    gold_tables = [
-        ("dw_fact_daily_sales", "dw_fact_daily_sales"),
-        ("dw_mart_product_abc_health", "dw_mart_product_abc_health")
-    ]
-
-    print("\n>>> SINCRONIZANDO CAPA GOLD (DATA MARTS / LOOKER READY) <<<")
-    for src, dst in gold_tables:
-        sync_table_to_bq(cursor, src, GOLD_DATASET, dst, token)
 
     conn.close()
 

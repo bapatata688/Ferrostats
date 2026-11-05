@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS dw_mart_product_abc_health (
     category_name TEXT NOT NULL,
     current_stock INTEGER NOT NULL,
     min_stock INTEGER NOT NULL,
-    stock_status TEXT NOT NULL CHECK (stock_status IN ('OPTIMO', 'BAJO_STOCK', 'AGOTADO')),
+    stock_status TEXT NOT NULL CHECK (stock_status IN ('OPTIMAL', 'LOW_STOCK', 'OUT_OF_STOCK', 'OPTIMO', 'BAJO_STOCK', 'AGOTADO')),
     units_sold_30d INTEGER NOT NULL,
     revenue_30d_usd REAL NOT NULL,
     profit_30d_usd REAL NOT NULL,

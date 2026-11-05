@@ -246,14 +246,14 @@ def generate_historical_sales_if_empty() -> None:
                             -item["quantity"],
                             p_info["current_stock"] + item["quantity"],
                             p_info["current_stock"],
-                            f"Venta mostrador ticket #{sale_id} ({tx_uuid[:16]})"
+                            f"POS counter sale ticket #{sale_id} ({tx_uuid[:16]})"
                         )
                     )
 
                 sale_counter += 1
 
         # 15 Registros de INGRESO_PROVEEDOR por Bodeguero (rflores, user_id 4)
-        print("--> Generando 15 ingresos de proveedor y 8 ajustes de auditoría en bodega...")
+        print("--> Generating 15 supplier restock entries and 8 warehouse audit adjustments...")
         ingresos_skus = ["MC-001", "MC-002", "HE-003", "FP-001", "TF-001", "PQ-001", "HM-001", "HM-003", "HE-004", "MC-004", "PQ-004", "FP-004", "HM-005", "TF-004", "FP-002"]
         for idx, sku in enumerate(ingresos_skus):
             p = next(x for x in products if x["sku"] == sku)
@@ -274,7 +274,7 @@ def generate_historical_sales_if_empty() -> None:
                     qty_in,
                     p["current_stock"],
                     p["current_stock"] + qty_in,
-                    f"Recepción lote #{1000 + idx} proveedor en pasillo {p['aisle_location']}"
+                    f"Supplier batch #{1000 + idx} received at {p['aisle_location']}"
                 )
             )
 
@@ -299,7 +299,7 @@ def generate_historical_sales_if_empty() -> None:
                     delta,
                     p["current_stock"],
                     max(0, p["current_stock"] + delta),
-                    f"Ajuste físico cíclico por conteo de pasillo ({sku})"
+                    f"Physical cycle count adjustment at aisle ({sku})"
                 )
             )
 

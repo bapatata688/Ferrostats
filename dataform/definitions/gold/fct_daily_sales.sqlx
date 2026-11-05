@@ -1,0 +1,49 @@
+config {
+  type: "table",
+  schema: "ferrostats_gold",
+  name: "fct_daily_sales",
+  description: "Gold Layer: Daily sales fact table aggregated by date and hardware category for Google Looker Studio.",
+  assertions: {
+    uniqueKey: ["date_key", "category_code"],
+    nonNull: ["date_key", "category_code", "gross_revenue_usd"]
+  }
+}
+
+WITH daily_sales_base AS (
+  SELECT
+    s.date_key,
+    s.sale_date,
+    p.category_code,
+    p.category_name,
+    COUNT(DISTINCT s.sale_id) AS total_transactions,
+    SUM(si.quantity) AS units_sold,
+    ROUND(SUM(si.subtotal_usd), 2) AS gross_revenue_usd,
+    ROUND(SUM(si.item_cogs_usd), 2) AS cogs_usd,
+    ROUND(SUM(si.item_profit_usd), 2) AS gross_profit_usd
+  FROM
+    ${ref("stg_sales")} s
+  INNER JOIN
+    ${ref("stg_sale_items")} si ON s.sale_id = si.sale_id
+  INNER JOIN
+    ${ref("stg_products")} p ON si.product_id = p.product_id
+  GROUP BY
+    1, 2, 3, 4
+)
+
+SELECT
+  date_key,
+  sale_date,
+  category_code,
+  category_name,
+  total_transactions,
+  units_sold,
+  gross_revenue_usd,
+  cogs_usd,
+  gross_profit_usd,
+  ROUND(SAFE_DIVIDE(gross_profit_usd, NULLIF(gross_revenue_usd, 0)) * 100.0, 2) AS gross_margin_pct,
+  CURRENT_TIMESTAMP() AS etl_updated_at
+FROM
+  daily_sales_base
+ORDER BY
+  date_key DESC, gross_revenue_usd DESC
+

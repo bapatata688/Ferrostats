@@ -272,16 +272,16 @@ def get_dataform_observability(
                     "dataset": "ferrostats_gold",
                     "status": "LOOKER_STUDIO_READY",
                     "tables": [
-                        "fct_ventas_diarias",
-                        "mart_inventario_pareto_abc",
-                        "dim_productos"
+                        "fct_daily_sales",
+                        "mart_inventory_pareto_abc",
+                        "dim_products"
                     ]
                 }
             },
             "looker_connectors": [
-                f"{GCP_PROJECT_ID}.ferrostats_gold.fct_ventas_diarias",
-                f"{GCP_PROJECT_ID}.ferrostats_gold.mart_inventario_pareto_abc",
-                f"{GCP_PROJECT_ID}.ferrostats_gold.dim_productos"
+                f"{GCP_PROJECT_ID}.ferrostats_gold.fct_daily_sales",
+                f"{GCP_PROJECT_ID}.ferrostats_gold.mart_inventory_pareto_abc",
+                f"{GCP_PROJECT_ID}.ferrostats_gold.dim_products"
             ],
             "dataform_console_url": f"https://console.cloud.google.com/bigquery/dataform/locations/us-central1/repositories/ferrostats-pipeline/workspaces/main-workspace?project={GCP_PROJECT_ID}"
         }

@@ -1,10 +1,11 @@
 config {
   type: "table",
   schema: "ferrostats_gold",
-  description: "Dimensión maestra de productos ferreteros para Looker Studio",
+  name: "dim_products",
+  description: "Gold Layer: Master product catalog dimension table enriched for Looker Studio filtering and SKU-to-Name lookup.",
   assertions: {
     uniqueKey: ["product_id"],
-    nonNull: ["product_id", "sku", "product_name"]
+    nonNull: ["sku", "product_name", "category_name"]
   }
 }
 
@@ -13,16 +14,21 @@ SELECT
   sku,
   product_name,
   category_id,
+  category_code,
   category_name,
+  target_margin_pct,
   supplier_id,
   supplier_name,
+  lead_time_days,
   unit_measure,
   unit_cost_usd,
   unit_price_usd,
   unit_margin_usd,
+  ROUND(SAFE_DIVIDE(unit_margin_usd, NULLIF(unit_price_usd, 0)) * 100.0, 2) AS catalog_margin_pct,
   current_stock,
   min_stock,
   aisle_location,
   stock_status
 FROM
   ${ref("stg_products")}
+

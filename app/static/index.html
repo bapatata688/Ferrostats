@@ -65,14 +65,14 @@
       <!-- Aisle Filters & Critical Items Toggle -->
       <div class="warehouse-filter-container">
         <div class="aisle-pills-scroller" id="aisleTabs">
-          <button class="aisle-tab active" data-aisle="TODOS">All Aisles</button>
-          <button class="aisle-tab" data-aisle="Pasillo A">Aisle A (Hand Tools)</button>
-          <button class="aisle-tab" data-aisle="Pasillo B">Aisle B (Power Tools)</button>
-          <button class="aisle-tab" data-aisle="Pasillo C">Aisle C (Fasteners)</button>
-          <button class="aisle-tab" data-aisle="Pasillo D">Aisle D (Plumbing)</button>
-          <button class="aisle-tab" data-aisle="Pasillo E">Aisle E (Paints)</button>
-          <button class="aisle-tab" data-aisle="Bodega Pesados">Heavy Materials Yard</button>
-          <button class="aisle-tab" data-aisle="Bodega Tubos">Pipe &amp; Conduit Yard</button>
+          <button class="aisle-tab active" data-aisle="ALL">All Aisles</button>
+          <button class="aisle-tab" data-aisle="Aisle A">Aisle A (Hand Tools)</button>
+          <button class="aisle-tab" data-aisle="Aisle B">Aisle B (Power Tools)</button>
+          <button class="aisle-tab" data-aisle="Aisle C">Aisle C (Fasteners)</button>
+          <button class="aisle-tab" data-aisle="Aisle D">Aisle D (Plumbing)</button>
+          <button class="aisle-tab" data-aisle="Aisle E">Aisle E (Paints)</button>
+          <button class="aisle-tab" data-aisle="Heavy Materials Yard">Heavy Materials Yard</button>
+          <button class="aisle-tab" data-aisle="Pipe &amp; Conduit Yard">Pipe &amp; Conduit Yard</button>
         </div>
         
         <label class="filter-critical-checkbox">
@@ -136,9 +136,6 @@
         </div>
         
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" id="btnConfigureLookerUrl">
-            <i data-lucide="settings"></i> <span>Configure URL</span>
-          </button>
           <button class="btn btn-secondary btn-sm" id="btnReloadLooker">
             <i data-lucide="rotate-cw"></i> <span>Refresh Dataform &amp; Sync</span>
           </button>
@@ -175,15 +172,11 @@
               <ol class="looker-guide-list">
                 <li>Go to <a href="https://lookerstudio.google.com" target="_blank" class="text-accent underline font-semibold">Looker Studio</a> and create a <strong>Blank Report</strong>.</li>
                 <li>Select the connector <strong>Google BigQuery &gt; My Projects &gt; ferrostats &gt; ferrostats_gold</strong>.</li>
-                <li>Choose any of the 3 Data Marts: <strong>fct_ventas_diarias</strong>, <strong>mart_inventario_pareto_abc</strong>, or <strong>dim_productos</strong>.</li>
+                <li>Choose any of the 3 Data Marts: <strong>fct_daily_sales</strong>, <strong>mart_inventory_pareto_abc</strong>, or <strong>dim_products</strong>.</li>
                 <li>Click <strong>Share &gt; Embed report &gt; Enable embedding</strong>.</li>
-                <li>Paste your embed URL by clicking the <strong>«Configure URL»</strong> button above.</li>
               </ol>
             </div>
             <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-              <button class="btn btn-primary btn-sm" id="btnOpenConfigModalFromFallback">
-                <i data-lucide="link"></i> <span>Paste Report URL</span>
-              </button>
               <a href="https://lookerstudio.google.com" target="_blank" class="btn btn-secondary btn-sm">
                 <i data-lucide="external-link"></i> <span>Go to Looker Studio</span>
               </a>
@@ -210,7 +203,7 @@
           <div class="connector-card">
             <div class="connector-header">
               <span class="connector-tag">Facts</span>
-              <code>ferrostats_gold.fct_ventas_diarias</code>
+              <code>ferrostats_gold.fct_daily_sales</code>
             </div>
             <p class="connector-desc">Daily sales aggregated by date and category with gross margins and COGS.</p>
             <div class="connector-fields">
@@ -221,7 +214,7 @@
           <div class="connector-card">
             <div class="connector-header">
               <span class="connector-tag">Data Mart</span>
-              <code>ferrostats_gold.mart_inventario_pareto_abc</code>
+              <code>ferrostats_gold.mart_inventory_pareto_abc</code>
             </div>
             <p class="connector-desc">80/20 ABC classification, turnover velocity (Daily Burn Rate), Days of Inventory (DOI), and ROP.</p>
             <div class="connector-fields">
@@ -232,7 +225,7 @@
           <div class="connector-card">
             <div class="connector-header">
               <span class="connector-tag">Dimension</span>
-              <code>ferrostats_gold.dim_productos</code>
+              <code>ferrostats_gold.dim_products</code>
             </div>
             <p class="connector-desc">Catalog master dimension enriched with unit costs, margins, and supplier data.</p>
             <div class="connector-fields">

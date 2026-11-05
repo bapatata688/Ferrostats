@@ -1,12 +1,14 @@
 config {
   type: "view",
   schema: "ferrostats_silver",
-  description: "Ventas limpias normalizadas y validadas desde la capa Bronze",
+  name: "stg_sales",
+  description: "Silver Layer: Validated, type-cast, and deduplicated POS sales transactions with automated Data Quality assertions.",
   assertions: {
     uniqueKey: ["sale_id"],
-    nonNull: ["sale_id", "transaction_uuid", "total_amount_usd", "sale_timestamp"],
+    nonNull: ["sale_id", "transaction_uuid", "sale_timestamp", "total_amount_usd"],
     rowConditions: [
-      "total_amount_usd >= 0"
+      "total_amount_usd >= 0",
+      "total_cost_usd >= 0"
     ]
   }
 }
@@ -14,19 +16,19 @@ config {
 SELECT
   CAST(sale_id AS INT64) AS sale_id,
   TRIM(transaction_uuid) AS transaction_uuid,
-  CAST(sale_timestamp AS TIMESTAMP) AS sale_timestamp,
-  DATE(CAST(sale_timestamp AS TIMESTAMP)) AS sale_date,
+  SAFE.PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', sale_timestamp) AS sale_timestamp,
+  DATE(SAFE.PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', sale_timestamp)) AS sale_date,
+  FORMAT_DATE('%Y-%m-%d', DATE(SAFE.PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', sale_timestamp))) AS date_key,
   CAST(user_id AS INT64) AS user_id,
   UPPER(TRIM(customer_type)) AS customer_type,
   UPPER(TRIM(payment_method)) AS payment_method,
-  ROUND(CAST(total_amount_usd AS FLOAT64), 2) AS total_amount_usd,
   ROUND(CAST(total_cost_usd AS FLOAT64), 2) AS total_cost_usd,
+  ROUND(CAST(total_amount_usd AS FLOAT64), 2) AS total_amount_usd,
   ROUND(CAST(gross_profit_usd AS FLOAT64), 2) AS gross_profit_usd,
-  ROUND(SAFE_DIVIDE(CAST(gross_profit_usd AS FLOAT64), CAST(total_amount_usd AS FLOAT64)) * 100, 2) AS gross_margin_pct
+  SAFE_DIVIDE(CAST(gross_profit_usd AS FLOAT64), NULLIF(CAST(total_amount_usd AS FLOAT64), 0)) * 100.0 AS margin_pct
 FROM
   ${ref("raw_sales")}
 WHERE
   sale_id IS NOT NULL
-  AND CAST(total_amount_usd AS FLOAT64) >= 0
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY sale_id ORDER BY CAST(sale_timestamp AS TIMESTAMP) DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY CAST(sale_id AS INT64) ORDER BY sale_timestamp DESC) = 1

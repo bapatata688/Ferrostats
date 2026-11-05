@@ -59,7 +59,7 @@ const State = {
   lang: localStorage.getItem('ferrostats_lang') || 'en',
   activeTab: 'bodega', // 'bodega', 'bi'
   products: [],
-  selectedAisle: 'TODOS',
+  selectedAisle: 'ALL',
   onlyCriticalAisles: false,
   analyticsData: null,
   lookerUrl: localStorage.getItem('ferrostats_looker_url') || DEFAULT_LOOKER_URL
@@ -164,7 +164,7 @@ function initWarehouseControls() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#aisleTabs .aisle-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      State.selectedAisle = btn.getAttribute('data-aisle') || 'TODOS';
+      State.selectedAisle = btn.getAttribute('data-aisle') || 'ALL';
       renderWarehouseCards();
     });
   });
@@ -202,12 +202,17 @@ function renderWarehouseCards() {
 
   let filtered = State.products;
 
-  if (State.selectedAisle !== 'TODOS') {
+  if (State.selectedAisle !== 'ALL' && State.selectedAisle !== 'TODOS') {
     filtered = filtered.filter(p => p.aisle_location.startsWith(State.selectedAisle));
   }
 
   if (State.onlyCriticalAisles) {
-    filtered = filtered.filter(p => p.stock_status === 'AGOTADO' || p.stock_status === 'BAJO_STOCK');
+    filtered = filtered.filter(p =>
+      p.stock_status === 'OUT_OF_STOCK' ||
+      p.stock_status === 'LOW_STOCK' ||
+      p.stock_status === 'AGOTADO' ||
+      p.stock_status === 'BAJO_STOCK'
+    );
   }
 
   if (filtered.length === 0) {
@@ -224,11 +229,11 @@ function renderWarehouseCards() {
     let statusClass = 'wh-status-optimo';
     let statusIcon = 'check-circle-2';
 
-    if (p.stock_status === 'AGOTADO') {
+    if (p.stock_status === 'OUT_OF_STOCK' || p.stock_status === 'AGOTADO') {
       statusText = t('statusOutOfStock');
       statusClass = 'wh-status-agotado';
       statusIcon = 'alert-circle';
-    } else if (p.stock_status === 'BAJO_STOCK') {
+    } else if (p.stock_status === 'LOW_STOCK' || p.stock_status === 'BAJO_STOCK') {
       statusText = t('statusLowStock');
       statusClass = 'wh-status-reorden';
       statusIcon = 'alert-triangle';
@@ -312,11 +317,11 @@ async function quickAdjust(productId, delta) {
 
     prod.current_stock = res.stock_after;
     if (prod.current_stock === 0) {
-      prod.stock_status = 'AGOTADO';
+      prod.stock_status = 'OUT_OF_STOCK';
     } else if (prod.current_stock <= prod.min_stock) {
-      prod.stock_status = 'BAJO_STOCK';
+      prod.stock_status = 'LOW_STOCK';
     } else {
-      prod.stock_status = 'OPTIMO';
+      prod.stock_status = 'OPTIMAL';
     }
 
     renderWarehouseCards();

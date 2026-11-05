@@ -1,10 +1,11 @@
 config {
   type: "view",
   schema: "ferrostats_silver",
-  description: "Renglones de venta normalizados de la capa Bronze",
+  name: "stg_sale_items",
+  description: "Silver Layer: POS sales line items with historical COGS and gross profit margin derivation.",
   assertions: {
     uniqueKey: ["sale_item_id"],
-    nonNull: ["sale_item_id", "sale_id", "product_id", "quantity", "subtotal_usd"],
+    nonNull: ["sale_item_id", "sale_id", "product_id", "quantity"],
     rowConditions: [
       "quantity > 0",
       "subtotal_usd >= 0"
@@ -13,19 +14,18 @@ config {
 }
 
 SELECT
-  CAST(sale_item_id AS INT64) AS sale_item_id,
-  CAST(sale_id AS INT64) AS sale_id,
-  CAST(product_id AS INT64) AS product_id,
-  CAST(quantity AS INT64) AS quantity,
-  ROUND(CAST(unit_price_snapshot_usd AS FLOAT64), 2) AS unit_price_usd,
-  ROUND(CAST(unit_cost_snapshot_usd AS FLOAT64), 2) AS unit_cost_usd,
-  ROUND(CAST(subtotal_usd AS FLOAT64), 2) AS subtotal_usd,
-  ROUND(CAST(quantity AS INT64) * CAST(unit_cost_snapshot_usd AS FLOAT64), 2) AS cogs_usd,
-  ROUND(CAST(subtotal_usd AS FLOAT64) - (CAST(quantity AS INT64) * CAST(unit_cost_snapshot_usd AS FLOAT64)), 2) AS item_profit_usd
+  CAST(si.sale_item_id AS INT64) AS sale_item_id,
+  CAST(si.sale_id AS INT64) AS sale_id,
+  CAST(si.product_id AS INT64) AS product_id,
+  CAST(si.quantity AS INT64) AS quantity,
+  ROUND(CAST(si.unit_cost_snapshot_usd AS FLOAT64), 2) AS unit_cost_usd,
+  ROUND(CAST(si.unit_price_snapshot_usd AS FLOAT64), 2) AS unit_price_usd,
+  ROUND(CAST(si.subtotal_usd AS FLOAT64), 2) AS subtotal_usd,
+  ROUND(CAST(si.quantity AS INT64) * CAST(si.unit_cost_snapshot_usd AS FLOAT64), 2) AS item_cogs_usd,
+  ROUND(CAST(si.subtotal_usd AS FLOAT64) - (CAST(si.quantity AS INT64) * CAST(si.unit_cost_snapshot_usd AS FLOAT64)), 2) AS item_profit_usd
 FROM
-  ${ref("raw_sale_items")}
+  ${ref("raw_sale_items")} si
 WHERE
-  sale_item_id IS NOT NULL
-  AND CAST(quantity AS INT64) > 0
+  si.sale_item_id IS NOT NULL
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY sale_item_id ORDER BY CAST(sale_id AS INT64) DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY CAST(si.sale_item_id AS INT64) ORDER BY si.sale_item_id DESC) = 1
