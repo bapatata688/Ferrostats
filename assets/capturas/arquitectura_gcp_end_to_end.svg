@@ -415,7 +415,7 @@
       <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">PARETO 80/20</text>
 
       <rect x="14" y="50" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
-      <text x="20" y="66" fill="#cbd5e1" font-size="9" font-family="monospace">mart_inventario_pareto_abc</text>
+      <text x="20" y="66" fill="#cbd5e1" font-size="9" font-family="monospace">mart_inventory_pareto_abc</text>
 
       <text x="14" y="90" fill="#94a3b8" font-size="10.5">Clasificación de 30 SKUs:</text>
       <text x="14" y="108" fill="#f8fafc" font-size="10.5">• <tspan font-weight="700">Clase A:</tspan> 80% ventas (Cemento, varilla)</text>
@@ -441,7 +441,7 @@
       <text x="51" y="40" fill="#94a3b8" font-size="8.5" font-weight="700">FINANZAS</text>
 
       <rect x="14" y="50" width="224" height="24" rx="4" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
-      <text x="22" y="66" fill="#cbd5e1" font-size="9.5" font-family="monospace">dw_fact_daily_sales</text>
+      <text x="22" y="66" fill="#cbd5e1" font-size="9.5" font-family="monospace">fct_daily_sales &amp; dim_products</text>
 
       <text x="14" y="90" fill="#94a3b8" font-size="10.5">Métricas operativas diarias:</text>
       <text x="14" y="108" fill="#94a3b8" font-size="10.5">• Consumo diario promedio (Burn Rate)</text>

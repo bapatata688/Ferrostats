@@ -1,19 +1,15 @@
-# FERROSTATS — Production Visual Assets & Screenshots
+# FERROSTATS — Data Platform Visual Assets & Screenshots
 
-Production screenshots and architectural diagrams of the **FERROSTATS** platform running live on **Google Cloud Platform (GCP)**.
+Production screenshots and vector architectural diagrams of the **FERROSTATS** Medallion Data Lakehouse running live on **Google Cloud Platform (GCP)**.
 
-| Filename / Archivo | Description (EN) | Descripción (ES) |
+| Filename | Layer / Scope | Description |
 |---|---|---|
-| `architecture_flow_en.png` | Bilingual Infographic Flow: 5-Stage Medallion Data Lakehouse (English, 1920x1071) | Diagrama Infográfico de Flujo: Data Lakehouse Medallón en 5 etapas (Inglés, 1920x1071) |
-| `architecture_flow_es.png` | Bilingual Infographic Flow: 5-Stage Medallion Data Lakehouse (Spanish, 1920x1071) | Diagrama Infográfico de Flujo: Data Lakehouse Medallón en 5 etapas (Español, 1920x1071) |
-| `arquitectura_gcp_end_to_end.png` | End-to-end Medallion data pipeline and serverless GCP architecture | Diagrama del pipeline Medallón end-to-end y arquitectura serverless GCP |
-| `arquitectura_gcp_end_to_end.svg` | Vector source diagram of the GCP cloud architecture | Diagrama vectorial en SVG de la arquitectura cloud en GCP |
-| `01_pos_mostrador.png` | Cashier POS checkout terminal with barcode search and cart | Terminal de caja mostrador (POS) con buscador de SKU y carrito |
-| `02_confirmar_venta.png` | Fiscal ticket confirmation modal with 13% IVA tax breakdown | Modal de confirmación con ticket fiscal y desglose de IVA (13%) |
-| `03_bodega_pasillos.png` | Managerial inventory portal organized by physical warehouse aisles | Portal de inventario gerencial organizado por pasillos físicos de bodega |
-| `04_inteligencia_negocio_looker_pag1.png` | Looker Studio BI Page 1: Revenue, sales trends, and gross profit | Looker Studio BI Página 1: Facturación, tendencias y margen bruto |
-| `05_inteligencia_negocio_looker_pag2.png` | Looker Studio BI Page 2: Dynamic Pareto 80/20 & DOI replenishment matrix | Looker Studio BI Página 2: Matriz Pareto 80/20 y días de inventario (DOI) |
-| `06_looker_ventas_pag3.png` | Looker Studio BI Page 3: Working capital valuation by ABC category | Looker Studio BI Página 3: Valoración de capital de trabajo por clase ABC |
-| `07_gcp_captura_dw.png` | Google BigQuery console showing Bronze, Silver, and Gold datasets | Consola de Google BigQuery con datasets Bronze, Silver y Gold |
-| `08_dataform.png` | Google Cloud Dataform repository executing SQLX pipeline DAGs | Repositorio de Google Cloud Dataform ejecutando DAGs de SQLX |
-
+| `architecture_gcp_end_to_end.svg` | **End-to-End Architecture (EN)** | 5-Stage Cloud Data Engineering vector diagram: OLTP Edge Producer $\to$ Async Streaming & BigQuery Bronze $\to$ Dataform SQLX & Silver $\to$ Gold Star Schema Marts $\to$ Looker Studio BI |
+| `arquitectura_gcp_end_to_end.svg` | **End-to-End Architecture (ES)** | Diagrama vectorial en español del pipeline Medallón end-to-end y arquitectura serverless en GCP |
+| `compiled_dag.png` | **Google Cloud Dataform** | Compiled SQLX dependency graph (`raw_*` $\to$ `stg_*` $\to$ `dim_products`, `fct_daily_sales`, `mart_inventory_pareto_abc` & Data Quality assertions) |
+| `datasets_bigquery.png` | **Google BigQuery** | BigQuery Explorer showing `ferrostats_bronze` (7 raw tables), `ferrostats_silver` (3 views), and `ferrostats_gold` (3 Star Schema marts) |
+| `looker_studio_1.png` | **Looker Studio BI (Page 1)** | Executive Revenue, COGS, and Gross Margin evolution powered by `ferrostats_gold.fct_daily_sales` |
+| `looker_studio_2.png` | **Looker Studio BI (Page 2)** | Dynamic 80/20 Pareto ABC Matrix, Stock Status, Burn Rate, and Days of Inventory (DOI) powered by `ferrostats_gold.mart_inventory_pareto_abc` |
+| `looker_studio_3.png` | **Looker Studio BI (Page 3)** | Working Capital Valuation & SKU Distribution by ABC Class powered by `dim_products` and `mart_inventory_pareto_abc` |
+| `ferrostats_pos.png` | **Upstream OLTP Source A (`/pos`)** | Synthetic POS checkout event producer streaming sales transactions into `ferrostats_bronze.raw_sales` |
+| `ferrostats_warehouse.png` | **Upstream OLTP Source B (`/`)** | Physical warehouse aisle audit view streaming stock adjustments into `ferrostats_bronze.raw_inventory_movements` |

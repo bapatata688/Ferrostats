@@ -41,7 +41,7 @@
 ## 1. Architecture & Data Lineage (OLTP Edge $\to$ BigQuery Medallion $\to$ BI)
 
 <p align="center">
-  <img src="assets/capturas/arquitectura_gcp_end_to_end.png" alt="End-to-End Architecture Diagram" width="900" />
+  <img src="assets/capturas/architecture_gcp_end_to_end.svg" alt="End-to-End Architecture Diagram" width="100%" />
 </p>
 
 ```mermaid
@@ -195,13 +195,13 @@ To clearly distinguish **Data Engineering ownership** from **AI-assisted fronten
 
 | Pipeline Stage | Technical Preview |
 |---|---|
-| **1. Google Cloud Dataform (SQLX DAG)**<br>*Compiled Medallion dependency graph (`raw_*` $\to$ `stg_*` $\to$ Gold marts & assertions)* | ![Dataform Console](assets/capturas/08_dataform.png) |
-| **2. Google BigQuery Data Warehouse**<br>*`ferrostats_bronze` (7 raw tables), `ferrostats_silver` (3 views), and `ferrostats_gold` (3 Star Schema marts)* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
-| **3. Looker Studio BI — Page 1 (Sales Fact)**<br>*Powered by `ferrostats_gold.fct_daily_sales`: Revenue, COGS, and gross margin trends* | ![Looker Page 1](assets/capturas/04_inteligencia_negocio_looker_pag1.png) |
-| **4. Looker Studio BI — Page 2 (Pareto & DOI)**<br>*Powered by `ferrostats_gold.mart_inventory_pareto_abc`: 80/20 ABC matrix, Burn Rate & DOI* | ![Looker Page 2](assets/capturas/05_inteligencia_negocio_looker_pag2.png) |
-| **5. Looker Studio BI — Page 3 (Capital Valuation)**<br>*Powered by `dim_products` & `mart_inventory_pareto_abc`: Working capital valuation by ABC class* | ![Looker Page 3](assets/capturas/06_looker_ventas_pag3.png) |
-| **6. Upstream Source A — POS Event Producer (`/pos`)**<br>*Synthetic OLTP checkout generator streaming sales into `ferrostats_bronze.raw_sales`* | ![POS Event Producer](assets/capturas/01_pos_mostrador.png) |
-| **7. Upstream Source B — Inventory & ROP Monitor (`/`)**<br>*Aisle stock audit and replenishment priority table streaming movements into `raw_inventory_movements`* | ![Inventory Audit & ROP](assets/capturas/03_bodega_pasillos.png) |
+| **1. Google Cloud Dataform (SQLX DAG)**<br>*Compiled Medallion dependency graph (`raw_*` $\to$ `stg_*` $\to$ Gold marts & assertions)* | ![Dataform Console](assets/capturas/compiled_dag.png) |
+| **2. Google BigQuery Data Warehouse**<br>*`ferrostats_bronze` (7 raw tables), `ferrostats_silver` (3 views), and `ferrostats_gold` (3 Star Schema marts)* | ![BigQuery Console](assets/capturas/datasets_bigquery.png) |
+| **3. Looker Studio BI — Page 1 (Sales Fact)**<br>*Powered by `ferrostats_gold.fct_daily_sales`: Revenue, COGS, and gross margin trends* | ![Looker Page 1](assets/capturas/looker_studio_1.png) |
+| **4. Looker Studio BI — Page 2 (Pareto & DOI)**<br>*Powered by `ferrostats_gold.mart_inventory_pareto_abc`: 80/20 ABC matrix, Burn Rate & DOI* | ![Looker Page 2](assets/capturas/looker_studio_2.png) |
+| **5. Looker Studio BI — Page 3 (Capital Valuation)**<br>*Powered by `dim_products` & `mart_inventory_pareto_abc`: Working capital valuation by ABC class* | ![Looker Page 3](assets/capturas/looker_studio_3.png) |
+| **6. Upstream Source A — POS Event Producer (`/pos`)**<br>*Synthetic OLTP checkout generator streaming sales into `ferrostats_bronze.raw_sales`* | ![POS Event Producer](assets/capturas/ferrostats_pos.png) |
+| **7. Upstream Source B — Inventory & ROP Monitor (`/`)**<br>*Aisle stock audit and replenishment priority table streaming movements into `raw_inventory_movements`* | ![Inventory Audit & ROP](assets/capturas/ferrostats_warehouse.png) |
 
 ---
 

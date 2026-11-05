@@ -38,17 +38,21 @@
 
 ---
 
-## Galería Visual del Pipeline y Data Lakehouse
+## Arquitectura y Galería Visual del Pipeline y Data Lakehouse
+
+<p align="center">
+  <img src="assets/capturas/arquitectura_gcp_end_to_end.svg" alt="Diagrama de Arquitectura End-to-End en GCP" width="100%" />
+</p>
 
 | Etapa del Pipeline | Vista Técnica |
 |---|---|
-| **1. Google Cloud Dataform (DAG SQLX)**<br>*Grafo Medallón compilado (`raw_*` $\to$ `stg_*` $\to$ Marts Gold y aserciones de calidad)* | ![Dataform Console](assets/capturas/08_dataform.png) |
-| **2. Google BigQuery Data Warehouse**<br>*`ferrostats_bronze` (7 tablas crudas), `ferrostats_silver` (3 vistas) y `ferrostats_gold` (3 Marts Estrella)* | ![BigQuery Console](assets/capturas/07_gcp_captura_dw.png) |
-| **3. Looker Studio BI — Página 1 (Tabla de Hechos)**<br>*Alimentado por `ferrostats_gold.fct_daily_sales`: Ingresos, COGS y evolución de margen bruto* | ![Looker Page 1](assets/capturas/04_inteligencia_negocio_looker_pag1.png) |
-| **4. Looker Studio BI — Página 2 (Pareto y DOI)**<br>*Alimentado por `ferrostats_gold.mart_inventory_pareto_abc`: Matriz ABC 80/20, Burn Rate y DOI* | ![Looker Page 2](assets/capturas/05_inteligencia_negocio_looker_pag2.png) |
-| **5. Looker Studio BI — Página 3 (Valoración de Capital)**<br>*Alimentado por `dim_products` y `mart_inventory_pareto_abc`: Valoración de inventario por clase ABC* | ![Looker Page 3](assets/capturas/06_looker_ventas_pag3.png) |
-| **6. Fuente Transaccional A — Productor de Eventos POS (`/pos`)**<br>*Generador de ventas OLTP que transmite eventos hacia `ferrostats_bronze.raw_sales`* | ![POS Event Producer](assets/capturas/01_pos_mostrador.png) |
-| **7. Fuente Transaccional B — Monitor de Inventario y Tabla ROP (`/`)**<br>*Auditoría de stock y tabla de prioridad de reorden que transmite movimientos hacia `raw_inventory_movements`* | ![Inventory Audit & ROP](assets/capturas/03_bodega_pasillos.png) |
+| **1. Google Cloud Dataform (DAG SQLX)**<br>*Grafo Medallón compilado (`raw_*` $\to$ `stg_*` $\to$ Marts Gold y aserciones de calidad)* | ![Dataform Console](assets/capturas/compiled_dag.png) |
+| **2. Google BigQuery Data Warehouse**<br>*`ferrostats_bronze` (7 tablas crudas), `ferrostats_silver` (3 vistas) y `ferrostats_gold` (3 Marts Estrella)* | ![BigQuery Console](assets/capturas/datasets_bigquery.png) |
+| **3. Looker Studio BI — Página 1 (Tabla de Hechos)**<br>*Alimentado por `ferrostats_gold.fct_daily_sales`: Ingresos, COGS y evolución de margen bruto* | ![Looker Page 1](assets/capturas/looker_studio_1.png) |
+| **4. Looker Studio BI — Página 2 (Pareto y DOI)**<br>*Alimentado por `ferrostats_gold.mart_inventory_pareto_abc`: Matriz ABC 80/20, Burn Rate y DOI* | ![Looker Page 2](assets/capturas/looker_studio_2.png) |
+| **5. Looker Studio BI — Página 3 (Valoración de Capital)**<br>*Alimentado por `dim_products` y `mart_inventory_pareto_abc`: Valoración de inventario por clase ABC* | ![Looker Page 3](assets/capturas/looker_studio_3.png) |
+| **6. Fuente Transaccional A — Productor de Eventos POS (`/pos`)**<br>*Generador de ventas OLTP que transmite eventos hacia `ferrostats_bronze.raw_sales`* | ![POS Event Producer](assets/capturas/ferrostats_pos.png) |
+| **7. Fuente Transaccional B — Monitor de Inventario y Tabla ROP (`/`)**<br>*Auditoría de stock y tabla de prioridad de reorden que transmite movimientos hacia `raw_inventory_movements`* | ![Inventory Audit & ROP](assets/capturas/ferrostats_warehouse.png) |
 
 ---
 

@@ -1,0 +1,485 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070B14" />
+      <stop offset="50%" stop-color="#0B1120" />
+      <stop offset="100%" stop-color="#060A12" />
+    </linearGradient>
+
+    <linearGradient id="headerBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="35%" stop-color="#0EA5E9" />
+      <stop offset="70%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+
+    <linearGradient id="cardDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141E33" />
+      <stop offset="100%" stop-color="#0D1424" />
+    </linearGradient>
+
+    <linearGradient id="stageAmber" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#0D1424" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="stageCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#0D1424" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="stagePurple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#0D1424" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="stageGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EAB308" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#0D1424" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="stageGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#0D1424" stop-opacity="0.95" />
+    </linearGradient>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.55" />
+    </filter>
+
+    <pattern id="techGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" stroke-width="0.7" stroke-opacity="0.55" />
+    </pattern>
+
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#F59E0B" />
+    </marker>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#0EA5E9" />
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#A855F7" />
+    </marker>
+    <marker id="arrowGold" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#EAB308" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#10B981" />
+    </marker>
+  </defs>
+
+  <style>
+    .font-sans { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; }
+    .font-mono { font-family: 'Consolas', 'Courier New', monospace; }
+    .title-main { font-size: 28px; font-weight: 800; fill: #F8FAFC; letter-spacing: 0.5px; }
+    .title-sub { font-size: 14px; font-weight: 500; fill: #94A3B8; letter-spacing: 0.3px; }
+    .stage-badge { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; }
+    .stage-title { font-size: 18px; font-weight: 800; fill: #F8FAFC; }
+    .stage-desc { font-size: 12px; font-weight: 500; fill: #94A3B8; }
+    .box-title { font-size: 14px; font-weight: 700; fill: #F1F5F9; }
+    .box-sub { font-size: 11.5px; font-weight: 500; fill: #94A3B8; }
+    .code-tag { font-size: 11.5px; font-weight: 600; fill: #E2E8F0; }
+    .metric-val { font-size: 16px; font-weight: 800; }
+    .metric-lbl { font-size: 11px; font-weight: 600; fill: #94A3B8; }
+    .pill-text { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)" />
+  <rect width="1920" height="1080" fill="url(#techGrid)" />
+  <rect x="0" y="0" width="1920" height="6" fill="url(#headerBar)" />
+
+  <!-- ======================================================================= -->
+  <!-- TOP HEADER BANNER                                                       -->
+  <!-- ======================================================================= -->
+  <g transform="translate(40, 26)" class="font-sans">
+    <rect x="0" y="0" width="1840" height="92" rx="14" fill="#0F172A" stroke="#1E293B" stroke-width="1.5" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="56" height="56" rx="12" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.5" />
+    <path d="M 34 56 L 34 40 L 42 40 L 42 56 Z M 45 56 L 45 32 L 53 32 L 53 56 Z M 56 56 L 56 36 L 64 36 L 64 56 Z" fill="#F59E0B" />
+
+    <text x="92" y="42" class="title-main">FERROSTATS — END-TO-END CLOUD DATA ENGINEERING ARCHITECTURE</text>
+    <text x="92" y="68" class="title-sub">Upstream OLTP Event Producer  •  Async Streaming Ingestion  •  BigQuery Medallion Lakehouse (Bronze / Silver / Gold)  •  Dataform SQLX  •  Looker Studio BI</text>
+
+    <g transform="translate(1240, 18)">
+      <rect x="0" y="0" width="185" height="24" rx="12" fill="#0EA5E9" fill-opacity="0.14" stroke="#0EA5E9" stroke-width="1" />
+      <text x="92" y="16" text-anchor="middle" class="pill-text" fill="#38BDF8">GCP PROJECT: ferrostats</text>
+
+      <rect x="195" y="0" width="190" height="24" rx="12" fill="#A855F7" fill-opacity="0.14" stroke="#A855F7" stroke-width="1" />
+      <text x="290" y="16" text-anchor="middle" class="pill-text" fill="#C084FC">REGION: us-central1 / US</text>
+
+      <rect x="395" y="0" width="185" height="24" rx="12" fill="#10B981" fill-opacity="0.14" stroke="#10B981" stroke-width="1" />
+      <text x="487" y="16" text-anchor="middle" class="pill-text" fill="#34D399">COST: $0.00 / MONTH</text>
+
+      <rect x="0" y="32" width="580" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+      <text x="290" y="48" text-anchor="middle" class="font-mono" font-size="11" font-weight="600" fill="#CBD5E1">Python 3.12 • BigQuery Storage Write • Dataform SQLX • Window SQL • Looker Studio</text>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- STAGE 1: UPSTREAM OLTP EVENT PRODUCER                                   -->
+  <!-- ======================================================================= -->
+  <g transform="translate(40, 142)" class="font-sans">
+    <rect x="0" y="0" width="335" height="755" rx="16" fill="url(#stageAmber)" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.65" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="110" height="22" rx="6" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="1" />
+    <text x="73" y="33" text-anchor="middle" class="stage-badge" fill="#FBBF24">STAGE 01</text>
+    <text x="18" y="64" class="stage-title">OLTP Event Producer</text>
+    <text x="18" y="84" class="stage-desc">Transactional Hardware Store Simulator</text>
+
+    <!-- Box 1.1: Counter POS -->
+    <g transform="translate(18, 105)">
+      <rect x="0" y="0" width="299" height="145" rx="12" fill="url(#cardDark)" stroke="#F59E0B" stroke-width="1.2" stroke-opacity="0.6" />
+      <circle cx="24" cy="26" r="12" fill="#F59E0B" fill-opacity="0.2" />
+      <text x="24" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#FBBF24">01</text>
+      <text x="44" y="25" class="box-title">POS Checkout Event Producer</text>
+      <text x="44" y="41" class="font-mono" font-size="11" fill="#FBBF24">GET /pos  •  POST /api/v1/sales</text>
+      <line x1="14" y1="52" x2="285" y2="52" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="72" class="box-sub">• Generates real-time sales &amp; line-item events</text>
+      <text x="16" y="92" class="box-sub">• Payment methods: Cash, Card, Transfer</text>
+      <text x="16" y="112" class="box-sub">• Atomic stock deduction &amp; Kárdex ledger write</text>
+      <text x="16" y="132" class="box-sub">• Pessimistic lock triggers async BQ stream</text>
+    </g>
+
+    <!-- Box 1.2: Warehouse Audit -->
+    <g transform="translate(18, 266)">
+      <rect x="0" y="0" width="299" height="145" rx="12" fill="url(#cardDark)" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.5" />
+      <circle cx="24" cy="26" r="12" fill="#0EA5E9" fill-opacity="0.2" />
+      <text x="24" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#38BDF8">02</text>
+      <text x="44" y="25" class="box-title">Warehouse &amp; Aisle Audit UI</text>
+      <text x="44" y="41" class="font-mono" font-size="11" fill="#38BDF8">GET /  •  POST /inventory/adjust</text>
+      <line x1="14" y1="52" x2="285" y2="52" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="72" class="box-sub">• Audits 7 functional aisles (Aisles A–E &amp; Yards)</text>
+      <text x="16" y="92" class="box-sub">• Emits restock &amp; shrinkage adjustment events</text>
+      <text x="16" y="112" class="box-sub">• Appends immutable Kárdex audit trail rows</text>
+      <text x="16" y="132" class="box-sub">• Real-time Burn Rate &amp; stock threshold validation</text>
+    </g>
+
+    <!-- Box 1.3: FastAPI + SQLite -->
+    <g transform="translate(18, 427)">
+      <rect x="0" y="0" width="299" height="165" rx="12" fill="url(#cardDark)" stroke="#F59E0B" stroke-width="1.2" stroke-opacity="0.6" />
+      <text x="16" y="25" class="box-title" fill="#FBBF24">FastAPI + SQLAlchemy 2.0 (OLTP)</text>
+      <text x="16" y="42" class="font-mono" font-size="11" fill="#94A3B8">Cloud Run Serverless • Ephemeral SQLite</text>
+      <line x1="14" y1="52" x2="285" y2="52" stroke="#1E293B" stroke-width="1" />
+      <rect x="14" y="62" width="271" height="24" rx="5" fill="#090D16" stroke="#1E293B" />
+      <text x="22" y="78" class="font-mono" font-size="11" fill="#38BDF8">categories (6) • suppliers (6) • users (4)</text>
+      <rect x="14" y="92" width="271" height="24" rx="5" fill="#090D16" stroke="#1E293B" />
+      <text x="22" y="108" class="font-mono" font-size="11" fill="#FBBF24">products (30 SKUs across 6 categories)</text>
+      <rect x="14" y="122" width="271" height="24" rx="5" fill="#090D16" stroke="#1E293B" />
+      <text x="22" y="138" class="font-mono" font-size="11" fill="#34D399">sales (180) • sale_items (271) • movements (294)</text>
+      <text x="16" y="158" font-size="10.5" fill="#94A3B8">SQLite WAL BEGIN IMMEDIATE + UUID Idempotency</text>
+    </g>
+
+    <!-- Box 1.4: Seed Generator -->
+    <g transform="translate(18, 608)">
+      <rect x="0" y="0" width="299" height="128" rx="12" fill="#090D16" stroke="#334155" stroke-width="1.2" />
+      <text x="16" y="24" class="box-title" fill="#E2E8F0">Deterministic Seed Engine</text>
+      <text x="16" y="42" class="font-mono" font-size="11" fill="#F59E0B">data/seeds/*.csv (Random Seed = 2026)</text>
+      <line x1="14" y1="50" x2="285" y2="50" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="70" class="box-sub">• Auto-hydrates 30 hardware SKUs on boot</text>
+      <text x="16" y="90" class="box-sub">• Simulates 30 days of Pareto 80/20 velocity</text>
+      <text x="16" y="110" class="box-sub">• 100% English schema &amp; dimensional attributes</text>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- STAGE 2: ASYNC STREAMING & BIGQUERY BRONZE LAYER                        -->
+  <!-- ======================================================================= -->
+  <g transform="translate(415, 142)" class="font-sans">
+    <rect x="0" y="0" width="345" height="755" rx="16" fill="url(#stageCyan)" stroke="#0EA5E9" stroke-width="1.5" stroke-opacity="0.65" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="110" height="22" rx="6" fill="#0EA5E9" fill-opacity="0.2" stroke="#0EA5E9" stroke-width="1" />
+    <text x="73" y="33" text-anchor="middle" class="stage-badge" fill="#38BDF8">STAGE 02</text>
+    <text x="18" y="64" class="stage-title">Ingestion &amp; Bronze Layer</text>
+    <text x="18" y="84" class="stage-desc">Non-Blocking Streaming + Raw Landing Zone</text>
+
+    <!-- Box 2.1: BigQueryStreamer -->
+    <g transform="translate(18, 105)">
+      <rect x="0" y="0" width="309" height="175" rx="12" fill="url(#cardDark)" stroke="#0EA5E9" stroke-width="1.2" stroke-opacity="0.65" />
+      <text x="16" y="25" class="box-title" fill="#38BDF8">Async Streaming Ingestion Engine</text>
+      <text x="16" y="42" class="font-mono" font-size="11" fill="#94A3B8">app/etl/bigquery_sync.py</text>
+      <line x1="14" y1="52" x2="295" y2="52" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="72" class="box-sub">• Zero heavy SDK bloat (native REST OAuth2)</text>
+      <text x="16" y="92" class="box-sub">• Zero latency impact on OLTP checkout (&lt;50ms)</text>
+      <text x="16" y="112" class="box-sub">• Uses <tspan class="font-mono" fill="#38BDF8">tabledata.insertAll</tspan> Streaming API</text>
+      <text x="16" y="132" class="box-sub">• Batch sync utility: <tspan class="font-mono" fill="#E2E8F0">sync_sqlite_to_bigquery.py</tspan></text>
+      <rect x="14" y="143" width="281" height="22" rx="5" fill="#0EA5E9" fill-opacity="0.12" />
+      <text x="154" y="158" text-anchor="middle" class="font-mono" font-size="10.5" fill="#38BDF8">Append-Only Ingestion + insertId Idempotency</text>
+    </g>
+
+    <!-- Box 2.2: Bronze Dataset -->
+    <g transform="translate(18, 300)">
+      <rect x="0" y="0" width="309" height="436" rx="12" fill="url(#cardDark)" stroke="#CD7F32" stroke-width="1.5" stroke-opacity="0.8" />
+      <rect x="14" y="14" width="281" height="32" rx="6" fill="#CD7F32" fill-opacity="0.18" stroke="#CD7F32" stroke-width="1" />
+      <text x="154" y="35" text-anchor="middle" class="font-mono" font-size="13" font-weight="700" fill="#FBBF24">BQ Dataset: ferrostats_bronze</text>
+      <text x="154" y="64" text-anchor="middle" class="box-sub">Raw Immutable Replica (7 Landing Tables)</text>
+
+      <g transform="translate(16, 78)" class="font-mono">
+        <rect x="0" y="0" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="17" font-size="12" font-weight="700" fill="#F8FAFC">raw_categories (6)</text>
+        <text x="12" y="31" font-size="10" fill="#94A3B8">category_id, category_code, category_name</text>
+
+        <rect x="0" y="46" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="63" font-size="12" font-weight="700" fill="#F8FAFC">raw_suppliers (6)</text>
+        <text x="12" y="77" font-size="10" fill="#94A3B8">supplier_id, supplier_name, lead_time_days</text>
+
+        <rect x="0" y="92" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="109" font-size="12" font-weight="700" fill="#FBBF24">raw_products (30 SKUs)</text>
+        <text x="12" y="123" font-size="10" fill="#94A3B8">sku, product_name, unit_cost_usd, unit_price_usd</text>
+
+        <rect x="0" y="138" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="155" font-size="12" font-weight="700" fill="#38BDF8">raw_sales (180+ txns)</text>
+        <text x="12" y="169" font-size="10" fill="#94A3B8">sale_id, transaction_uuid, total_amount_usd</text>
+
+        <rect x="0" y="184" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="201" font-size="12" font-weight="700" fill="#38BDF8">raw_sale_items (271+ lines)</text>
+        <text x="12" y="215" font-size="10" fill="#94A3B8">sale_item_id, sale_id, product_id, subtotal_usd</text>
+
+        <rect x="0" y="230" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="247" font-size="12" font-weight="700" fill="#34D399">raw_inventory_movements (294+)</text>
+        <text x="12" y="261" font-size="10" fill="#94A3B8">movement_id, product_id, movement_type, qty_change</text>
+
+        <rect x="0" y="276" width="277" height="38" rx="6" fill="#090D16" stroke="#1E293B" />
+        <text x="12" y="293" font-size="12" font-weight="700" fill="#C084FC">raw_users (4 operators)</text>
+        <text x="12" y="307" font-size="10" fill="#94A3B8">user_id, username, full_name, role</text>
+      </g>
+
+      <text x="154" y="424" text-anchor="middle" font-size="11" font-weight="600" fill="#CD7F32">At-Least-Once Delivery • Full Historical Lineage</text>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- STAGE 3: DATAFORM SQLX & SILVER LAYER                                   -->
+  <!-- ======================================================================= -->
+  <g transform="translate(800, 142)" class="font-sans">
+    <rect x="0" y="0" width="355" height="755" rx="16" fill="url(#stagePurple)" stroke="#A855F7" stroke-width="1.5" stroke-opacity="0.65" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="110" height="22" rx="6" fill="#A855F7" fill-opacity="0.2" stroke="#A855F7" stroke-width="1" />
+    <text x="73" y="33" text-anchor="middle" class="stage-badge" fill="#C084FC">STAGE 03</text>
+    <text x="18" y="64" class="stage-title">Dataform SQLX &amp; Silver</text>
+    <text x="18" y="84" class="stage-desc">Declarative DAG, Deduplication &amp; Assertions</text>
+
+    <!-- Box 3.1: Dataform Orchestrator -->
+    <g transform="translate(18, 105)">
+      <rect x="0" y="0" width="319" height="165" rx="12" fill="url(#cardDark)" stroke="#A855F7" stroke-width="1.2" stroke-opacity="0.65" />
+      <text x="16" y="25" class="box-title" fill="#C084FC">GCP Dataform Orchestration</text>
+      <text x="16" y="42" class="font-mono" font-size="11" fill="#94A3B8">Repo: ferrostats-pipeline (main-workspace)</text>
+      <line x1="14" y1="52" x2="305" y2="52" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="72" class="box-sub">• Dependency graph resolved via <tspan class="font-mono" fill="#E2E8F0">${ref(...)}</tspan></text>
+      <text x="16" y="92" class="box-sub">• Automated Data Quality <tspan class="font-mono" fill="#C084FC">assertions</tspan> pre-Gold</text>
+      <text x="16" y="112" class="box-sub">• Idempotent runs synced via Dataform API v1beta1</text>
+      <rect x="14" y="124" width="291" height="26" rx="5" fill="#A855F7" fill-opacity="0.14" />
+      <text x="159" y="141" text-anchor="middle" class="font-mono" font-size="10.5" fill="#E9D5FF">workflow_settings.yaml • BigQuery Region: US</text>
+    </g>
+
+    <!-- Box 3.2: Silver Dataset -->
+    <g transform="translate(18, 290)">
+      <rect x="0" y="0" width="319" height="446" rx="12" fill="url(#cardDark)" stroke="#94A3B8" stroke-width="1.5" stroke-opacity="0.85" />
+      <rect x="14" y="14" width="291" height="32" rx="6" fill="#94A3B8" fill-opacity="0.18" stroke="#94A3B8" stroke-width="1" />
+      <text x="159" y="35" text-anchor="middle" class="font-mono" font-size="13" font-weight="700" fill="#E2E8F0">BQ Dataset: ferrostats_silver</text>
+      <text x="159" y="64" text-anchor="middle" class="box-sub">Cleaned, Casted &amp; Deduplicated Views</text>
+
+      <!-- stg_products -->
+      <g transform="translate(16, 80)">
+        <rect x="0" y="0" width="287" height="98" rx="8" fill="#090D16" stroke="#334155" />
+        <text x="12" y="20" class="font-mono" font-size="12.5" font-weight="700" fill="#38BDF8">VIEW: stg_products.sqlx</text>
+        <text x="12" y="40" class="box-sub">• Enriches SKUs with <tspan class="font-mono" fill="#E2E8F0">raw_categories</tspan> &amp; aisles</text>
+        <text x="12" y="58" class="box-sub">• Computes <tspan class="font-mono" fill="#34D399">unit_margin</tspan> &amp; <tspan class="font-mono" fill="#34D399">margin_pct</tspan></text>
+        <text x="12" y="76" class="box-sub">• Evaluates <tspan class="font-mono" fill="#FBBF24">OPTIMAL | LOW_STOCK | OUT_OF_STOCK</tspan></text>
+        <text x="12" y="91" class="font-mono" font-size="10" fill="#C084FC">Assertion: uniqueKey [product_id], nonNull [sku_code]</text>
+      </g>
+
+      <!-- stg_sales -->
+      <g transform="translate(16, 192)">
+        <rect x="0" y="0" width="287" height="92" rx="8" fill="#090D16" stroke="#334155" />
+        <text x="12" y="20" class="font-mono" font-size="12.5" font-weight="700" fill="#38BDF8">VIEW: stg_sales.sqlx</text>
+        <text x="12" y="40" class="box-sub">• Filters voided sales (<tspan class="font-mono" fill="#E2E8F0">status = 'COMPLETED'</tspan>)</text>
+        <text x="12" y="58" class="box-sub">• Extracts <tspan class="font-mono" fill="#E2E8F0">sale_day</tspan>, <tspan class="font-mono" fill="#E2E8F0">sale_month</tspan>, <tspan class="font-mono" fill="#E2E8F0">day_of_week</tspan></text>
+        <text x="12" y="78" class="font-mono" font-size="10" fill="#C084FC">QUALIFY ROW_NUMBER() OVER (PARTITION BY id ...)</text>
+      </g>
+
+      <!-- stg_sale_items -->
+      <g transform="translate(16, 298)">
+        <rect x="0" y="0" width="287" height="98" rx="8" fill="#090D16" stroke="#334155" />
+        <text x="12" y="20" class="font-mono" font-size="12.5" font-weight="700" fill="#38BDF8">VIEW: stg_sale_items.sqlx</text>
+        <text x="12" y="40" class="box-sub">• Joins line items with header date &amp; cost</text>
+        <text x="12" y="58" class="box-sub">• Calculates <tspan class="font-mono" fill="#34D399">total_line_cost</tspan> &amp; <tspan class="font-mono" fill="#34D399">gross_profit</tspan></text>
+        <text x="12" y="78" class="font-mono" font-size="10" fill="#C084FC">Assertion: quantity &gt; 0 AND subtotal &gt;= 0</text>
+      </g>
+
+      <text x="159" y="426" text-anchor="middle" font-size="11" font-weight="600" fill="#C084FC">Zero Storage Duplication (Virtual SQL Views)</text>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- STAGE 4: GOLD LAYER (STAR SCHEMA & PARETO ABC MARTS)                    -->
+  <!-- ======================================================================= -->
+  <g transform="translate(1195, 142)" class="font-sans">
+    <rect x="0" y="0" width="345" height="755" rx="16" fill="url(#stageGold)" stroke="#EAB308" stroke-width="1.5" stroke-opacity="0.75" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="110" height="22" rx="6" fill="#EAB308" fill-opacity="0.2" stroke="#EAB308" stroke-width="1" />
+    <text x="73" y="33" text-anchor="middle" class="stage-badge" fill="#FACC15">STAGE 04</text>
+    <text x="18" y="64" class="stage-title">BigQuery Gold Layer</text>
+    <text x="18" y="84" class="stage-desc">Materialized Star Schema &amp; Analytical Marts</text>
+
+    <g transform="translate(18, 105)">
+      <rect x="0" y="0" width="309" height="631" rx="12" fill="url(#cardDark)" stroke="#EAB308" stroke-width="1.5" stroke-opacity="0.85" />
+      <rect x="14" y="14" width="281" height="32" rx="6" fill="#EAB308" fill-opacity="0.18" stroke="#EAB308" stroke-width="1" />
+      <text x="154" y="35" text-anchor="middle" class="font-mono" font-size="13" font-weight="700" fill="#FDE047">BQ Dataset: ferrostats_gold</text>
+      <text x="154" y="64" text-anchor="middle" class="box-sub">Partitioned &amp; Clustered BI-Ready Tables</text>
+
+      <!-- Mart 1: Pareto ABC -->
+      <g transform="translate(16, 82)">
+        <rect x="0" y="0" width="277" height="205" rx="8" fill="#090D16" stroke="#EAB308" stroke-width="1.2" stroke-opacity="0.7" />
+        <rect x="10" y="10" width="257" height="24" rx="4" fill="#EAB308" fill-opacity="0.15" />
+        <text x="138" y="26" text-anchor="middle" class="font-mono" font-size="11.5" font-weight="700" fill="#FDE047">TABLE: mart_inventory_pareto_abc</text>
+        <text x="12" y="52" class="box-sub">• Window Cumulative Revenue Share:</text>
+        <text x="16" y="70" class="font-mono" font-size="10" fill="#38BDF8">SUM(rev) OVER (ORDER BY rev DESC) / Total</text>
+        <text x="12" y="90" class="box-sub">• Dynamic ABC Classification:</text>
+        <text x="16" y="108" class="font-mono" font-size="10.5" fill="#FBBF24">Class A (&lt;=80%) • Class B (80-95%) • C (&gt;95%)</text>
+        <text x="12" y="128" class="box-sub">• 30-Day Daily Burn Rate (<tspan class="font-mono" fill="#E2E8F0">daily_burn_rate_30d</tspan>)</text>
+        <text x="12" y="148" class="box-sub">• Days of Inventory Remaining (<tspan class="font-mono" fill="#34D399">days_of_inventory</tspan>)</text>
+        <text x="12" y="168" class="box-sub">• Capital Tied Up &amp; Potential Stock Value</text>
+        <text x="12" y="190" class="font-mono" font-size="10" fill="#94A3B8">ClusterBy: [abc_class, category_name]</text>
+      </g>
+
+      <!-- Fact 2: Daily Sales -->
+      <g transform="translate(16, 302)">
+        <rect x="0" y="0" width="277" height="165" rx="8" fill="#090D16" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.7" />
+        <rect x="10" y="10" width="257" height="24" rx="4" fill="#0EA5E9" fill-opacity="0.15" />
+        <text x="138" y="26" text-anchor="middle" class="font-mono" font-size="11.5" font-weight="700" fill="#38BDF8">TABLE: fct_daily_sales</text>
+        <text x="12" y="52" class="box-sub">• Daily grain by Category, Aisle &amp; Payment</text>
+        <text x="12" y="72" class="box-sub">• KPIs: <tspan class="font-mono" fill="#E2E8F0">gross_revenue</tspan>, <tspan class="font-mono" fill="#E2E8F0">total_cogs</tspan>, <tspan class="font-mono" fill="#34D399">gross_profit</tspan></text>
+        <text x="12" y="92" class="box-sub">• Ticket metrics: <tspan class="font-mono" fill="#E2E8F0">total_tickets</tspan>, <tspan class="font-mono" fill="#E2E8F0">total_units_sold</tspan></text>
+        <text x="12" y="112" class="box-sub">• Realized Margin % (<tspan class="font-mono" fill="#34D399">realized_margin_pct</tspan>)</text>
+        <text x="12" y="136" class="font-mono" font-size="10" fill="#FBBF24">PartitionBy: sale_day (DATE)</text>
+        <text x="12" y="152" class="font-mono" font-size="10" fill="#94A3B8">ClusterBy: [category_name, payment_method]</text>
+      </g>
+
+      <!-- Dim 3: Dim Products -->
+      <g transform="translate(16, 482)">
+        <rect x="0" y="0" width="277" height="125" rx="8" fill="#090D16" stroke="#10B981" stroke-width="1.2" stroke-opacity="0.7" />
+        <rect x="10" y="10" width="257" height="24" rx="4" fill="#10B981" fill-opacity="0.15" />
+        <text x="138" y="26" text-anchor="middle" class="font-mono" font-size="11.5" font-weight="700" fill="#34D399">TABLE: dim_products</text>
+        <text x="12" y="52" class="box-sub">• Conformed Product &amp; Category Dimension</text>
+        <text x="12" y="72" class="box-sub">• Attributes: <tspan class="font-mono" fill="#E2E8F0">sku_code</tspan>, <tspan class="font-mono" fill="#E2E8F0">aisle_location</tspan>, <tspan class="font-mono" fill="#E2E8F0">stock_status</tspan></text>
+        <text x="12" y="92" class="box-sub">• Powers Star Schema joins in Looker Studio</text>
+        <text x="12" y="112" class="font-mono" font-size="10" fill="#94A3B8">30 Active Hardware SKUs • 7 Functional Aisles</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- STAGE 5: LOOKER STUDIO BI & SERVING                                     -->
+  <!-- ======================================================================= -->
+  <g transform="translate(1580, 142)" class="font-sans">
+    <rect x="0" y="0" width="300" height="755" rx="16" fill="url(#stageGreen)" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.65" filter="url(#dropShadow)" />
+    <rect x="18" y="18" width="110" height="22" rx="6" fill="#10B981" fill-opacity="0.2" stroke="#10B981" stroke-width="1" />
+    <text x="73" y="33" text-anchor="middle" class="stage-badge" fill="#34D399">STAGE 05</text>
+    <text x="18" y="64" class="stage-title">BI &amp; Decision Layer</text>
+    <text x="18" y="84" class="stage-desc">Executive Analytics &amp; Capital Optimization</text>
+
+    <!-- Box 5.1: Looker Studio -->
+    <g transform="translate(18, 105)">
+      <rect x="0" y="0" width="264" height="310" rx="12" fill="url(#cardDark)" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.8" />
+      <text x="16" y="26" class="box-title" fill="#34D399">Google Looker Studio BI</text>
+      <text x="16" y="43" class="font-mono" font-size="11" fill="#94A3B8">Native BigQuery BI Engine Connector</text>
+      <line x1="14" y1="54" x2="250" y2="54" stroke="#1E293B" stroke-width="1" />
+
+      <rect x="14" y="66" width="236" height="68" rx="6" fill="#090D16" stroke="#1E293B" />
+      <text x="24" y="85" font-size="12" font-weight="700" fill="#F8FAFC">Page 1: Revenue &amp; Margin</text>
+      <text x="24" y="103" class="box-sub">• Daily sales &amp; gross profit trends</text>
+      <text x="24" y="120" class="box-sub">• Revenue breakdown by Category</text>
+
+      <rect x="14" y="144" width="236" height="68" rx="6" fill="#090D16" stroke="#1E293B" />
+      <text x="24" y="163" font-size="12" font-weight="700" fill="#FBBF24">Page 2: Pareto ABC &amp; DOI</text>
+      <text x="24" y="181" class="box-sub">• Stockout priority matrix &amp; status</text>
+      <text x="24" y="198" class="box-sub">• Burn Rate vs. Days of Inventory</text>
+
+      <rect x="14" y="222" width="236" height="68" rx="6" fill="#090D16" stroke="#1E293B" />
+      <text x="24" y="241" font-size="12" font-weight="700" fill="#38BDF8">Page 3: Working Capital</text>
+      <text x="24" y="259" class="box-sub">• Tied-up capital by ABC class</text>
+      <text x="24" y="276" class="box-sub">• Aisle valuation &amp; SKU distribution</text>
+    </g>
+
+    <!-- Box 5.2: Analytical API Endpoints -->
+    <g transform="translate(18, 435)">
+      <rect x="0" y="0" width="264" height="150" rx="12" fill="url(#cardDark)" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.6" />
+      <text x="16" y="25" class="box-title" fill="#38BDF8">Low-Latency Analytical API</text>
+      <text x="16" y="42" class="font-mono" font-size="10.5" fill="#94A3B8">app/api/routes_analytics.py</text>
+      <line x1="14" y1="52" x2="250" y2="52" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="72" class="font-mono" font-size="11" fill="#E2E8F0">GET /api/v1/analytics/kpis</text>
+      <text x="16" y="92" class="font-mono" font-size="11" fill="#E2E8F0">GET /api/v1/analytics/abc-pareto</text>
+      <text x="16" y="112" class="font-mono" font-size="11" fill="#E2E8F0">GET /api/v1/inventory/alerts</text>
+      <text x="16" y="134" class="box-sub">Serves operational replenish alerts</text>
+    </g>
+
+    <!-- Box 5.3: Business Impact -->
+    <g transform="translate(18, 603)">
+      <rect x="0" y="0" width="264" height="133" rx="12" fill="#090D16" stroke="#10B981" stroke-width="1.2" stroke-opacity="0.6" />
+      <text x="16" y="24" class="box-title" fill="#34D399">Engineering Value Delivered</text>
+      <line x1="14" y1="34" x2="250" y2="34" stroke="#1E293B" stroke-width="1" />
+      <text x="16" y="54" class="box-sub">• Protects Class A revenue drivers</text>
+      <text x="16" y="74" class="box-sub">• Frees trapped Class C capital</text>
+      <text x="16" y="94" class="box-sub">• Automates reorder point calculation</text>
+      <text x="16" y="114" class="box-sub">• 100% reproducible ELT Dataform DAG</text>
+    </g>
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- CONNECTING ARROWS BETWEEN STAGES                                        -->
+  <!-- ======================================================================= -->
+  <!-- Stage 1 -> Stage 2 -->
+  <g>
+    <path d="M 375 310 L 412 310" stroke="#F59E0B" stroke-width="3" marker-end="url(#arrowAmber)" />
+    <path d="M 375 510 L 412 510" stroke="#0EA5E9" stroke-width="3" marker-end="url(#arrowCyan)" />
+  </g>
+
+  <!-- Stage 2 -> Stage 3 -->
+  <g>
+    <path d="M 760 310 L 797 310" stroke="#0EA5E9" stroke-width="3" marker-end="url(#arrowCyan)" />
+    <path d="M 760 510 L 797 510" stroke="#A855F7" stroke-width="3" marker-end="url(#arrowPurple)" />
+  </g>
+
+  <!-- Stage 3 -> Stage 4 -->
+  <g>
+    <path d="M 1155 360 L 1192 360" stroke="#A855F7" stroke-width="3" marker-end="url(#arrowPurple)" />
+    <path d="M 1155 540 L 1192 540" stroke="#EAB308" stroke-width="3" marker-end="url(#arrowGold)" />
+  </g>
+
+  <!-- Stage 4 -> Stage 5 -->
+  <g>
+    <path d="M 1540 330 L 1577 330" stroke="#EAB308" stroke-width="3" marker-end="url(#arrowGold)" />
+    <path d="M 1540 510 L 1577 510" stroke="#10B981" stroke-width="3" marker-end="url(#arrowGreen)" />
+  </g>
+
+  <!-- ======================================================================= -->
+  <!-- BOTTOM INFRASTRUCTURE & FINOPS FOOTER BAR                               -->
+  <!-- ======================================================================= -->
+  <g transform="translate(40, 918)" class="font-sans">
+    <rect x="0" y="0" width="1840" height="130" rx="14" fill="#0F172A" stroke="#1E293B" stroke-width="1.5" filter="url(#dropShadow)" />
+
+    <g transform="translate(24, 20)">
+      <rect x="0" y="0" width="430" height="90" rx="10" fill="#090D16" stroke="#1E293B" />
+      <text x="18" y="26" class="metric-val" fill="#F59E0B">01. Decoupled OLTP → OLAP Streaming</text>
+      <text x="18" y="48" class="box-sub">FastAPI commits ACID sales in &lt;35ms and offloads BigQuery</text>
+      <text x="18" y="66" class="box-sub">ingestion to asynchronous workers without blocking POS cashiers.</text>
+    </g>
+
+    <g transform="translate(478, 20)">
+      <rect x="0" y="0" width="430" height="90" rx="10" fill="#090D16" stroke="#1E293B" />
+      <text x="18" y="26" class="metric-val" fill="#38BDF8">02. Idempotent Silver Deduplication</text>
+      <text x="18" y="48" class="box-sub">Handles at-least-once streaming retries via analytical windowing:</text>
+      <text x="18" y="68" class="font-mono" font-size="11" fill="#C084FC">QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY ingested_at DESC) = 1</text>
+    </g>
+
+    <g transform="translate(932, 20)">
+      <rect x="0" y="0" width="430" height="90" rx="10" fill="#090D16" stroke="#1E293B" />
+      <text x="18" y="26" class="metric-val" fill="#EAB308">03. Windowed Pareto 80/20 &amp; DOI Math</text>
+      <text x="18" y="48" class="box-sub">Computes cumulative revenue share, ABC class, 30-day Burn Rate,</text>
+      <text x="18" y="66" class="box-sub">and Days of Inventory Remaining directly in BigQuery Gold SQLX.</text>
+    </g>
+
+    <g transform="translate(1386, 20)">
+      <rect x="0" y="0" width="430" height="90" rx="10" fill="#090D16" stroke="#1E293B" />
+      <text x="18" y="26" class="metric-val" fill="#10B981">04. FinOps &amp; Serverless Governance</text>
+      <text x="18" y="48" class="box-sub">Cloud Run scale-to-zero (`min-instances=0`) + BigQuery partitioned</text>
+      <text x="18" y="66" class="box-sub">&amp; clustered Gold tables keep total cloud footprint at $0.00/mo.</text>
+    </g>
+  </g>
+</svg>
