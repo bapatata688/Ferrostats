@@ -253,7 +253,6 @@ function renderWarehouseCards() {
           </div>
         </div>
         <div class="wh-prod-name">${escapeHtml(p.product_name)}</div>
-        <div class="wh-prod-measure">${t('unitLabel')} ${p.unit_measure} • ${t('classLabel')} ${p.abc_class || 'A'}</div>
         
         <div class="wh-stock-section">
           <div class="wh-stock-col wh-stock-primary">
