@@ -4,7 +4,7 @@ Production screenshots and vector architectural diagrams of the **FERROSTATS** M
 
 | Filename | Layer / Scope | Description |
 |---|---|---|
-| `architecture_gcp_end_to_end.svg` | **End-to-End Architecture (EN)** | 5-Stage Cloud Data Engineering vector diagram: OLTP Edge Producer $\to$ Async Streaming & BigQuery Bronze $\to$ Dataform SQLX & Silver $\to$ Gold Star Schema Marts $\to$ Looker Studio BI |
+| `architecture_flow_en.png` | **End-to-End Architecture (EN)** | 5-Stage Cloud Data Engineering Infographic (`1920x1071`): Edge POS Producer $\to$ Serverless Compute (Cloud Run + SQLite WAL) $\to$ BigQuery Streaming API $\to$ Medallion Lakehouse (Bronze / Silver Dataform SQLX / Gold Star Schema & Pareto 80/20) $\to$ Looker Studio BI |
 | `arquitectura_gcp_end_to_end.svg` | **End-to-End Architecture (ES)** | Diagrama vectorial en español del pipeline Medallón end-to-end y arquitectura serverless en GCP |
 | `compiled_dag.png` | **Google Cloud Dataform** | Compiled SQLX dependency graph (`raw_*` $\to$ `stg_*` $\to$ `dim_products`, `fct_daily_sales`, `mart_inventory_pareto_abc` & Data Quality assertions) |
 | `datasets_bigquery.png` | **Google BigQuery** | BigQuery Explorer showing `ferrostats_bronze` (7 raw tables), `ferrostats_silver` (3 views), and `ferrostats_gold` (3 Star Schema marts) |

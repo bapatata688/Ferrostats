@@ -41,7 +41,7 @@
 ## Arquitectura y Galería Visual del Pipeline y Data Lakehouse
 
 <p align="center">
-  <img src="assets/capturas/arquitectura_gcp_end_to_end.svg" alt="Diagrama de Arquitectura End-to-End en GCP" width="100%" />
+  <img src="assets/capturas/architecture_flow_en.png" alt="Diagrama de Arquitectura End-to-End en GCP" width="900" />
 </p>
 
 | Etapa del Pipeline | Vista Técnica |

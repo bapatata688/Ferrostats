@@ -41,7 +41,7 @@
 ## 1. Architecture & Data Lineage (OLTP Edge $\to$ BigQuery Medallion $\to$ BI)
 
 <p align="center">
-  <img src="assets/capturas/architecture_gcp_end_to_end.svg" alt="End-to-End Architecture Diagram" width="100%" />
+  <img src="assets/capturas/architecture_flow_en.png" alt="End-to-End Architecture Diagram" width="900" />
 </p>
 
 ```mermaid
