@@ -1,4 +1,4 @@
-# FERROSTATS — Google Cloud Medallion Data Lakehouse (BigQuery + Dataform SQLX) & Streaming Ingestion Pipeline
+# FERROSTATS: Google Cloud Medallion Data Lakehouse (BigQuery + Dataform SQLX) & Streaming Ingestion Pipeline
 
 <p align="center">
   <img src="assets/logo.png" alt="FERROSTATS Logo" width="200" />
