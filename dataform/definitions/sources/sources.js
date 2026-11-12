@@ -45,3 +45,10 @@ declare({
   name: "raw_inventory_movements",
   description: "Immutable ledger of physical stock movements and warehouse aisle audit adjustments."
 });
+
+declare({
+  database: "ferrostats",
+  schema: "ferrostats_bronze",
+  name: "raw_users",
+  description: "Operational store operators and role metadata synchronized from the OLTP edge."
+});

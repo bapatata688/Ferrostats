@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Data Engineering Portfolio Project: Automated Medallion Data Lakehouse (Bronze / Silver / Gold) in Google BigQuery, Declarative SQLX Orchestration with Google Dataform, Analytical Window Modeling (80/20 Pareto, DOI, ROP), and Permanent $0.00/mo FinOps Governance.</strong>
+  <strong>Data Engineering Portfolio Project: Automated Medallion Data Lakehouse (Bronze / Silver / Gold) in Google BigQuery, Declarative SQLX Orchestration with Google Dataform, Analytical Window Modeling (80/20 Pareto, DOI, ROP), and &lt;$1/mo FinOps Governance.</strong>
 </p>
 
 <p align="center">
@@ -13,7 +13,7 @@
   <a href="https://cloud.google.com/bigquery"><img src="https://img.shields.io/badge/Google%20BigQuery-Medallion%20Lakehouse-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="BigQuery" /></a>
   <a href="https://cloud.google.com/dataform"><img src="https://img.shields.io/badge/Google%20Dataform-SQLX%20%26%20Assertions-38bdf8?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Dataform" /></a>
   <a href="https://lookerstudio.google.com/"><img src="https://img.shields.io/badge/Looker%20Studio-Star%20Schema%20BI-38bdf8?style=for-the-badge&logo=googlelooker&logoColor=white" alt="Looker Studio" /></a>
-  <a href="finops/gcp_free_tier_policy.json"><img src="https://img.shields.io/badge/FinOps-$0.00%20USD%2Fmo%20Always%20Free%20Tier-10b981?style=for-the-badge" alt="FinOps" /></a>
+  <a href="finops/gcp_free_tier_policy.json"><img src="https://img.shields.io/badge/FinOps-%3C%241%20USD%2Fmo%20Always%20Free%20Tier-10b981?style=for-the-badge" alt="FinOps" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python%203.11-ETL%20%26%20Streaming%20Ingestion-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
 </p>
 
@@ -23,7 +23,7 @@
 
 > [!IMPORTANT]
 > **Data Engineering Focus & Role of the Web Simulator:**  
-> This repository is a **Data Engineering & Cloud Architecture** project. The core deliverables are the **Google BigQuery Medallion Lakehouse (`ferrostats_bronze` $\to$ `ferrostats_silver` $\to$ `ferrostats_gold`)**, the **Google Dataform SQLX pipeline & Data Quality assertions**, the **analytical SQL window functions (Pareto 80/20, Burn Rate, DOI, ROP)**, and the **$0.00/mo GCP FinOps architecture**.  
+> This repository is a **Data Engineering & Cloud Architecture** project. The core deliverables are the **Google BigQuery Medallion Lakehouse (`ferrostats_bronze` $\to$ `ferrostats_silver` $\to$ `ferrostats_gold`)**, the **Google Dataform SQLX pipeline & Data Quality assertions**, the **analytical SQL window functions (Pareto 80/20, Burn Rate, DOI, ROP)**, and the **<$1/mo GCP FinOps architecture**.  
 > Because a streaming data pipeline requires an upstream transactional source, a lightweight web simulator (`/pos` and `/`) was generated via **Spec-Driven Development (SDD)** strictly to act as a **synthetic OLTP event producer** feeding live sales and inventory movements into BigQuery Bronze.
 
 ---
@@ -46,12 +46,12 @@
 
 ```mermaid
 flowchart TD
-    subgraph SOURCE["1. Upstream OLTP Event Producer (Cloud Run Edge — $0.00/mo)"]
+    subgraph SOURCE["1. Upstream OLTP Event Producer (Cloud Run Edge — <$1/mo)"]
         SIM["Synthetic Retail Event Producer (/pos & /)\n- Deterministic Seed (180 Sales, 30 SKUs)\n- SQLite WAL BEGIN IMMEDIATE Lock (<50 ms)\n- Guarded Stock Decrement & UUID Idempotency"]
         STREAM["Async REST Ingestion Client (bigquery_sync.py)\n- Internal GCP Metadata OAuth Token Minting\n- Zero Heavy SDK Bloat (Python urllib.request)"]
     end
 
-    subgraph LAKEHOUSE["2. Google BigQuery Medallion Data Lakehouse ($0.00/mo Free Tier)"]
+    subgraph LAKEHOUSE["2. Google BigQuery Medallion Data Lakehouse (<$1/mo Free Tier)"]
         subgraph BRONZE["Bronze Layer (ferrostats_bronze — 7 Immutable Raw Tables)"]
             B1["raw_sales (180+ txns)\nraw_sale_items (271+ lines)"]
             B2["raw_products (30 SKUs)\nraw_categories (6) & raw_suppliers (6)"]
@@ -150,7 +150,7 @@ When `current_stock <= min_stock`, the formula automatically scales the replenis
 
 ---
 
-## 4. OLTP-to-OLAP Ingestion Integrity & FinOps Engineering ($0.00/mo)
+## 4. OLTP-to-OLAP Ingestion Integrity & FinOps Engineering (<$1/mo)
 
 ### 4.1 Edge Concurrency & Idempotency Rules ([`app/api/routes_pos.py`](app/api/routes_pos.py))
 - **Immediate Write Serialization (`BEGIN IMMEDIATE`):** Prevents `SQLITE_BUSY` read-to-write upgrade deadlocks under concurrent requests.
@@ -163,17 +163,18 @@ When `current_stock <= min_stock`, the formula automatically scales the replenis
   If `cursor.rowcount == 0`, the transaction triggers an immediate `ROLLBACK` and returns `HTTP 409 Conflict`.
 - **UUID Idempotency Replay:** Every transaction requires a client `transaction_uuid`. Retrying a committed UUID returns `HTTP 200 OK` with `Idempotent-Replay: true` without double-decrementing stock or emitting duplicate rows to BigQuery.
 
-### 4.2 Permanent $0.00 USD/Month GCP FinOps Architecture ([`finops/gcp_free_tier_policy.json`](finops/gcp_free_tier_policy.json))
-By replacing persistent Cloud SQL instances (~$25/mo) and Serverless VPC Connectors (~$15/mo) with scale-to-zero Cloud Run containers, metadata OAuth tokens, and BigQuery Free Tier datasets, the platform saves **~$40/month** and runs permanently at **$0.00/mo**:
+### 4.2 Ultra-Low-Cost (<$1/mo) GCP FinOps Architecture ([`finops/gcp_free_tier_policy.json`](finops/gcp_free_tier_policy.json))
+By replacing persistent Cloud SQL instances (~$25/mo) and Serverless VPC Connectors (~$15/mo) with scale-to-zero Cloud Run containers, metadata OAuth tokens, and BigQuery Free Tier datasets, the platform saves **~$40/month** and runs at **<$1/mo**:
 
-| GCP Service | Always Free Tier Limit | FERROSTATS Footprint | Billed Cost |
+| GCP Service | Always Free Tier Limit | FERROSTATS Footprint | Estimated Cost |
 |---|---|---|:---:|
 | **Google BigQuery** | 10 GB storage + 1 TB query scan / mo | < 50 MB storage + < 25 MB scan / mo (pre-aggregated Gold tables) | **$0.00 USD** |
 | **Google Dataform** | Free SQLX repositories & workspaces | 1 repository (`ferrostats-pipeline`) | **$0.00 USD** |
 | **Google Looker Studio** | Free BI reporting & native connector | 3-page dashboard connected to `ferrostats_gold` | **$0.00 USD** |
 | **Google Cloud Run** | 2M requests + 360,000 vCPU-sec / mo | ~15,000 req/mo (`--min-instances 0`, `<3 s` cold start) | **$0.00 USD** |
-| **Google Artifact Registry** | 0.5 GB container storage / mo | Kept `< 0.3 GB` via automated image digest pruning in `deploy_gcp.ps1` | **$0.00 USD** |
+| **Google Artifact Registry** | 0.5 GB container storage / mo | Kept `< 0.3 GB` via automated image digest pruning in `deploy_gcp.ps1` | **<$0.10 USD** |
 | **Cloud SQL & VPC Connectors** | *Prohibited (Fixed hourly billing)* | Replaced by edge SQLite WAL + IAM metadata REST streaming | **$0.00 USD** |
+| **Total Monthly Platform Cost** | **Always Free Tier + Minimal Registry Overhead** | **End-to-end Lakehouse + BI + Edge Producer** | **<$1/mo** |
 
 ### 4.3 Key Architectural Decisions & Engineering Trade-offs (ADR)
 
@@ -183,7 +184,7 @@ By replacing persistent Cloud SQL instances (~$25/mo) and Serverless VPC Connect
 | **ADR-02: Virtual Views in Silver vs. Materialized Tables in Gold** | Materializing every intermediate layer duplicates storage and adds latency; querying raw views directly from BI scans excessive bytes per dashboard load. | Configure Silver (`stg_*`) as virtual **Views** (`0 MB` extra storage, always up-to-date) and Gold (`fct_*`, `mart_*`, `dim_*`) as **Materialized Tables** (`<25 MB/mo` scanned by Looker Studio). | Optimal balance between zero intermediate storage bloat and sub-second BI query responsiveness. |
 | **ADR-03: Explicit `ROWS` Framing in 80/20 Pareto Window SQL** | In BigQuery Standard SQL, `SUM(rev) OVER(ORDER BY rev DESC)` defaults to `RANGE`, which merges SKUs with tied revenue into a single jump and distorts ABC cutoffs. | Enforce `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` with a deterministic tie-breaker (`ORDER BY revenue_30d_usd DESC, units_sold_30d DESC, product_id ASC`). | Guarantees a strictly monotonic row-by-row cumulative revenue curve across all 30 SKUs. |
 | **ADR-04: Historical Cost Snapshot (`unit_cost_snapshot_usd`)** | Computing historical profit by joining `sale_items` against `products.unit_cost_usd` corrupts past COGS whenever a supplier updates prices (SCD Type 1 overwrite). | Freeze `unit_cost_snapshot_usd` and `unit_price_usd` on each `raw_sale_items` row at checkout time, computing `item_cogs_usd` in Silver from the immutable snapshot. | Preserves 100% accounting accuracy for historical Gross Margin (`30.48%` baseline) regardless of future catalog cost changes. |
-| **ADR-05: Edge SQLite WAL (`BEGIN IMMEDIATE`) + Metadata OAuth Streaming** | Cloud SQL (`~$25/mo`) + Serverless VPC Connector (`~$15/mo`) incur `~$40/mo` in fixed idle costs; standard SQLite `DEFERRED` locks cause `SQLITE_BUSY` deadlocks under concurrency. | Combine in-container SQLite `WAL` (`BEGIN IMMEDIATE` serialization + deterministic startup seed) with asynchronous REST streaming (`bigquery_sync.py`) using GCP Metadata Server OAuth2 tokens. | Achieves `<50 ms` ACID commits at `$0.00/mo`. For multi-branch commercial scale, the OLTP layer can evolve to Cloud SQL / AlloyDB + Datastream without changing Silver/Gold SQLX models. |
+| **ADR-05: Edge SQLite WAL (`BEGIN IMMEDIATE`) + Metadata OAuth Streaming** | Cloud SQL (`~$25/mo`) + Serverless VPC Connector (`~$15/mo`) incur `~$40/mo` in fixed idle costs; standard SQLite `DEFERRED` locks cause `SQLITE_BUSY` deadlocks under concurrency. | Combine in-container SQLite `WAL` (`BEGIN IMMEDIATE` serialization + deterministic startup seed) with asynchronous REST streaming (`bigquery_sync.py`) using GCP Metadata Server OAuth2 tokens. | Achieves `<50 ms` ACID commits at `<$1/mo`. For multi-branch commercial scale, the OLTP layer can evolve to Cloud SQL / AlloyDB + Datastream without changing Silver/Gold SQLX models. |
 
 ---
 
@@ -246,7 +247,7 @@ ferrostats/
 │   ├── api/                       # FastAPI Ingestion & Observability Endpoints
 │   └── static/                    # SDD Synthetic Event Producer UI (POS & Warehouse Simulator)
 ├── finops/
-│   └── gcp_free_tier_policy.json  # Machine-readable $0.00/mo FinOps guardrails
+│   └── gcp_free_tier_policy.json  # Machine-readable <$1/mo FinOps guardrails
 ├── specs/                         # Formal Spec-Driven Development (SDD) Architectural Blueprints (01–07)
 └── deploy_gcp.ps1                 # Scale-to-zero Cloud Run deployment & Artifact Registry pruning
 ```
